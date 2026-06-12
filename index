@@ -507,6 +507,27 @@ function tick(){
 }
 setInterval(tick,1000); tick();
 
+/* ═══════════════════ CONFIGURAÇÃO BITRIX24 ═══════════════════
+   A ata é registrada como DEAL no funil 67 (fiorella.bitrix24.com.br).
+   Preencha o webhook para ativar. Deixe webhook = '' para usar só o PDF local.
+
+   webhook .............. URL do webhook de entrada (ex.: 'https://fiorella.bitrix24.com.br/rest/1/CHAVE/')
+   categoryId ........... ID do funil de Deals onde a ata será criada (67)
+   stageId .............. estágio inicial do Deal ('' = primeiro estágio do funil; ex.: 'C67:NEW')
+   campoArquivo ......... código do campo personalizado de arquivo do Deal p/ anexar o PDF
+                          (ex.: 'UF_CRM_1718000000000'). '' = não anexa, o resumo vai em COMMENTS
+   criarTarefas ......... true = cada chamado do item 7 vira uma tarefa (tasks.task.add)
+   responsavelTarefas ... ID do usuário responsável pelas tarefas criadas
+*/
+const BITRIX = {
+  webhook: '',
+  categoryId: 67,
+  stageId: '',
+  campoArquivo: '',
+  criarTarefas: true,
+  responsavelTarefas: 1
+};
+
 /* ═══════════════════ ESTADO ═══════════════════ */
 const LS_KEY = 'ata_fiorella_rascunho';
 let contador = 0;
@@ -768,7 +789,7 @@ function limparTudo(){
 }
 
 /* ═══════════════════ GERAÇÃO DA ATA FINAL (PDF) ═══════════════════ */
-function gerarAtaPDF(){
+async function gerarAtaPDF(){
   const d = coletarTudo();
   if(!d.dataReuniao || !d.vendedorNome){
     alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
@@ -921,13 +942,101 @@ function gerarAtaPDF(){
     doc.text('Página ' + p + ' de ' + total, W-14, 292, {align:'right'});
   }
 
-  doc.save('ATA_FIORELLA_' + dataFmt.replace(/\//g,'-') + '_' + (d.vendedorNome||'').split(' ')[0].toUpperCase() + '.pdf');
+  const nomeArquivo = 'ATA_FIORELLA_' + dataFmt.replace(/\//g,'-') + '_' + (d.vendedorNome||'').split(' ')[0].toUpperCase() + '.pdf';
+  const pdfBase64 = doc.output('datauristring').split(',')[1];
+  doc.save(nomeArquivo);
 
-  // ── Limpar formulário após a geração da ata ──
-  const av = document.getElementById('avisoSalvo');
-  av.textContent = 'Ata gerada — limpando formulário...';
-  av.classList.add('mostrar');
+  // ── Registro no Bitrix24 (se configurado) ──
+  if(BITRIX.webhook){
+    toast('Registrando ata no Bitrix24...');
+    try{
+      await registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt);
+      toast('Ata registrada no Bitrix24 — limpando formulário...');
+    }catch(err){
+      alert('O PDF foi gerado, mas houve erro ao registrar no Bitrix24:\n\n' + err.message +
+            '\n\nO formulário NÃO foi limpo para que você possa tentar novamente.');
+      return; // mantém os dados preenchidos
+    }
+  } else {
+    toast('Ata gerada — limpando formulário...');
+  }
+
   setTimeout(function(){ location.reload(); }, 1800);
+}
+
+/* ═══════════════════ TOAST ═══════════════════ */
+function toast(msg){
+  const av = document.getElementById('avisoSalvo');
+  av.textContent = msg;
+  av.classList.add('mostrar');
+}
+
+/* ═══════════════════ REGISTRO NO BITRIX24 ═══════════════════ */
+async function chamarBitrix(metodo, payload){
+  const resp = await fetch(BITRIX.webhook.replace(/\/+$/,'') + '/' + metodo + '.json', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const json = await resp.json();
+  if(json.error) throw new Error(json.error_description || json.error);
+  return json.result;
+}
+
+function montarResumoAta(d, dataFmt){
+  const L = [];
+  L.push('ATA DE REUNIÃO SEMANAL — FIORELLA');
+  L.push('Data: ' + dataFmt + ' | Vendedor: ' + d.vendedorNome + (d.vendedorCodigo? ' (cód. '+d.vendedorCodigo+')':'') + ' | Condutor: ' + (d.condutor||'—'));
+  L.push('');
+  function bloco(titulo, lista){
+    L.push('— ' + titulo + ' —');
+    if(!lista.length){ L.push('Sem registros.'); }
+    else lista.forEach(r=>L.push('• ' + (r.cnpj||'s/ CNPJ') + ' | ' + (r.cliente||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—')));
+    L.push('');
+  }
+  bloco('1. CLIENTES EM RISCO', d.risco);
+  bloco('2. CLIENTES PERDIDOS', d.perdidos);
+  if(d.obsPerdidos.trim()){ L.push('Obs. gerais (perdidos): ' + d.obsPerdidos); L.push(''); }
+  bloco('3. CLIENTES SEM CONTATO', d.semContato);
+  if(d.obsSemContato.trim()){ L.push('Obs. gerais (sem contato): ' + d.obsSemContato); L.push(''); }
+  bloco('4. OPORTUNIDADES RELEVANTES', d.oportunidades);
+  L.push('— 5. AÇÕES DA SEMANA ANTERIOR —');
+  L.push(d.obsAcoes.trim() || 'Sem observações.'); L.push('');
+  L.push('— 6. UTILIZAÇÃO DO CRM —');
+  L.push(d.obsCRM.trim() || 'Sem observações.'); L.push('');
+  bloco('7. CHAMADOS / NECESSIDADES DE APOIO', d.chamados);
+  return L.join('\n');
+}
+
+async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt){
+  const resumo = montarResumoAta(d, dataFmt);
+
+  // 1) Deal no funil configurado, com resumo em COMMENTS e PDF anexado
+  const fields = {
+    TITLE: 'ATA REUNIÃO ' + dataFmt + ' — ' + d.vendedorNome.toUpperCase(),
+    CATEGORY_ID: BITRIX.categoryId,
+    COMMENTS: resumo.replace(/\n/g,'<br>'),
+    OPENED: 'Y'
+  };
+  if(BITRIX.stageId) fields.STAGE_ID = BITRIX.stageId;
+  if(BITRIX.campoArquivo){
+    fields[BITRIX.campoArquivo] = { fileData: [nomeArquivo, pdfBase64] };
+  }
+  await chamarBitrix('crm.deal.add', { fields: fields });
+
+  // 2) Cada chamado do item 7 vira uma tarefa
+  if(BITRIX.criarTarefas && d.chamados.length){
+    for(const ch of d.chamados){
+      await chamarBitrix('tasks.task.add', { fields: {
+        TITLE: 'CHAMADO — ' + (ch.tipoApoio||'Apoio comercial') + ' — ' + (ch.cliente||ch.cnpj||'cliente'),
+        DESCRIPTION: 'Origem: Ata de reunião semanal ' + dataFmt + ' — Vendedor: ' + d.vendedorNome +
+                     '\nCNPJ: ' + (ch.cnpj||'—') + '\nCliente: ' + (ch.cliente||'—') +
+                     '\nTipo de apoio: ' + (ch.tipoApoio||'—') +
+                     '\n\n' + (ch.texto||''),
+        RESPONSIBLE_ID: BITRIX.responsavelTarefas
+      }});
+    }
+  }
 }
 
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
