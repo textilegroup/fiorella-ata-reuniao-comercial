@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIORELLA — Ata de Reunião Semanal Comercial</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --preto:#111111;
+  --vermelho:#C8102E;
+  --vermelho-escuro:#9B0C23;
+  --cinza-fundo:#F2F2F4;
+  --cinza-borda:#D9D9DE;
+  --cinza-texto:#55555E;
+  --branco:#FFFFFF;
+  --verde:#1E7A3C;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
+body{background:var(--cinza-fundo);color:var(--preto);padding-bottom:30px;}
+
+/* ───── CABEÇALHO ───── */
+.header{
+  background:var(--preto);
+  color:var(--branco);
+  padding:12px 18px 10px;
+  border-bottom:3px solid var(--vermelho);
+}
+.header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
+.header h1{font-size:20px;letter-spacing:3px;font-weight:800;}
+.header h1 span{color:var(--vermelho);}
+.header .subtitulo{font-size:10px;letter-spacing:1.5px;color:#BBBBC2;text-transform:uppercase;margin-top:2px;}
+.relogio{text-align:right;font-size:11px;color:#DDDDE2;}
+.relogio .hora{font-size:16px;font-weight:700;color:var(--branco);font-variant-numeric:tabular-nums;}
+
+.container{max-width:1000px;margin:12px auto;padding:0 10px;}
+
+/* ───── CARTÕES / SEÇÕES ───── */
+.card{
+  background:var(--branco);
+  border:1px solid var(--cinza-borda);
+  border-radius:6px;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+.card-titulo{
+  background:var(--preto);
+  color:var(--branco);
+  padding:7px 12px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.card-titulo .num{
+  background:var(--vermelho);
+  min-width:21px;height:21px;
+  border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;margin-right:8px;flex:none;
+}
+.card-titulo .tag{
+  font-size:10px;background:var(--vermelho);padding:3px 8px;border-radius:3px;letter-spacing:1px;flex:none;
+}
+.card-corpo{padding:10px 12px;}
+.guia{
+  background:#FAFAFB;border-left:4px solid var(--vermelho);
+  padding:7px 10px;border-radius:0 4px 4px 0;margin-bottom:10px;
+  font-size:12px;color:var(--cinza-texto);line-height:1.45;
+}
+.guia strong{color:var(--preto);}
+.guia ul{margin:3px 0 0 16px;}
+.guia li{margin:1px 0;}
+
+/* ───── CAMPOS ───── */
+label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--cinza-texto);margin:0 0 3px;}
+input[type=text],input[type=date],textarea,select{
+  width:100%;padding:6px 9px;border:1px solid var(--cinza-borda);border-radius:5px;
+  font-size:13px;background:var(--branco);color:var(--preto);
+}
+textarea{min-height:50px;resize:vertical;line-height:1.4;}
+input:focus,textarea:focus{outline:none;border-color:var(--vermelho);box-shadow:0 0 0 2px rgba(200,16,46,.12);}
+.linha{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.col{flex:1;min-width:160px;}
+.col-fixa{flex:0 0 190px;min-width:150px;}
+
+/* ───── BOTÕES ───── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 13px;border:none;border-radius:5px;cursor:pointer;
+  font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  transition:filter .15s;
+}
+.btn:hover{filter:brightness(1.12);}
+.btn-vermelho{background:var(--vermelho);color:var(--branco);}
+.btn-preto{background:var(--preto);color:var(--branco);}
+.btn-claro{background:#E8E8EC;color:var(--preto);}
+.btn-remover{background:transparent;color:var(--vermelho);border:1px solid var(--vermelho);padding:6px 12px;font-size:11px;}
+.btn-grande{width:100%;justify-content:center;padding:11px;font-size:13px;}
+
+/* ───── SUBCARTÕES (registros por cliente) ───── */
+.registro{
+  border:1px solid var(--cinza-borda);border-radius:6px;
+  padding:9px 10px;margin-bottom:8px;background:#FCFCFD;position:relative;
+}
+.registro-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.registro-topo .rotulo{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--vermelho);text-transform:uppercase;}
+
+/* ───── ARQUIVOS ───── */
+.docs-area{margin-top:8px;}
+.docs-hint{font-size:11px;color:var(--cinza-texto);margin-top:5px;font-style:italic;}
+input[type=file]{font-size:12px;}
+.lista-arquivos{list-style:none;margin-top:8px;}
+.lista-arquivos li{
+  font-size:12px;background:#EFEFF3;border-radius:4px;padding:5px 10px;margin:4px 0;
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.lista-arquivos li button{background:none;border:none;color:var(--vermelho);cursor:pointer;font-weight:700;}
+
+/* ───── CHECKLIST CRM ───── */
+.check-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed var(--cinza-borda);font-size:13px;}
+.check-item:last-of-type{border-bottom:none;}
+.check-item input{width:18px;height:18px;accent-color:var(--vermelho);flex:none;}
+
+/* ───── SEÇÕES RECOLHÍVEIS ───── */
+.recolhivel .card-corpo{display:none;}
+.recolhivel.aberto .card-corpo{display:block;}
+.btn-toggle{
+  background:transparent;border:1px solid var(--branco);color:var(--branco);
+  padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;letter-spacing:1px;flex:none;
+}
+.texto-orientativo{font-size:12.5px;line-height:1.5;color:#333;}
+.texto-orientativo h4{margin:10px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--vermelho);}
+.texto-orientativo h4:first-child{margin-top:0;}
+.texto-orientativo ul{margin:4px 0 8px 20px;}
+.texto-orientativo .destaque{background:#FFF3F4;border-left:3px solid var(--vermelho);padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;}
+
+/* ───── IMPORTAÇÃO EXCEL ───── */
+.zona-import{
+  border:2px dashed var(--cinza-borda);border-radius:6px;padding:10px;text-align:center;
+  margin-bottom:10px;background:#FBFBFC;
+}
+.zona-import p{font-size:12px;color:var(--cinza-texto);margin-bottom:6px;}
+.badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
+
+/* ───── RODAPÉ DE AÇÕES ───── */
+.acoes-finais{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.acoes-finais .btn{flex:1;min-width:220px;}
+.aviso-salvo{
+  position:fixed;bottom:18px;right:18px;background:var(--preto);color:#fff;
+  padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;
+  border-left:4px solid var(--vermelho);
+}
+.aviso-salvo.mostrar{opacity:1;}
+
+@media(max-width:640px){
+  .header-inner{flex-direction:column;align-items:flex-start;}
+  .relogio{text-align:left;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ CABEÇALHO ═══════════ -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>FIORELLA<span>.</span></h1>
+      <div class="subtitulo">Ata de Reunião Semanal — Vendedores</div>
+    </div>
+    <div class="relogio">
+      <div class="hora" id="relogioHora">--:--:--</div>
+      <div id="relogioData">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════ DADOS DA REUNIÃO ═══════════ -->
+<div class="card recolhivel aberto" id="sec0">
+  <div class="card-titulo"><span><span class="num">✓</span>DADOS DA REUNIÃO</span>
+    <button type="button" class="btn-toggle" onclick="toggleSecao('sec0',this)">RECOLHER</button></div>
+  <div class="card-corpo">
+    <div class="linha">
+      <div class="col-fixa">
+        <label>Data da reunião</label>
+        <input type="date" id="dataReuniao" onclick="this.showPicker && this.showPicker()">
+      </div>
+      <div class="col">
+        <label>Vendedor</label>
+        <input type="text" id="vendedorNome" placeholder="Nome do vendedor">
+      </div>
+      <div class="col-fixa">
+        <label>Código do vendedor</label>
+        <input type="text" id="vendedorCodigo" placeholder="Ex.: 2000">
+      </div>
+    </div>
+    <div class="linha" style="margin-bottom:0">
+      <div class="col">
+        <label>Condutor da reunião</label>
+        <input type="text" id="condutor" placeholder="Responsável pela condução">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 1. CLIENTES EM RISCO ═══════════ -->
+<div class="card recolhivel aberto" id="sec1">
+  <div class="card-titulo">
+    <span><span class="num">1</span>CLIENTES EM RISCO DE PERDA</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">REGISTRAR POR CNPJ</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Principal tema da reunião.</strong> Identificação de acordo com a experiência do vendedor.
+      <ul>
+        <li>Qual cliente está comprando menos ou sem compra? <em>(Após a pergunta, o ideal é apresentar os dados, caso o vendedor não os tenha ou hesite em responder.)</em></li>
+        <li>Cliente mudou o padrão de compra?</li>
+        <li>Está sendo visitado ou contactado pela concorrência?</li>
+      </ul>
+    </div>
+    <div id="listaRisco"></div>
+    <button type="button" class="btn btn-vermelho" onclick="addRegistroCNPJ('listaRisco','risco')">+ Adicionar cliente (CNPJ)</button>
+  </div>
+</div>
+
+<!-- ═══════════ 2. CLIENTES PERDIDOS ═══════════ -->
+<div class="card recolhivel aberto" id="sec2">
+  <div class="card-titulo">
+    <span><span class="num">2</span>CLIENTES PERDIDOS</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">LANÇAR RELATÓRIO</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec2',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Não para discutir o passado, mas para gerar ação.</strong>
+      <ul>
+        <li>O motivo foi preço?</li>
+        <li>Atendimento?</li>
+        <li>Produto?</li>
+        <li>Prazo?</li>
+        <li>Existe plano de recuperação?</li>
+      </ul>
+    </div>
+
+    <div class="zona-import">
+      <p><strong>Lance o relatório em Excel de clientes perdidos.</strong><br>
+      Serão abertos campos de texto e justificativa para cada CNPJ encontrado.</p>
+      <input type="file" id="excelPerdidos" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaPerdidos','perdido','statusImport')">
+      <div id="statusImport"></div>
+    </div>
+
+    <div id="listaPerdidos"></div>
+    <button type="button" class="btn btn-claro" onclick="addRegistroCNPJ('listaPerdidos','perdido')">+ Adicionar cliente manualmente</button>
+
+    <div style="margin-top:10px">
+      <label>Observações gerais — clientes perdidos</label>
+      <textarea id="obsPerdidos" placeholder="Observações gerais sobre o tema..."></textarea>
+      <div class="docs-area">
+        <label>Documento principal — diagnóstico de clientes</label>
+        <input type="file" multiple onchange="anexar(this,'docsPerdidos')">
+        <div class="docs-hint">Insira aqui o relatório que evidenciou esse problema.</div>
+        <ul class="lista-arquivos" id="docsPerdidos"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 3. CLIENTES SEM CONTATO ═══════════ -->
+<div class="card recolhivel aberto" id="sec3">
+  <div class="card-titulo">
+    <span><span class="num">3</span>CLIENTES SEM CONTATO</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">LANÇAR RELATÓRIO</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec3',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Principalmente clientes relevantes.</strong>
+      <ul>
+        <li>Há quanto tempo não recebe visita?</li>
+        <li>Há quanto tempo não recebe ligação?</li>
+        <li>Há quanto tempo não recebe proposta?</li>
+      </ul>
+      Obs.: Após a pergunta, o ideal é apresentar os dados, caso o vendedor não os tenha ou hesite em responder.
+    </div>
+    <div class="zona-import">
+      <p><strong>Lance o relatório em Excel de clientes sem contato.</strong><br>
+      Serão abertos campos de texto para cada CNPJ encontrado.</p>
+      <input type="file" id="excelSemContato" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaSemContato','semcontato','statusImportSC')">
+      <div id="statusImportSC"></div>
+    </div>
+
+    <div id="listaSemContato"></div>
+    <button type="button" class="btn btn-claro" onclick="addRegistroCNPJ('listaSemContato','semcontato')">+ Adicionar cliente manualmente</button>
+
+    <div style="margin-top:10px">
+      <label>Observações gerais</label>
+      <textarea id="obsSemContato" placeholder="Registre aqui observações gerais sobre clientes sem contato..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 4. OPORTUNIDADES RELEVANTES ═══════════ -->
+<div class="card recolhivel aberto" id="sec4">
+  <div class="card-titulo">
+    <span><span class="num">4</span>OPORTUNIDADES RELEVANTES</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">REGISTRAR POR CNPJ</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Projetos que possam gerar crescimento.</strong>
+      <ul>
+        <li>O que está em desenvolvimento?</li>
+        <li>O que está parado?</li>
+        <li>O que precisa de apoio?</li>
+      </ul>
+    </div>
+    <div id="listaOportunidades"></div>
+    <button type="button" class="btn btn-vermelho" onclick="addRegistroCNPJ('listaOportunidades','oportunidade')">+ Adicionar oportunidade (CNPJ)</button>
+  </div>
+</div>
+
+<!-- ═══════════ 5. AÇÕES DA SEMANA ANTERIOR ═══════════ -->
+<div class="card recolhivel aberto" id="sec5">
+  <div class="card-titulo">
+    <span><span class="num">5</span>AÇÕES DA SEMANA ANTERIOR</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">REGISTRAR</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Talvez o item mais importante.</strong>
+      <ul>
+        <li>O que foi combinado?</li>
+        <li>Foi executado?</li>
+        <li>Qual resultado gerou?</li>
+      </ul>
+    </div>
+    <label>Observações gerais</label>
+    <textarea id="obsAcoes" placeholder="O que foi combinado, o que foi executado e qual resultado gerou..."></textarea>
+  </div>
+</div>
+
+<!-- ═══════════ 6. UTILIZAÇÃO DO CRM ═══════════ -->
+<div class="card recolhivel aberto" id="sec6">
+  <div class="card-titulo"><span><span class="num">6</span>UTILIZAÇÃO DO CRM</span>
+    <button type="button" class="btn-toggle" onclick="toggleSecao('sec6',this)">RECOLHER</button></div>
+  <div class="card-corpo">
+    <div class="guia"><strong>Verificar:</strong>
+      <ul>
+        <li>Negócios sem atualização</li>
+        <li>Atividades vencidas</li>
+        <li>Contatos não registrados</li>
+        <li>Oportunidades abandonadas</li>
+      </ul>
+    </div>
+    <div style="margin-top:8px">
+      <label>Observações sobre o CRM</label>
+      <textarea id="obsCRM" placeholder="Pendências e correções acordadas no CRM..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 7. NECESSIDADES DE APOIO ═══════════ -->
+<div class="card recolhivel aberto" id="sec7">
+  <div class="card-titulo">
+    <span><span class="num">7</span>NECESSIDADES DE APOIO</span>
+    <span style="display:flex;gap:8px;align-items:center;flex:none">
+      <span class="tag">ABRIR CHAMADO</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec7',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="guia">
+      <strong>Quando realmente houver necessidade.</strong> Exemplos:
+      <ul>
+        <li>Visita conjunta</li>
+        <li>Aprovação comercial</li>
+        <li>Questão estratégica</li>
+        <li>Recuperação de cliente</li>
+      </ul>
+      <em>Integração com chamados no Bitrix24 a ser definida — por enquanto, os chamados ficam registrados na ata.</em>
+    </div>
+    <div id="listaChamados"></div>
+    <button type="button" class="btn btn-preto" onclick="addChamado()">+ ADICIONAR CHAMADO</button>
+  </div>
+</div>
+
+<!-- ═══════════ 8. TEMAS QUE DEVEM SER EVITADOS (RECOLHÍVEL) ═══════════ -->
+<div class="card recolhivel" id="secEvitados">
+  <div class="card-titulo">
+    <span><span class="num">8</span>TEMAS QUE DEVEM SER EVITADOS</span>
+    <button type="button" class="btn-toggle" onclick="toggleSecao('secEvitados',this)">EXIBIR</button>
+  </div>
+  <div class="card-corpo">
+    <div class="texto-orientativo">
+      <h4>a) Reclamações genéricas de mercado</h4>
+      Exemplos:
+      <ul>
+        <li>"O mercado está ruim."</li>
+        <li>"Todo mundo está parado."</li>
+        <li>"A concorrência está vendendo barato."</li>
+      </ul>
+      <div class="destaque">Se surgir, a pergunta deve ser: <strong>qual cliente especificamente foi impactado e qual ação será tomada?</strong></div>
+
+      <h4>b) Problemas operacionais de rotina</h4>
+      Exemplos:
+      <ul>
+        <li>Nota fiscal</li>
+        <li>Transportadora</li>
+        <li>Cadastro</li>
+        <li>Ajustes administrativos</li>
+      </ul>
+      Esses assuntos devem entrar em fluxo próprio.
+
+      <h4>c) Conversas sobre clientes sem relevância comercial</h4>
+      Evitar gastar 20 minutos discutindo um cliente que compra R$ 500 por mês quando existe um cliente de R$ 50 mil reduzindo compras.
+
+      <h4>d) Discussões técnicas profundas</h4>
+      A reunião comercial não deve virar reunião de desenvolvimento de produto. Registrar a necessidade e encaminhar.
+
+      <h4>e) Comparação entre vendedores</h4>
+      Evitar:
+      <ul>
+        <li>"Fulano vende mais."</li>
+        <li>"A carteira dele é melhor."</li>
+      </ul>
+      A comparação deve ser contra:
+      <ul>
+        <li>histórico do próprio vendedor;</li>
+        <li>potencial da carteira;</li>
+        <li>metas definidas.</li>
+      </ul>
+
+      <h4>f) Justificativas sem plano de ação</h4>
+      Sempre que surgir uma justificativa — "o cliente não respondeu" —
+      <div class="destaque">a próxima pergunta deve ser: <strong>qual será a próxima tentativa e quando?</strong></div>
+
+      <h4>g) Revisão detalhada de todos os clientes</h4>
+      Erro comum. Uma carteira pode ter centenas de clientes. A reunião deve focar apenas em:
+      <ul>
+        <li>clientes em risco;</li>
+        <li>clientes perdidos;</li>
+        <li>clientes estratégicos;</li>
+        <li>oportunidades relevantes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 9. REGRA PRÁTICA (RECOLHÍVEL) ═══════════ -->
+<div class="card recolhivel" id="secRegra">
+  <div class="card-titulo">
+    <span><span class="num">9</span>REGRA PRÁTICA</span>
+    <button type="button" class="btn-toggle" onclick="toggleSecao('secRegra',this)">EXIBIR</button>
+  </div>
+  <div class="card-corpo">
+    <div class="texto-orientativo">
+      Se a reunião tivesse que ser resumida em três perguntas, seriam:
+      <ul>
+        <li><strong>a)</strong> Quem estamos correndo risco de perder?</li>
+        <li><strong>b)</strong> Quem podemos recuperar?</li>
+        <li><strong>c)</strong> Quais ações concretas serão executadas até a próxima reunião?</li>
+      </ul>
+      <div class="destaque">Se a reunião responder essas três perguntas toda semana, ela provavelmente estará atacando os pontos que mais impactam o faturamento da Fiorella.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ AÇÕES FINAIS ═══════════ -->
+<div class="acoes-finais">
+  <button type="button" class="btn btn-vermelho btn-grande" onclick="gerarAtaPDF()">GERAR ATA FINAL (PDF)</button>
+  <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR FORMULÁRIO</button>
+</div>
+
+</div><!-- /container -->
+
+<div class="aviso-salvo" id="avisoSalvo">Rascunho salvo automaticamente</div>
+
+<script>
+/* ═══════════════════ RELÓGIO DINÂMICO ═══════════════════ */
+function tick(){
+  const ag = new Date();
+  document.getElementById('relogioHora').textContent =
+    ag.toLocaleTimeString('pt-BR');
+  document.getElementById('relogioData').textContent =
+    ag.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+}
+setInterval(tick,1000); tick();
+
+/* ═══════════════════ ESTADO ═══════════════════ */
+const LS_KEY = 'ata_fiorella_rascunho';
+let contador = 0;
+const arquivos = {}; // {containerId: [{nome, tipo, base64}]}
+const LIMITE_ARQ = 5 * 1024 * 1024; // 5MB
+
+/* ═══════════════════ REGISTROS POR CNPJ ═══════════════════ */
+const ROTULOS = {
+  risco:'Cliente em risco',
+  perdido:'Cliente perdido',
+  semcontato:'Cliente sem contato',
+  oportunidade:'Oportunidade'
+};
+const PLACEHOLDERS = {
+  risco:'Situação do cliente, mudança de padrão de compra, presença da concorrência e ação definida...',
+  perdido:'Motivo da perda (preço, atendimento, produto, prazo) e plano de recuperação...',
+  semcontato:'Há quanto tempo sem visita, ligação e proposta — e qual ação foi definida...',
+  oportunidade:'O que está em desenvolvimento, o que está parado e que apoio é necessário...'
+};
+
+function addRegistroCNPJ(containerId, tipo, dados){
+  dados = dados || {};
+  contador++;
+  const id = 'reg_' + contador;
+  const docsId = 'docs_' + id;
+  const div = document.createElement('div');
+  div.className = 'registro';
+  div.id = id;
+  div.dataset.tipo = tipo;
+  div.innerHTML = `
+    <div class="registro-topo">
+      <span class="rotulo">${ROTULOS[tipo]}</span>
+      <button type="button" class="btn btn-remover" onclick="removerRegistro('${id}')">Remover</button>
+    </div>
+    <div class="linha">
+      <div class="col-fixa">
+        <label>CNPJ</label>
+        <input type="text" class="campo-cnpj" placeholder="00.000.000/0000-00" value="${esc(dados.cnpj||'')}" oninput="mascaraCNPJ(this); salvarDebounce()">
+      </div>
+      <div class="col">
+        <label>Cliente</label>
+        <input type="text" class="campo-cliente" placeholder="Razão social / nome do cliente" value="${esc(dados.cliente||'')}" oninput="salvarDebounce()">
+      </div>
+    </div>
+    <label>${tipo==='perdido' ? 'Justificativa' : 'Registro'}</label>
+    <textarea class="campo-texto" placeholder="${PLACEHOLDERS[tipo]}" oninput="salvarDebounce()">${esc(dados.texto||'')}</textarea>
+    ${tipo==='risco' ? `<div class="docs-area">
+      <label>Documentos</label>
+      <input type="file" multiple onchange="anexar(this,'${docsId}')">
+      <ul class="lista-arquivos" id="${docsId}"></ul>
+    </div>` : ''}`;
+  document.getElementById(containerId).appendChild(div);
+  salvarDebounce();
+  return div;
+}
+
+function removerRegistro(id){
+  const el = document.getElementById(id);
+  if(el && confirm('Remover este registro?')){
+    delete arquivos['docs_' + id];
+    el.remove();
+    salvarDebounce();
+  }
+}
+
+/* ═══════════════════ CHAMADOS (ITEM 7) ═══════════════════ */
+function addChamado(dados){
+  dados = dados || {};
+  contador++;
+  const id = 'cham_' + contador;
+  const div = document.createElement('div');
+  div.className = 'registro';
+  div.id = id;
+  div.innerHTML = `
+    <div class="registro-topo">
+      <span class="rotulo">Chamado</span>
+      <button type="button" class="btn btn-remover" onclick="removerRegistro('${id}')">Remover</button>
+    </div>
+    <div class="linha">
+      <div class="col-fixa">
+        <label>CNPJ</label>
+        <input type="text" class="campo-cnpj" placeholder="00.000.000/0000-00" value="${esc(dados.cnpj||'')}" oninput="mascaraCNPJ(this); salvarDebounce()">
+      </div>
+      <div class="col">
+        <label>Cliente</label>
+        <input type="text" class="campo-cliente" placeholder="Razão social / nome do cliente" value="${esc(dados.cliente||'')}" oninput="salvarDebounce()">
+      </div>
+      <div class="col-fixa">
+        <label>Tipo de apoio</label>
+        <select class="campo-tipo" onchange="salvarDebounce()">
+          <option value="">Selecione...</option>
+          <option ${dados.tipoApoio==='Visita comercial'?'selected':''}>Visita comercial</option>
+          <option ${dados.tipoApoio==='Visita técnica'?'selected':''}>Visita técnica</option>
+          <option ${dados.tipoApoio==='Aprovação comercial'?'selected':''}>Aprovação comercial</option>
+          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Operacional)'?'selected':''}>Contato telefônico (Supervisão Operacional)</option>
+          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Administrativa)'?'selected':''}>Contato telefônico (Supervisão Administrativa)</option>
+        </select>
+      </div>
+    </div>
+    <label>Descrição do chamado</label>
+    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio..." oninput="salvarDebounce()">${esc(dados.texto||'')}</textarea>`;
+  document.getElementById('listaChamados').appendChild(div);
+  salvarDebounce();
+}
+
+/* ═══════════════════ MÁSCARA CNPJ ═══════════════════ */
+function mascaraCNPJ(input){
+  let v = input.value.replace(/\D/g,'').slice(0,14);
+  v = v.replace(/^(\d{2})(\d)/,'$1.$2')
+       .replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
+       .replace(/\.(\d{3})(\d)/,'.$1/$2')
+       .replace(/(\d{4})(\d)/,'$1-$2');
+  input.value = v;
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════ IMPORTAÇÃO EXCEL — CLIENTES PERDIDOS ═══════════════════ */
+function importarExcel(input, containerId, tipo, statusId){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if(!rows.length){ alert('Planilha vazia.'); return; }
+
+      // localizar coluna de CNPJ (cabeçalho ou padrão numérico de 14 dígitos)
+      let colCNPJ = -1, colNome = -1, inicio = 0;
+      const cab = rows[0].map(c => String(c).toLowerCase());
+      cab.forEach((c,i)=>{
+        if(colCNPJ<0 && c.includes('cnpj')) colCNPJ = i;
+        if(colNome<0 && (c.includes('cliente')||c.includes('razão')||c.includes('razao')||c.includes('nome'))) colNome = i;
+      });
+      if(colCNPJ>=0 || colNome>=0) inicio = 1;
+
+      if(colCNPJ<0){
+        // detectar pela primeira linha de dados: célula com 14 dígitos
+        const teste = rows[inicio]||[];
+        teste.forEach((c,i)=>{
+          if(colCNPJ<0 && String(c).replace(/\D/g,'').length===14) colCNPJ = i;
+        });
+      }
+      if(colNome<0) colNome = colCNPJ===0 ? 1 : 0;
+
+      let importados = 0;
+      for(let r=inicio; r<rows.length; r++){
+        const linha = rows[r];
+        if(!linha || linha.every(c=>String(c).trim()==='')) continue;
+        let cnpj = colCNPJ>=0 ? String(linha[colCNPJ]||'') : '';
+        const dig = cnpj.replace(/\D/g,'');
+        if(dig.length===14){
+          cnpj = dig.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+        }
+        const nome = String(linha[colNome]||'').trim();
+        if(!cnpj && !nome) continue;
+        addRegistroCNPJ(containerId, tipo, {cnpj:cnpj, cliente:nome});
+        importados++;
+      }
+      document.getElementById(statusId).innerHTML =
+        importados>0
+          ? '<span class="badge-ok">✓ ' + importados + ' cliente(s) importado(s) — preencha o registro de cada CNPJ</span>'
+          : '<span style="color:var(--vermelho);font-size:12px">Nenhum CNPJ/cliente identificado na planilha.</span>';
+    }catch(err){
+      alert('Erro ao ler a planilha: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  input.value = '';
+}
+
+/* ═══════════════════ ANEXOS ═══════════════════ */
+function anexar(input, containerId){
+  const files = Array.from(input.files);
+  if(!arquivos[containerId]) arquivos[containerId] = [];
+  let pendentes = files.length;
+  files.forEach(f=>{
+    if(f.size > LIMITE_ARQ){
+      alert('Arquivo "' + f.name + '" excede 5MB e não foi anexado.');
+      if(--pendentes===0) renderArquivos(containerId);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e=>{
+      arquivos[containerId].push({nome:f.name, tipo:f.type, base64:e.target.result});
+      if(--pendentes===0) renderArquivos(containerId);
+      salvarDebounce();
+    };
+    reader.readAsDataURL(f);
+  });
+  input.value = '';
+}
+
+function renderArquivos(containerId){
+  const ul = document.getElementById(containerId);
+  if(!ul) return;
+  ul.innerHTML = '';
+  (arquivos[containerId]||[]).forEach((a,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = '<span>📎 ' + esc(a.nome) + '</span>' +
+      '<button type="button" onclick="removerArquivo(\'' + containerId + '\',' + i + ')">✕</button>';
+    ul.appendChild(li);
+  });
+}
+
+function removerArquivo(containerId, idx){
+  arquivos[containerId].splice(idx,1);
+  renderArquivos(containerId);
+  salvarDebounce();
+}
+
+/* ═══════════════════ RECOLHER / EXIBIR (ITENS 8 E 9) ═══════════════════ */
+function toggleSecao(id, btn){
+  const sec = document.getElementById(id);
+  sec.classList.toggle('aberto');
+  btn.textContent = sec.classList.contains('aberto') ? 'RECOLHER' : 'EXIBIR';
+}
+
+/* ═══════════════════ COLETA DE DADOS ═══════════════════ */
+function coletarRegistros(containerId){
+  return Array.from(document.getElementById(containerId).querySelectorAll('.registro')).map(div=>({
+    cnpj: (div.querySelector('.campo-cnpj')||{}).value || '',
+    cliente: (div.querySelector('.campo-cliente')||{}).value || '',
+    tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
+    texto: (div.querySelector('.campo-texto')||{}).value || '',
+    docs: (arquivos['docs_' + div.id]||[]).map(a=>a.nome)
+  }));
+}
+
+function coletarTudo(){
+  return {
+    dataReuniao: document.getElementById('dataReuniao').value,
+    vendedorNome: document.getElementById('vendedorNome').value,
+    vendedorCodigo: document.getElementById('vendedorCodigo').value,
+    condutor: document.getElementById('condutor').value,
+    risco: coletarRegistros('listaRisco'),
+    perdidos: coletarRegistros('listaPerdidos'),
+    obsPerdidos: document.getElementById('obsPerdidos').value,
+    semContato: coletarRegistros('listaSemContato'),
+    obsSemContato: document.getElementById('obsSemContato').value,
+    obsAcoes: document.getElementById('obsAcoes').value,
+    obsCRM: document.getElementById('obsCRM').value,
+    oportunidades: coletarRegistros('listaOportunidades'),
+    chamados: coletarRegistros('listaChamados'),
+    arquivos: arquivos
+  };
+}
+
+/* ═══════════════════ AUTOSAVE (localStorage) ═══════════════════ */
+function salvarDebounce(){ /* sem persistência — o formulário sempre inicia limpo */ }
+
+function limparTudo(){
+  if(!confirm('Limpar todo o formulário? Esta ação não pode ser desfeita.')) return;
+  location.reload();
+}
+
+/* ═══════════════════ GERAÇÃO DA ATA FINAL (PDF) ═══════════════════ */
+function gerarAtaPDF(){
+  const d = coletarTudo();
+  if(!d.dataReuniao || !d.vendedorNome){
+    alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const W = doc.internal.pageSize.getWidth();
+  const PRETO = [17,17,17], VERMELHO = [200,16,46], CINZA = [85,85,94];
+  let y = 0;
+
+  // ── Cabeçalho ──
+  doc.setFillColor(...PRETO); doc.rect(0,0,W,26,'F');
+  doc.setFillColor(...VERMELHO); doc.rect(0,26,W,1.6,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(17);
+  doc.text('FIORELLA', 14, 12);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('ATA DE REUNIÃO SEMANAL — VENDEDORES', 14, 19);
+  const dataFmt = d.dataReuniao.split('-').reverse().join('/');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('Data: ' + dataFmt, W-14, 12, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.text('Emitida em ' + new Date().toLocaleString('pt-BR'), W-14, 19, {align:'right'});
+  y = 34;
+
+  // ── Identificação ──
+  doc.autoTable({
+    startY: y, theme:'grid',
+    head: [['VENDEDOR','CÓDIGO','CONDUTOR']],
+    body: [[d.vendedorNome, d.vendedorCodigo||'—', d.condutor||'—']],
+    headStyles:{fillColor:PRETO, fontSize:8, halign:'left'},
+    styles:{fontSize:9, cellPadding:2.5},
+    margin:{left:14, right:14}
+  });
+  y = doc.lastAutoTable.finalY + 8;
+
+  function titulo(num, txt){
+    if(y > 265){ doc.addPage(); y = 20; }
+    doc.setFillColor(...VERMELHO); doc.rect(14, y-4.5, 6.5, 6.5, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(String(num), 17.2, y, {align:'center'});
+    doc.setTextColor(...PRETO); doc.setFontSize(11);
+    doc.text(txt, 24, y);
+    doc.setDrawColor(...VERMELHO); doc.setLineWidth(.4);
+    doc.line(14, y+2.5, W-14, y+2.5);
+    y += 8;
+  }
+
+  function tabelaRegistros(lista, comApoio, comDocs){
+    if(!lista.length){
+      doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(...CINZA);
+      doc.text('Sem registros nesta reunião.', 14, y); y += 8;
+      return;
+    }
+    let head, body;
+    if(comApoio){
+      head = [['CNPJ','CLIENTE','TIPO DE APOIO','DESCRIÇÃO']];
+      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.tipoApoio||'—', r.texto||'—']);
+    } else if(comDocs){
+      head = [['CNPJ','CLIENTE','REGISTRO','DOCUMENTOS']];
+      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.texto||'—', r.docs.length? r.docs.join('\n') : '—']);
+    } else {
+      head = [['CNPJ','CLIENTE','REGISTRO / JUSTIFICATIVA']];
+      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.texto||'—']);
+    }
+    doc.autoTable({
+      startY:y, theme:'grid', head, body,
+      headStyles:{fillColor:PRETO, fontSize:7.5},
+      styles:{fontSize:8.5, cellPadding:2, valign:'top'},
+      columnStyles:{0:{cellWidth:32}, 1:{cellWidth:42}},
+      margin:{left:14, right:14}
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
+  function blocoTexto(rotulo, texto, docs){
+    if(y > 255){ doc.addPage(); y = 20; }
+    if(rotulo){
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(...CINZA);
+      doc.text(rotulo.toUpperCase(), 14, y); y += 4.5;
+    }
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...PRETO);
+    const linhas = doc.splitTextToSize(texto && texto.trim() ? texto : 'Sem observações.', W-28);
+    linhas.forEach(l=>{
+      if(y > 280){ doc.addPage(); y = 20; }
+      doc.text(l, 14, y); y += 4.8;
+    });
+    if(docs && docs.length){
+      doc.setFont('helvetica','italic'); doc.setFontSize(8); doc.setTextColor(...CINZA);
+      const dl = doc.splitTextToSize('Documentos anexados: ' + docs.map(a=>a.nome).join('; '), W-28);
+      dl.forEach(l=>{ if(y>280){doc.addPage(); y=20;} doc.text(l, 14, y); y += 4.2; });
+    }
+    y += 5;
+  }
+
+  // ── Seções ──
+  titulo(1,'CLIENTES EM RISCO DE PERDA');
+  tabelaRegistros(d.risco, false, true);
+
+  titulo(2,'CLIENTES PERDIDOS');
+  tabelaRegistros(d.perdidos);
+  blocoTexto('Observações gerais', d.obsPerdidos, arquivos['docsPerdidos']);
+
+  titulo(3,'CLIENTES SEM CONTATO');
+  tabelaRegistros(d.semContato);
+  if(d.obsSemContato && d.obsSemContato.trim()) blocoTexto('Observações gerais', d.obsSemContato);
+
+  titulo(4,'OPORTUNIDADES RELEVANTES');
+  tabelaRegistros(d.oportunidades);
+
+  titulo(5,'AÇÕES DA SEMANA ANTERIOR');
+  blocoTexto('', d.obsAcoes);
+
+  titulo(6,'UTILIZAÇÃO DO CRM');
+  blocoTexto('', d.obsCRM);
+
+  titulo(7,'NECESSIDADES DE APOIO — CHAMADOS');
+  tabelaRegistros(d.chamados, true);
+
+  // ── Resumo / regra prática ──
+  if(y > 235){ doc.addPage(); y = 20; }
+  doc.setFillColor(250,243,244);
+  doc.setDrawColor(...VERMELHO);
+  doc.roundedRect(14, y, W-28, 26, 2, 2, 'FD');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...VERMELHO);
+  doc.text('REGRA PRÁTICA — TRÊS PERGUNTAS DA SEMANA', 18, y+6);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...PRETO);
+  doc.text('a) Quem estamos correndo risco de perder?', 18, y+12);
+  doc.text('b) Quem podemos recuperar?', 18, y+17);
+  doc.text('c) Quais ações concretas serão executadas até a próxima reunião?', 18, y+22);
+  y += 34;
+
+  // ── Assinaturas ──
+  if(y > 255){ doc.addPage(); y = 30; } else { y = Math.max(y, 250); }
+  doc.setDrawColor(...PRETO); doc.setLineWidth(.3);
+  doc.line(20, y, 95, y);
+  doc.line(115, y, 190, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...CINZA);
+  doc.text('Vendedor: ' + d.vendedorNome, 57.5, y+5, {align:'center'});
+  doc.text('Condutor: ' + (d.condutor||'____________'), 152.5, y+5, {align:'center'});
+
+  // ── Rodapé em todas as páginas ──
+  const total = doc.internal.getNumberOfPages();
+  for(let p=1; p<=total; p++){
+    doc.setPage(p);
+    doc.setFontSize(7); doc.setTextColor(...CINZA);
+    doc.text('FIORELLA — Ata de Reunião Semanal Comercial — ' + dataFmt, 14, 292);
+    doc.text('Página ' + p + ' de ' + total, W-14, 292, {align:'right'});
+  }
+
+  doc.save('ATA_FIORELLA_' + dataFmt.replace(/\//g,'-') + '_' + (d.vendedorNome||'').split(' ')[0].toUpperCase() + '.pdf');
+
+  // ── Limpar formulário após a geração da ata ──
+  const av = document.getElementById('avisoSalvo');
+  av.textContent = 'Ata gerada — limpando formulário...';
+  av.classList.add('mostrar');
+  setTimeout(function(){ location.reload(); }, 1800);
+}
+
+/* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
+window.addEventListener('load', function(){
+  // sempre iniciar limpo — remove qualquer rascunho antigo do navegador
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  document.getElementById('dataReuniao').value = new Date().toISOString().slice(0,10);
+});
+</script>
+</body>
+</html>
