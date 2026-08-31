@@ -148,6 +148,21 @@ input[type=file]{font-size:12px;}
 .zona-import code{font-family:Consolas,'Courier New',monospace;font-size:11px;background:#fff;border:1px solid rgba(200,16,46,.2);border-radius:3px;padding:1px 5px;color:var(--vermelho);white-space:nowrap;display:inline-block;margin:1px;}
 .import-acoes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .lista-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* ───── MODO EDIÇÃO ───── */
+.edicao{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  border:1px solid rgba(200,16,46,.35);border-left:4px solid var(--vermelho);
+  background:var(--vermelho-suave);border-radius:0 6px 6px 0;
+  padding:10px 13px;margin-bottom:12px;font-size:13px;
+}
+.edicao b{color:var(--vermelho);}
+.edicao small{display:block;color:var(--cinza-texto);font-size:11.5px;margin-top:2px;}
+
+/* ───── ESTADO DA ATA ───── */
+.estado{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.7px;padding:2px 8px;border-radius:10px;white-space:nowrap;text-transform:uppercase;}
+.estado.final{background:var(--verde-suave);color:var(--verde);border:1px solid rgba(30,122,60,.35);}
+.estado.prep{background:var(--vermelho-suave);color:var(--vermelho);border:1px solid rgba(200,16,46,.35);}
 .badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
 
 /* ───── DADOS DO RELATÓRIO NO REGISTRO ───── */
@@ -270,6 +285,15 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 </div>
 
 <div class="container">
+
+<!-- ═══════════ MODO EDIÇÃO ═══════════ -->
+<div class="edicao" id="barraEdicao" style="display:none">
+  <div>
+    <b>Editando a ata nº <span id="edNumero">—</span></b>
+    <small id="edInfo"></small>
+  </div>
+  <button type="button" class="btn btn-claro btn-mini" onclick="cancelarEdicao()">Cancelar edição</button>
+</div>
 
 <!-- ═══════════ PROGRESSO ═══════════ -->
 <div class="progresso">
@@ -637,9 +661,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <!-- ═══════════ AÇÕES FINAIS ═══════════ -->
 <div class="acoes-finais">
   <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF()">GERAR ATA FINAL (PDF)</button>
+  <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR PREPARAÇÃO (SEM PDF)</button>
   <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR FORMULÁRIO</button>
 </div>
-<div class="nota-banco">Ao gerar a ata, ela é <b>arquivada automaticamente</b> e fica disponível na Área ADM.</div>
+<div class="nota-banco">
+  <b>Preparação</b> guarda a ata para uma reunião futura, sem gerar PDF — depois é só reabri-la na Área ADM em <b>Editar</b>.
+  <b>Gerar ata final</b> conclui a ata e emite o PDF.
+</div>
 
 </div><!-- /container -->
 
@@ -704,8 +732,8 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <table class="tabela">
           <thead>
             <tr>
-              <th>Nº</th><th>Data</th><th>Vendedor</th><th>Cód.</th><th>Condutor</th>
-              <th>Conteúdo</th><th>Anexos</th><th>Arquivada em</th><th>Ações</th>
+              <th>Nº</th><th>Estado</th><th>Data</th><th>Vendedor</th><th>Cód.</th><th>Condutor</th>
+              <th>Conteúdo</th><th>Anexos</th><th>Registrada em</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="admLinhas"></tbody>
@@ -738,6 +766,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     <div class="modal-topo">
       <h3 id="modalTitulo">Ata</h3>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="btn btn-verde btn-mini" id="modalBtnEditar">Editar ata</button>
         <button type="button" class="btn btn-vermelho btn-mini" id="modalBtnPDF">Baixar PDF</button>
         <button type="button" class="btn btn-claro btn-mini" onclick="fecharModal()">Fechar</button>
       </div>
@@ -790,6 +819,9 @@ const LIMITE_ARQ = 5 * 1024 * 1024;
 let admSenhaAtual = '';
 let admDados = [];
 let admSecoes = [];
+let editandoId = null;
+let editandoNumero = null;
+let anexosOriginais = [];
 
 /* ═══════════════════ RELÓGIO ═══════════════════ */
 function tick(){
@@ -1035,16 +1067,16 @@ function addChamado(dados){
         <label>Tipo de apoio</label>
         <select class="campo-tipo">
           <option value="">Selecione...</option>
-          <option>Visita comercial</option>
-          <option>Visita técnica</option>
-          <option>Aprovação comercial</option>
-          <option>Contato telefônico (Supervisão Operacional)</option>
-          <option>Contato telefônico (Supervisão Administrativa)</option>
+          <option ${dados.tipoApoio==='Visita comercial'?'selected':''}>Visita comercial</option>
+          <option ${dados.tipoApoio==='Visita técnica'?'selected':''}>Visita técnica</option>
+          <option ${dados.tipoApoio==='Aprovação comercial'?'selected':''}>Aprovação comercial</option>
+          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Operacional)'?'selected':''}>Contato telefônico (Supervisão Operacional)</option>
+          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Administrativa)'?'selected':''}>Contato telefônico (Supervisão Administrativa)</option>
         </select>
       </div>
     </div>
     <label>Descrição do chamado</label>
-    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio..."></textarea>`;
+    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio...">${esc(dados.texto||'')}</textarea>`;
   document.getElementById('listaChamados').appendChild(div);
   statusDoContainer('listaChamados');
 }
@@ -1244,7 +1276,7 @@ function coletarRegistros(containerId){
       texto: (div.querySelector('.campo-texto')||{}).value || '',
       ref: ref,
       _docsKey: 'docs_' + div.id,
-      docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho}))
+      docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||''}))
     };
   });
 }
@@ -1273,7 +1305,7 @@ function coletarTudo(){
     oportunidades: regs('listaOportunidades','oportunidades'),
     chamados: regs('listaChamados','apoio'),
     docsGerais: ativo('perdidos')
-      ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, contexto:'perdidos'}))
+      ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||'', contexto:'perdidos'}))
       : []
   };
 }
@@ -1304,10 +1336,135 @@ async function enviarAnexos(ataId, d){
   });
 }
 
-async function salvarNoBanco(ataId, d){
-  const { data, error } = await sb.rpc('ata_salvar', { p_dados: d, p_id: ataId });
-  if(error) throw new Error(error.message);
-  return data;
+/* ═══════════════════ GRAVAÇÃO (nova ata ou edição) ═══════════════════ */
+async function salvarAta(finalizar){
+  const d = coletarTudo();
+  if(!d.dataReuniao || !d.vendedorNome){
+    alert('Preencha a data da reunião e o nome do vendedor.');
+    document.getElementById('sec0').classList.add('aberto');
+    return null;
+  }
+
+  const alvo = editandoId || uid();
+  toast('Enviando anexos...');
+  await enviarAnexos(alvo, d);
+  toast(editandoId ? 'Salvando alterações...' : 'Arquivando ata no banco...');
+
+  let res;
+  if(editandoId){
+    const chamada = admSenhaAtual
+      ? sb.rpc('ata_admin_atualizar', { p_senha: admSenhaAtual, p_id: editandoId, p_dados: d, p_finalizada: finalizar })
+      : sb.rpc('ata_atualizar_preparacao', { p_id: editandoId, p_dados: d, p_finalizada: finalizar });
+    const { data, error } = await chamada;
+    if(error) throw new Error(error.message);
+    res = data;
+    const remover = (data && data.arquivos_removidos) || [];
+    if(remover.length){ try{ await sb.storage.from(BUCKET_ANEXOS).remove(remover); }catch(e){} }
+  }else{
+    const { data, error } = await sb.rpc('ata_salvar', { p_dados: d, p_id: alvo, p_finalizada: finalizar });
+    if(error) throw new Error(error.message);
+    res = data;
+  }
+  return { dados: d, id: (res && res.id) || alvo, numero: res && res.numero };
+}
+
+/* ═══════════════════ MODO EDIÇÃO ═══════════════════ */
+function entrarModoEdicao(id, numero, finalizada, criadoEm){
+  editandoId = id;
+  editandoNumero = numero;
+  document.getElementById('barraEdicao').style.display = '';
+  document.getElementById('edNumero').textContent = String(numero).padStart(4,'0');
+  document.getElementById('edInfo').textContent =
+    (finalizada ? 'Ata já finalizada — salvar substitui a versão arquivada.'
+                : 'Ata preparada, ainda sem PDF final.') +
+    (criadoEm ? ' Criada em ' + dataHoraBR(criadoEm) + '.' : '');
+  document.getElementById('btnGerar').textContent = 'SALVAR E GERAR ATA FINAL (PDF)';
+  document.getElementById('btnPreparar').textContent = 'SALVAR ALTERAÇÕES (SEM PDF)';
+}
+
+function cancelarEdicao(){
+  if(!confirm('Sair da edição? As alterações não salvas serão perdidas e o formulário volta a ficar em branco.')) return;
+  location.reload();
+}
+
+function carregarAtaNoFormulario(a){
+  const d = a.dados || {};
+
+  // visibilidade: união entre a configuração atual e a vigente na ata (nada se perde)
+  TOPICOS.forEach(t=>{
+    const naAta = (d.secoesVisiveis && d.secoesVisiveis[t.slug] !== undefined) ? !!d.secoesVisiveis[t.slug] : true;
+    visibilidade[t.slug] = !!visibilidade[t.slug] || naAta;
+  });
+
+  ['listaRisco','listaPerdidos','listaSemContato','listaOportunidades','listaChamados'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.innerHTML = '';
+  });
+  ['statusImportRisco','statusImport','statusImportSC'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.innerHTML = '';
+  });
+  Object.keys(arquivos).forEach(k => delete arquivos[k]);
+
+  document.getElementById('dataReuniao').value   = a.data_reuniao || d.dataReuniao || '';
+  document.getElementById('vendedorNome').value  = a.vendedor_nome || d.vendedorNome || '';
+  document.getElementById('vendedorCodigo').value= a.vendedor_codigo || d.vendedorCodigo || '';
+  document.getElementById('condutor').value      = a.condutor || d.condutor || '';
+  document.getElementById('obsPerdidos').value   = d.obsPerdidos || '';
+  document.getElementById('obsSemContato').value = d.obsSemContato || '';
+  document.getElementById('obsAcoes').value      = d.obsAcoes || '';
+  document.getElementById('obsCRM').value        = d.obsCRM || '';
+
+  [['risco','listaRisco','risco'], ['perdidos','listaPerdidos','perdido'],
+   ['semContato','listaSemContato','semcontato'], ['oportunidades','listaOportunidades','oportunidade']]
+  .forEach(([chave, lista, tipo])=>{
+    (d[chave]||[]).forEach(r=>{
+      const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, ref:r.ref});
+      const docs = (r.docs||[]).filter(x => x && x.caminho);
+      if(docs.length){
+        const k = 'docs_' + div.id;
+        arquivos[k] = docs.map(x=>({nome:x.nome, tipo:x.tipo, tamanho:x.tamanho, caminho:x.caminho}));
+        renderArquivos(k);
+      }
+    });
+  });
+
+  (d.chamados||[]).forEach(c=>addChamado({codigo:c.codigo, empresa:c.empresa, tipoApoio:c.tipoApoio, texto:c.texto}));
+
+  const docsG = (d.docsGerais||[]).filter(x => x && x.caminho);
+  if(docsG.length){
+    arquivos['docsPerdidos'] = docsG.map(x=>({nome:x.nome, tipo:x.tipo, tamanho:x.tamanho, caminho:x.caminho}));
+    renderArquivos('docsPerdidos');
+  }
+
+  semRegistro = {};
+  TOPICOS.forEach(t=>{
+    const v = !!(d.semRegistro && d.semRegistro[t.slug]);
+    semRegistro[t.slug] = v;
+    const card = document.getElementById(t.card);
+    const chk = card && card.querySelector('.chk-sem');
+    if(chk) chk.checked = v;
+  });
+
+  anexosOriginais = (a.anexos||[]).map(x=>x.caminho);
+  entrarModoEdicao(a.id, a.numero, a.finalizada !== false, a.criado_em);
+  aplicarVisibilidade();
+  atualizarTodosStatus();
+  atualizarBotoesLimpar();
+}
+
+async function salvarPreparacao(){
+  const btn = document.getElementById('btnPreparar');
+  btn.disabled = true;
+  try{
+    const r = await salvarAta(false);
+    if(r){
+      if(!editandoId) entrarModoEdicao(r.id, r.numero, false, new Date().toISOString());
+      document.getElementById('edInfo').textContent = 'Preparação salva. Continue agora ou reabra depois na Área ADM.';
+      toast('Ata nº ' + String(r.numero).padStart(4,'0') + ' salva como preparação.');
+    }
+  }catch(err){
+    alert('Não foi possível salvar a preparação:\n\n' + err.message);
+  }
+  btn.disabled = false;
 }
 
 /* ═══════════════════ PDF ═══════════════════ */
@@ -1486,8 +1643,7 @@ function construirPDF(d, numero){
 /* ═══════════════════ GERAÇÃO DA ATA ═══════════════════ */
 async function gerarAtaPDF(){
   const btn = document.getElementById('btnGerar');
-  const d = coletarTudo();
-  if(!d.dataReuniao || !d.vendedorNome){
+  if(!document.getElementById('dataReuniao').value || !document.getElementById('vendedorNome').value.trim()){
     alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
     document.getElementById('sec0').classList.add('aberto');
     return;
@@ -1501,15 +1657,12 @@ async function gerarAtaPDF(){
   }
 
   btn.disabled = true;
-  const ataId = uid();
-  let numero = null;
+  let d, numero = null;
 
   try{
-    toast('Enviando anexos...');
-    await enviarAnexos(ataId, d);
-    toast('Arquivando ata no banco...');
-    const res = await salvarNoBanco(ataId, d);
-    numero = res && res.numero;
+    const r = await salvarAta(true);
+    if(!r){ btn.disabled = false; return; }
+    d = r.dados; numero = r.numero;
   }catch(err){
     btn.disabled = false;
     alert('Não foi possível arquivar a ata no banco:\n\n' + err.message +
@@ -1675,14 +1828,14 @@ async function admCarregar(){
   const busca = document.getElementById('filtroBusca').value || null;
 
   const tbody = document.getElementById('admLinhas');
-  tbody.innerHTML = '<tr><td colspan="9" style="padding:18px;color:#6A6A73">Carregando...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="10" style="padding:18px;color:#6A6A73">Carregando...</td></tr>';
 
   const [lista, resumo] = await Promise.all([
     sb.rpc('ata_admin_listar', { p_senha: admSenhaAtual, p_de: de, p_ate: ate, p_busca: busca }),
     sb.rpc('ata_admin_resumo', { p_senha: admSenhaAtual })
   ]);
 
-  if(lista.error){ tbody.innerHTML = '<tr><td colspan="9" style="padding:18px;color:#C8102E">Erro: '+esc(lista.error.message)+'</td></tr>'; return; }
+  if(lista.error){ tbody.innerHTML = '<tr><td colspan="10" style="padding:18px;color:#C8102E">Erro: '+esc(lista.error.message)+'</td></tr>'; return; }
   admDados = lista.data || [];
   admRenderCards(resumo.error ? null : resumo.data);
   admRenderLista();
@@ -1720,17 +1873,20 @@ function admRenderLista(){
   vazio.style.display = 'none';
   admDados.forEach(a=>{
     const tr = document.createElement('tr');
+    const fin = a.finalizada !== false;
     tr.innerHTML = `
       <td><strong>${String(a.numero).padStart(4,'0')}</strong></td>
+      <td><span class="estado ${fin?'final':'prep'}">${fin?'Finalizada':'Preparação'}</span></td>
       <td>${dataBR(a.data_reuniao)}</td>
       <td>${esc(a.vendedor_nome)}</td>
       <td>${esc(a.vendedor_codigo||'—')}</td>
       <td>${esc(a.condutor||'—')}</td>
       <td>${pill('Risco',a.qt_risco)}${pill('Perdidos',a.qt_perdidos)}${pill('S/ contato',a.qt_semcontato)}${pill('Oport.',a.qt_oportunidades)}${pill('Chamados',a.qt_chamados)}</td>
       <td>${a.total_anexos||0}</td>
-      <td style="white-space:nowrap">${dataHoraBR(a.criado_em)}</td>
+      <td style="white-space:nowrap">${dataHoraBR(a.criado_em)}${a.atualizado_em?'<br><small style="color:#6A6A73">editada '+dataHoraBR(a.atualizado_em)+'</small>':''}</td>
       <td><div class="acoes">
         <button type="button" class="btn btn-claro btn-mini" onclick="admVer('${a.id}')">Ver</button>
+        <button type="button" class="btn btn-verde btn-mini" onclick="admEditar('${a.id}')">Editar</button>
         <button type="button" class="btn btn-preto btn-mini" onclick="admBaixarPDF('${a.id}')">PDF</button>
         <button type="button" class="btn btn-vermelho btn-mini" onclick="admExcluir('${a.id}',${a.numero})">Excluir</button>
       </div></td>`;
@@ -1742,6 +1898,19 @@ async function admObter(id){
   const { data, error } = await sb.rpc('ata_admin_obter', { p_senha: admSenhaAtual, p_id: id });
   if(error) throw new Error(error.message);
   return data;
+}
+
+async function admEditar(id){
+  try{
+    if(editandoId && editandoId !== id){
+      if(!confirm('Você já está editando outra ata. Abrir esta descarta as alterações não salvas. Continuar?')) return;
+    }
+    const a = await admObter(id);
+    carregarAtaNoFormulario(a);
+    fecharADM();
+    window.scrollTo({top:0, behavior:'smooth'});
+    toast('Ata nº ' + String(a.numero).padStart(4,'0') + ' aberta para edição.');
+  }catch(err){ alert('Erro ao abrir a ata para edição: ' + err.message); }
 }
 
 async function admBaixarPDF(id){
@@ -1781,12 +1950,16 @@ async function admVer(id){
     const vis = d.secoesVisiveis || {}, nada = d.semRegistro || {};
     const ver = s => (vis[s] === undefined ? true : !!vis[s]);
 
+    const fin = a.finalizada !== false;
     document.getElementById('modalTitulo').innerHTML =
       'Ata nº ' + String(a.numero).padStart(4,'0') +
+      ' <span class="estado ' + (fin?'final':'prep') + '">' + (fin?'Finalizada':'Preparação') + '</span>' +
       '<small>' + dataBR(a.data_reuniao) + ' · ' + esc(a.vendedor_nome) +
       (a.vendedor_codigo? ' (cód. '+esc(a.vendedor_codigo)+')' : '') +
-      ' · Condutor: ' + esc(a.condutor||'—') + '</small>';
+      ' · Condutor: ' + esc(a.condutor||'—') +
+      (a.atualizado_em ? ' · editada em ' + dataHoraBR(a.atualizado_em) : '') + '</small>';
     document.getElementById('modalBtnPDF').onclick = ()=>admBaixarPDF(id);
+    document.getElementById('modalBtnEditar').onclick = ()=>{ fecharModal(); admEditar(id); };
 
     let html = '';
     SECOES_DET.forEach(([sec, slug, rot])=>{
