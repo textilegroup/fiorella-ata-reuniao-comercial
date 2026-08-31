@@ -9,31 +9,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
-  --preto:#111111;
+  --preto:#1A1A1A;
   --vermelho:#C8102E;
   --vermelho-escuro:#9B0C23;
-  --cinza-fundo:#F2F2F4;
-  --cinza-borda:#D9D9DE;
-  --cinza-texto:#55555E;
+  --vermelho-suave:#FDF2F4;
+  --cinza-fundo:#FFFFFF;
+  --cinza-borda:#E6E6EA;
+  --cinza-texto:#6A6A73;
   --branco:#FFFFFF;
   --verde:#1E7A3C;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
-body{background:var(--cinza-fundo);color:var(--preto);padding-bottom:30px;}
+body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 
 /* ───── CABEÇALHO ───── */
 .header{
-  background:var(--preto);
-  color:var(--branco);
-  padding:12px 18px 10px;
+  background:var(--branco);
+  color:var(--preto);
+  padding:14px 18px 12px;
   border-bottom:3px solid var(--vermelho);
 }
 .header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
-.header h1{font-size:20px;letter-spacing:3px;font-weight:800;}
+.header h1{font-size:22px;letter-spacing:3px;font-weight:800;color:var(--preto);}
 .header h1 span{color:var(--vermelho);}
-.header .subtitulo{font-size:10px;letter-spacing:1.5px;color:#BBBBC2;text-transform:uppercase;margin-top:2px;}
-.relogio{text-align:right;font-size:11px;color:#DDDDE2;}
-.relogio .hora{font-size:16px;font-weight:700;color:var(--branco);font-variant-numeric:tabular-nums;}
+.header .subtitulo{font-size:10px;letter-spacing:1.5px;color:var(--cinza-texto);text-transform:uppercase;margin-top:3px;}
+.relogio{text-align:right;font-size:11px;color:var(--cinza-texto);}
+.relogio .hora{font-size:16px;font-weight:700;color:var(--vermelho);font-variant-numeric:tabular-nums;}
 
 .container{max-width:1000px;margin:12px auto;padding:0 10px;}
 
@@ -44,34 +45,40 @@ body{background:var(--cinza-fundo);color:var(--preto);padding-bottom:30px;}
   border-radius:6px;
   margin-bottom:10px;
   overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
 }
 .card-titulo{
-  background:var(--preto);
-  color:var(--branco);
-  padding:7px 12px;
+  background:var(--branco);
+  color:var(--preto);
+  padding:9px 12px;
   font-size:12px;
-  font-weight:700;
+  font-weight:800;
   letter-spacing:1px;
   text-transform:uppercase;
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
+  border-bottom:2px solid var(--vermelho);
 }
+.card-titulo>span:first-child{display:flex;align-items:center;}
 .card-titulo .num{
   background:var(--vermelho);
+  color:var(--branco);
   min-width:21px;height:21px;
   border-radius:4px;
   display:inline-flex;align-items:center;justify-content:center;
   font-size:12px;margin-right:8px;flex:none;
 }
 .card-titulo .tag{
-  font-size:10px;background:var(--vermelho);padding:3px 8px;border-radius:3px;letter-spacing:1px;flex:none;
+  font-size:10px;background:var(--vermelho-suave);color:var(--vermelho);
+  border:1px solid rgba(200,16,46,.28);
+  padding:3px 8px;border-radius:3px;letter-spacing:1px;flex:none;font-weight:700;
 }
 .card-corpo{padding:10px 12px;}
 .guia{
-  background:#FAFAFB;border-left:4px solid var(--vermelho);
-  padding:7px 10px;border-radius:0 4px 4px 0;margin-bottom:10px;
+  background:var(--vermelho-suave);border-left:4px solid var(--vermelho);
+  padding:8px 11px;border-radius:0 4px 4px 0;margin-bottom:10px;
   font-size:12px;color:var(--cinza-texto);line-height:1.45;
 }
 .guia strong{color:var(--preto);}
@@ -85,7 +92,7 @@ input[type=text],input[type=date],textarea,select{
   font-size:13px;background:var(--branco);color:var(--preto);
 }
 textarea{min-height:50px;resize:vertical;line-height:1.4;}
-input:focus,textarea:focus{outline:none;border-color:var(--vermelho);box-shadow:0 0 0 2px rgba(200,16,46,.12);}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho);box-shadow:0 0 0 2px rgba(200,16,46,.12);}
 .linha{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
 .col{flex:1;min-width:160px;}
 .col-fixa{flex:0 0 190px;min-width:150px;}
@@ -95,19 +102,23 @@ input:focus,textarea:focus{outline:none;border-color:var(--vermelho);box-shadow:
   display:inline-flex;align-items:center;gap:8px;
   padding:7px 13px;border:none;border-radius:5px;cursor:pointer;
   font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  transition:filter .15s;
+  transition:background .15s,color .15s,filter .15s;
 }
-.btn:hover{filter:brightness(1.12);}
 .btn-vermelho{background:var(--vermelho);color:var(--branco);}
-.btn-preto{background:var(--preto);color:var(--branco);}
-.btn-claro{background:#E8E8EC;color:var(--preto);}
+.btn-vermelho:hover{background:var(--vermelho-escuro);}
+.btn-preto{background:var(--branco);color:var(--vermelho);border:1.5px solid var(--vermelho);}
+.btn-preto:hover{background:var(--vermelho);color:var(--branco);}
+.btn-claro{background:var(--branco);color:var(--vermelho);border:1px solid var(--cinza-borda);}
+.btn-claro:hover{border-color:var(--vermelho);background:var(--vermelho-suave);}
 .btn-remover{background:transparent;color:var(--vermelho);border:1px solid var(--vermelho);padding:6px 12px;font-size:11px;}
-.btn-grande{width:100%;justify-content:center;padding:11px;font-size:13px;}
+.btn-remover:hover{background:var(--vermelho);color:var(--branco);}
+.btn-grande{width:100%;justify-content:center;padding:12px;font-size:13px;}
 
-/* ───── SUBCARTÕES (registros por cliente) ───── */
+/* ───── SUBCARTÕES (registros por empresa) ───── */
 .registro{
-  border:1px solid var(--cinza-borda);border-radius:6px;
-  padding:9px 10px;margin-bottom:8px;background:#FCFCFD;position:relative;
+  border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);
+  border-radius:0 6px 6px 0;
+  padding:9px 10px;margin-bottom:8px;background:var(--branco);position:relative;
 }
 .registro-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
 .registro-topo .rotulo{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--vermelho);text-transform:uppercase;}
@@ -118,7 +129,8 @@ input:focus,textarea:focus{outline:none;border-color:var(--vermelho);box-shadow:
 input[type=file]{font-size:12px;}
 .lista-arquivos{list-style:none;margin-top:8px;}
 .lista-arquivos li{
-  font-size:12px;background:#EFEFF3;border-radius:4px;padding:5px 10px;margin:4px 0;
+  font-size:12px;background:var(--vermelho-suave);border:1px solid rgba(200,16,46,.18);
+  border-radius:4px;padding:5px 10px;margin:4px 0;
   display:flex;justify-content:space-between;align-items:center;gap:8px;
 }
 .lista-arquivos li button{background:none;border:none;color:var(--vermelho);cursor:pointer;font-weight:700;}
@@ -132,30 +144,33 @@ input[type=file]{font-size:12px;}
 .recolhivel .card-corpo{display:none;}
 .recolhivel.aberto .card-corpo{display:block;}
 .btn-toggle{
-  background:transparent;border:1px solid var(--branco);color:var(--branco);
-  padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;letter-spacing:1px;flex:none;
+  background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);
+  padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;letter-spacing:1px;flex:none;font-weight:700;
 }
+.btn-toggle:hover{background:var(--vermelho);color:var(--branco);}
 .texto-orientativo{font-size:12.5px;line-height:1.5;color:#333;}
 .texto-orientativo h4{margin:10px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--vermelho);}
 .texto-orientativo h4:first-child{margin-top:0;}
 .texto-orientativo ul{margin:4px 0 8px 20px;}
-.texto-orientativo .destaque{background:#FFF3F4;border-left:3px solid var(--vermelho);padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;}
+.texto-orientativo .destaque{background:var(--vermelho-suave);border-left:3px solid var(--vermelho);padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;}
 
 /* ───── IMPORTAÇÃO EXCEL ───── */
 .zona-import{
-  border:2px dashed var(--cinza-borda);border-radius:6px;padding:10px;text-align:center;
-  margin-bottom:10px;background:#FBFBFC;
+  border:2px dashed rgba(200,16,46,.35);border-radius:6px;padding:10px;text-align:center;
+  margin-bottom:10px;background:var(--vermelho-suave);
 }
 .zona-import p{font-size:12px;color:var(--cinza-texto);margin-bottom:6px;}
+.zona-import strong{color:var(--preto);}
 .badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
 
 /* ───── RODAPÉ DE AÇÕES ───── */
 .acoes-finais{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .acoes-finais .btn{flex:1;min-width:220px;}
 .aviso-salvo{
-  position:fixed;bottom:18px;right:18px;background:var(--preto);color:#fff;
+  position:fixed;bottom:18px;right:18px;background:var(--branco);color:var(--preto);
   padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;
-  border-left:4px solid var(--vermelho);
+  border:1px solid var(--cinza-borda);border-left:4px solid var(--vermelho);
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
 }
 .aviso-salvo.mostrar{opacity:1;}
 
@@ -216,7 +231,7 @@ input[type=file]{font-size:12px;}
   <div class="card-titulo">
     <span><span class="num">1</span>CLIENTES EM RISCO DE PERDA</span>
     <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">REGISTRAR POR CNPJ</span>
+      <span class="tag">CÓDIGO + EMPRESA</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">RECOLHER</button>
     </span>
   </div>
@@ -230,7 +245,7 @@ input[type=file]{font-size:12px;}
       </ul>
     </div>
     <div id="listaRisco"></div>
-    <button type="button" class="btn btn-vermelho" onclick="addRegistroCNPJ('listaRisco','risco')">+ Adicionar cliente (CNPJ)</button>
+    <button type="button" class="btn btn-vermelho" onclick="addRegistroEmpresa('listaRisco','risco')">+ Adicionar empresa</button>
   </div>
 </div>
 
@@ -257,13 +272,13 @@ input[type=file]{font-size:12px;}
 
     <div class="zona-import">
       <p><strong>Lance o relatório em Excel de clientes perdidos.</strong><br>
-      Serão abertos campos de texto e justificativa para cada CNPJ encontrado.</p>
+      A planilha deve conter as colunas <strong>Código</strong> e <strong>Nome</strong> da empresa. Será aberto um campo de justificativa para cada empresa encontrada.</p>
       <input type="file" id="excelPerdidos" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaPerdidos','perdido','statusImport')">
       <div id="statusImport"></div>
     </div>
 
     <div id="listaPerdidos"></div>
-    <button type="button" class="btn btn-claro" onclick="addRegistroCNPJ('listaPerdidos','perdido')">+ Adicionar cliente manualmente</button>
+    <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaPerdidos','perdido')">+ Adicionar empresa manualmente</button>
 
     <div style="margin-top:10px">
       <label>Observações gerais — clientes perdidos</label>
@@ -299,13 +314,13 @@ input[type=file]{font-size:12px;}
     </div>
     <div class="zona-import">
       <p><strong>Lance o relatório em Excel de clientes sem contato.</strong><br>
-      Serão abertos campos de texto para cada CNPJ encontrado.</p>
+      A planilha deve conter as colunas <strong>Código</strong> e <strong>Nome</strong> da empresa. Será aberto um campo de registro para cada empresa encontrada.</p>
       <input type="file" id="excelSemContato" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaSemContato','semcontato','statusImportSC')">
       <div id="statusImportSC"></div>
     </div>
 
     <div id="listaSemContato"></div>
-    <button type="button" class="btn btn-claro" onclick="addRegistroCNPJ('listaSemContato','semcontato')">+ Adicionar cliente manualmente</button>
+    <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaSemContato','semcontato')">+ Adicionar empresa manualmente</button>
 
     <div style="margin-top:10px">
       <label>Observações gerais</label>
@@ -319,7 +334,7 @@ input[type=file]{font-size:12px;}
   <div class="card-titulo">
     <span><span class="num">4</span>OPORTUNIDADES RELEVANTES</span>
     <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">REGISTRAR POR CNPJ</span>
+      <span class="tag">CÓDIGO + EMPRESA</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">RECOLHER</button>
     </span>
   </div>
@@ -333,7 +348,7 @@ input[type=file]{font-size:12px;}
       </ul>
     </div>
     <div id="listaOportunidades"></div>
-    <button type="button" class="btn btn-vermelho" onclick="addRegistroCNPJ('listaOportunidades','oportunidade')">+ Adicionar oportunidade (CNPJ)</button>
+    <button type="button" class="btn btn-vermelho" onclick="addRegistroEmpresa('listaOportunidades','oportunidade')">+ Adicionar oportunidade</button>
   </div>
 </div>
 
@@ -510,14 +525,6 @@ setInterval(tick,1000); tick();
 /* ═══════════════════ CONFIGURAÇÃO BITRIX24 ═══════════════════
    A ata é registrada como DEAL no funil 67 (fiorella.bitrix24.com.br).
    Preencha o webhook para ativar. Deixe webhook = '' para usar só o PDF local.
-
-   webhook .............. URL do webhook de entrada (ex.: 'https://fiorella.bitrix24.com.br/rest/1/CHAVE/')
-   categoryId ........... ID do funil de Deals onde a ata será criada (67)
-   stageId .............. estágio inicial do Deal ('' = primeiro estágio do funil; ex.: 'C67:NEW')
-   campoArquivo ......... código do campo personalizado de arquivo do Deal p/ anexar o PDF
-                          (ex.: 'UF_CRM_1718000000000'). '' = não anexa, o resumo vai em COMMENTS
-   criarTarefas ......... true = cada chamado do item 7 vira uma tarefa (tasks.task.add)
-   responsavelTarefas ... ID do usuário responsável pelas tarefas criadas
 */
 const BITRIX = {
   webhook: 'https://fiorella.bitrix24.com.br/rest/1/1kalsjfoz13rhglc/',
@@ -534,7 +541,7 @@ let contador = 0;
 const arquivos = {}; // {containerId: [{nome, tipo, base64}]}
 const LIMITE_ARQ = 5 * 1024 * 1024; // 5MB
 
-/* ═══════════════════ REGISTROS POR CNPJ ═══════════════════ */
+/* ═══════════════════ REGISTROS POR EMPRESA (CÓDIGO + NOME) ═══════════════════ */
 const ROTULOS = {
   risco:'Cliente em risco',
   perdido:'Cliente perdido',
@@ -548,7 +555,7 @@ const PLACEHOLDERS = {
   oportunidade:'O que está em desenvolvimento, o que está parado e que apoio é necessário...'
 };
 
-function addRegistroCNPJ(containerId, tipo, dados){
+function addRegistroEmpresa(containerId, tipo, dados){
   dados = dados || {};
   contador++;
   const id = 'reg_' + contador;
@@ -564,12 +571,12 @@ function addRegistroCNPJ(containerId, tipo, dados){
     </div>
     <div class="linha">
       <div class="col-fixa">
-        <label>CNPJ</label>
-        <input type="text" class="campo-cnpj" placeholder="00.000.000/0000-00" value="${esc(dados.cnpj||'')}" oninput="mascaraCNPJ(this); salvarDebounce()">
+        <label>Código da empresa</label>
+        <input type="text" class="campo-codigo" placeholder="Ex.: 10245" value="${esc(dados.codigo||'')}" oninput="salvarDebounce()">
       </div>
       <div class="col">
-        <label>Cliente</label>
-        <input type="text" class="campo-cliente" placeholder="Razão social / nome do cliente" value="${esc(dados.cliente||'')}" oninput="salvarDebounce()">
+        <label>Nome da empresa</label>
+        <input type="text" class="campo-empresa" placeholder="Nome da empresa no sistema" value="${esc(dados.empresa||'')}" oninput="salvarDebounce()">
       </div>
     </div>
     <label>${tipo==='perdido' ? 'Justificativa' : 'Registro'}</label>
@@ -608,12 +615,12 @@ function addChamado(dados){
     </div>
     <div class="linha">
       <div class="col-fixa">
-        <label>CNPJ</label>
-        <input type="text" class="campo-cnpj" placeholder="00.000.000/0000-00" value="${esc(dados.cnpj||'')}" oninput="mascaraCNPJ(this); salvarDebounce()">
+        <label>Código da empresa</label>
+        <input type="text" class="campo-codigo" placeholder="Ex.: 10245" value="${esc(dados.codigo||'')}" oninput="salvarDebounce()">
       </div>
       <div class="col">
-        <label>Cliente</label>
-        <input type="text" class="campo-cliente" placeholder="Razão social / nome do cliente" value="${esc(dados.cliente||'')}" oninput="salvarDebounce()">
+        <label>Nome da empresa</label>
+        <input type="text" class="campo-empresa" placeholder="Nome da empresa no sistema" value="${esc(dados.empresa||'')}" oninput="salvarDebounce()">
       </div>
       <div class="col-fixa">
         <label>Tipo de apoio</label>
@@ -633,21 +640,11 @@ function addChamado(dados){
   salvarDebounce();
 }
 
-/* ═══════════════════ MÁSCARA CNPJ ═══════════════════ */
-function mascaraCNPJ(input){
-  let v = input.value.replace(/\D/g,'').slice(0,14);
-  v = v.replace(/^(\d{2})(\d)/,'$1.$2')
-       .replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
-       .replace(/\.(\d{3})(\d)/,'.$1/$2')
-       .replace(/(\d{4})(\d)/,'$1-$2');
-  input.value = v;
-}
-
 function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ═══════════════════ IMPORTAÇÃO EXCEL — CLIENTES PERDIDOS ═══════════════════ */
+/* ═══════════════════ IMPORTAÇÃO EXCEL — CÓDIGO + NOME ═══════════════════ */
 function importarExcel(input, containerId, tipo, statusId){
   const file = input.files[0];
   if(!file) return;
@@ -659,42 +656,33 @@ function importarExcel(input, containerId, tipo, statusId){
       const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
       if(!rows.length){ alert('Planilha vazia.'); return; }
 
-      // localizar coluna de CNPJ (cabeçalho ou padrão numérico de 14 dígitos)
-      let colCNPJ = -1, colNome = -1, inicio = 0;
-      const cab = rows[0].map(c => String(c).toLowerCase());
+      // localizar colunas de CÓDIGO e NOME pelo cabeçalho
+      let colCod = -1, colNome = -1, inicio = 0;
+      const cab = rows[0].map(c => String(c).toLowerCase().trim());
       cab.forEach((c,i)=>{
-        if(colCNPJ<0 && c.includes('cnpj')) colCNPJ = i;
-        if(colNome<0 && (c.includes('cliente')||c.includes('razão')||c.includes('razao')||c.includes('nome'))) colNome = i;
+        if(colCod<0 && (c.includes('cod') || c.includes('cód'))) colCod = i;
+        if(colNome<0 && (c.includes('nome')||c.includes('empresa')||c.includes('cliente')||c.includes('razão')||c.includes('razao')||c.includes('fantasia'))) colNome = i;
       });
-      if(colCNPJ>=0 || colNome>=0) inicio = 1;
+      if(colCod>=0 || colNome>=0) inicio = 1;
 
-      if(colCNPJ<0){
-        // detectar pela primeira linha de dados: célula com 14 dígitos
-        const teste = rows[inicio]||[];
-        teste.forEach((c,i)=>{
-          if(colCNPJ<0 && String(c).replace(/\D/g,'').length===14) colCNPJ = i;
-        });
-      }
-      if(colNome<0) colNome = colCNPJ===0 ? 1 : 0;
+      // sem cabeçalho reconhecível: assume 1ª coluna = código, 2ª = nome
+      if(colCod<0) colCod = 0;
+      if(colNome<0) colNome = (colCod===0 ? 1 : 0);
 
       let importados = 0;
       for(let r=inicio; r<rows.length; r++){
         const linha = rows[r];
         if(!linha || linha.every(c=>String(c).trim()==='')) continue;
-        let cnpj = colCNPJ>=0 ? String(linha[colCNPJ]||'') : '';
-        const dig = cnpj.replace(/\D/g,'');
-        if(dig.length===14){
-          cnpj = dig.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
-        }
+        const codigo = String(linha[colCod]||'').trim();
         const nome = String(linha[colNome]||'').trim();
-        if(!cnpj && !nome) continue;
-        addRegistroCNPJ(containerId, tipo, {cnpj:cnpj, cliente:nome});
+        if(!codigo && !nome) continue;
+        addRegistroEmpresa(containerId, tipo, {codigo:codigo, empresa:nome});
         importados++;
       }
       document.getElementById(statusId).innerHTML =
         importados>0
-          ? '<span class="badge-ok">✓ ' + importados + ' cliente(s) importado(s) — preencha o registro de cada CNPJ</span>'
-          : '<span style="color:var(--vermelho);font-size:12px">Nenhum CNPJ/cliente identificado na planilha.</span>';
+          ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — preencha o registro de cada uma</span>'
+          : '<span style="color:var(--vermelho);font-size:12px">Nenhuma empresa identificada na planilha (verifique as colunas Código e Nome).</span>';
     }catch(err){
       alert('Erro ao ler a planilha: ' + err.message);
     }
@@ -743,7 +731,7 @@ function removerArquivo(containerId, idx){
   salvarDebounce();
 }
 
-/* ═══════════════════ RECOLHER / EXIBIR (ITENS 8 E 9) ═══════════════════ */
+/* ═══════════════════ RECOLHER / EXIBIR ═══════════════════ */
 function toggleSecao(id, btn){
   const sec = document.getElementById(id);
   sec.classList.toggle('aberto');
@@ -753,8 +741,8 @@ function toggleSecao(id, btn){
 /* ═══════════════════ COLETA DE DADOS ═══════════════════ */
 function coletarRegistros(containerId){
   return Array.from(document.getElementById(containerId).querySelectorAll('.registro')).map(div=>({
-    cnpj: (div.querySelector('.campo-cnpj')||{}).value || '',
-    cliente: (div.querySelector('.campo-cliente')||{}).value || '',
+    codigo: (div.querySelector('.campo-codigo')||{}).value || '',
+    empresa: (div.querySelector('.campo-empresa')||{}).value || '',
     tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
     texto: (div.querySelector('.campo-texto')||{}).value || '',
     docs: (arquivos['docs_' + div.id]||[]).map(a=>a.nome)
@@ -780,7 +768,7 @@ function coletarTudo(){
   };
 }
 
-/* ═══════════════════ AUTOSAVE (localStorage) ═══════════════════ */
+/* ═══════════════════ AUTOSAVE ═══════════════════ */
 function salvarDebounce(){ /* sem persistência — o formulário sempre inicia limpo */ }
 
 function limparTudo(){
@@ -799,21 +787,26 @@ async function gerarAtaPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
   const W = doc.internal.pageSize.getWidth();
-  const PRETO = [17,17,17], VERMELHO = [200,16,46], CINZA = [85,85,94];
+  const PRETO = [26,26,26], VERMELHO = [200,16,46], CINZA = [106,106,115], BORDA = [230,230,234];
   let y = 0;
 
-  // ── Cabeçalho ──
-  doc.setFillColor(...PRETO); doc.rect(0,0,W,26,'F');
-  doc.setFillColor(...VERMELHO); doc.rect(0,26,W,1.6,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFont('helvetica','bold'); doc.setFontSize(17);
+  // ── Cabeçalho (branco com detalhe vermelho) ──
+  doc.setFillColor(255,255,255); doc.rect(0,0,W,26,'F');
+  doc.setFillColor(...VERMELHO); doc.rect(0,26,W,1.8,'F');
+  doc.setTextColor(...PRETO);
+  doc.setFont('helvetica','bold'); doc.setFontSize(18);
   doc.text('FIORELLA', 14, 12);
-  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  const larguraMarca = doc.getTextWidth('FIORELLA');
+  doc.setTextColor(...VERMELHO);
+  doc.text('.', 14 + larguraMarca + 0.5, 12);
+  doc.setTextColor(...CINZA);
+  doc.setFontSize(8.5); doc.setFont('helvetica','normal');
   doc.text('ATA DE REUNIÃO SEMANAL — VENDEDORES', 14, 19);
   const dataFmt = d.dataReuniao.split('-').reverse().join('/');
+  doc.setTextColor(...PRETO);
   doc.setFont('helvetica','bold'); doc.setFontSize(10);
   doc.text('Data: ' + dataFmt, W-14, 12, {align:'right'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...CINZA);
   doc.text('Emitida em ' + new Date().toLocaleString('pt-BR'), W-14, 19, {align:'right'});
   y = 34;
 
@@ -822,8 +815,8 @@ async function gerarAtaPDF(){
     startY: y, theme:'grid',
     head: [['VENDEDOR','CÓDIGO','CONDUTOR']],
     body: [[d.vendedorNome, d.vendedorCodigo||'—', d.condutor||'—']],
-    headStyles:{fillColor:PRETO, fontSize:8, halign:'left'},
-    styles:{fontSize:9, cellPadding:2.5},
+    headStyles:{fillColor:VERMELHO, textColor:[255,255,255], fontSize:8, halign:'left'},
+    styles:{fontSize:9, cellPadding:2.5, lineColor:BORDA, textColor:PRETO},
     margin:{left:14, right:14}
   });
   y = doc.lastAutoTable.finalY + 8;
@@ -848,20 +841,21 @@ async function gerarAtaPDF(){
     }
     let head, body;
     if(comApoio){
-      head = [['CNPJ','CLIENTE','TIPO DE APOIO','DESCRIÇÃO']];
-      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.tipoApoio||'—', r.texto||'—']);
+      head = [['CÓDIGO','EMPRESA','TIPO DE APOIO','DESCRIÇÃO']];
+      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.tipoApoio||'—', r.texto||'—']);
     } else if(comDocs){
-      head = [['CNPJ','CLIENTE','REGISTRO','DOCUMENTOS']];
-      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.texto||'—', r.docs.length? r.docs.join('\n') : '—']);
+      head = [['CÓDIGO','EMPRESA','REGISTRO','DOCUMENTOS']];
+      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—', r.docs.length? r.docs.join('\n') : '—']);
     } else {
-      head = [['CNPJ','CLIENTE','REGISTRO / JUSTIFICATIVA']];
-      body = lista.map(r=>[r.cnpj||'—', r.cliente||'—', r.texto||'—']);
+      head = [['CÓDIGO','EMPRESA','REGISTRO / JUSTIFICATIVA']];
+      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—']);
     }
     doc.autoTable({
       startY:y, theme:'grid', head, body,
-      headStyles:{fillColor:PRETO, fontSize:7.5},
-      styles:{fontSize:8.5, cellPadding:2, valign:'top'},
-      columnStyles:{0:{cellWidth:32}, 1:{cellWidth:42}},
+      headStyles:{fillColor:VERMELHO, textColor:[255,255,255], fontSize:7.5},
+      styles:{fontSize:8.5, cellPadding:2, valign:'top', lineColor:BORDA, textColor:PRETO},
+      alternateRowStyles:{fillColor:[253,242,244]},
+      columnStyles:{0:{cellWidth:22}, 1:{cellWidth:48}},
       margin:{left:14, right:14}
     });
     y = doc.lastAutoTable.finalY + 8;
@@ -913,7 +907,7 @@ async function gerarAtaPDF(){
 
   // ── Resumo / regra prática ──
   if(y > 235){ doc.addPage(); y = 20; }
-  doc.setFillColor(250,243,244);
+  doc.setFillColor(253,242,244);
   doc.setDrawColor(...VERMELHO);
   doc.roundedRect(14, y, W-28, 26, 2, 2, 'FD');
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...VERMELHO);
@@ -937,6 +931,8 @@ async function gerarAtaPDF(){
   const total = doc.internal.getNumberOfPages();
   for(let p=1; p<=total; p++){
     doc.setPage(p);
+    doc.setDrawColor(...VERMELHO); doc.setLineWidth(.4);
+    doc.line(14, 288, W-14, 288);
     doc.setFontSize(7); doc.setTextColor(...CINZA);
     doc.text('FIORELLA — Ata de Reunião Semanal Comercial — ' + dataFmt, 14, 292);
     doc.text('Página ' + p + ' de ' + total, W-14, 292, {align:'right'});
@@ -955,7 +951,7 @@ async function gerarAtaPDF(){
     }catch(err){
       alert('O PDF foi gerado, mas houve erro ao registrar no Bitrix24:\n\n' + err.message +
             '\n\nO formulário NÃO foi limpo para que você possa tentar novamente.');
-      return; // mantém os dados preenchidos
+      return;
     }
   } else {
     toast('Ata gerada — limpando formulário...');
@@ -991,7 +987,7 @@ function montarResumoAta(d, dataFmt){
   function bloco(titulo, lista){
     L.push('— ' + titulo + ' —');
     if(!lista.length){ L.push('Sem registros.'); }
-    else lista.forEach(r=>L.push('• ' + (r.cnpj||'s/ CNPJ') + ' | ' + (r.cliente||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—')));
+    else lista.forEach(r=>L.push('• ' + (r.codigo||'s/ código') + ' | ' + (r.empresa||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—')));
     L.push('');
   }
   bloco('1. CLIENTES EM RISCO', d.risco);
@@ -1011,7 +1007,6 @@ function montarResumoAta(d, dataFmt){
 async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt){
   const resumo = montarResumoAta(d, dataFmt);
 
-  // 1) Deal no funil configurado, com resumo em COMMENTS e PDF anexado
   const fields = {
     TITLE: 'ATA REUNIÃO ' + dataFmt + ' — ' + d.vendedorNome.toUpperCase(),
     CATEGORY_ID: BITRIX.categoryId,
@@ -1024,13 +1019,12 @@ async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt){
   }
   await chamarBitrix('crm.deal.add', { fields: fields });
 
-  // 2) Cada chamado do item 7 vira uma tarefa
   if(BITRIX.criarTarefas && d.chamados.length){
     for(const ch of d.chamados){
       await chamarBitrix('tasks.task.add', { fields: {
-        TITLE: 'CHAMADO — ' + (ch.tipoApoio||'Apoio comercial') + ' — ' + (ch.cliente||ch.cnpj||'cliente'),
+        TITLE: 'CHAMADO — ' + (ch.tipoApoio||'Apoio comercial') + ' — ' + (ch.empresa||ch.codigo||'empresa'),
         DESCRIPTION: 'Origem: Ata de reunião semanal ' + dataFmt + ' — Vendedor: ' + d.vendedorNome +
-                     '\nCNPJ: ' + (ch.cnpj||'—') + '\nCliente: ' + (ch.cliente||'—') +
+                     '\nCódigo da empresa: ' + (ch.codigo||'—') + '\nEmpresa: ' + (ch.empresa||'—') +
                      '\nTipo de apoio: ' + (ch.tipoApoio||'—') +
                      '\n\n' + (ch.texto||''),
         RESPONSIBLE_ID: BITRIX.responsavelTarefas
@@ -1041,7 +1035,6 @@ async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt){
 
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
 window.addEventListener('load', function(){
-  // sempre iniciar limpo — remove qualquer rascunho antigo do navegador
   try{ localStorage.removeItem(LS_KEY); }catch(e){}
   document.getElementById('dataReuniao').value = new Date().toISOString().slice(0,10);
 });
