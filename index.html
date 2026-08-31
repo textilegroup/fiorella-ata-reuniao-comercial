@@ -142,10 +142,19 @@ input[type=file]{font-size:12px;}
 .texto-orientativo .destaque{background:var(--vermelho-suave);border-left:3px solid var(--vermelho);padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;}
 
 /* ───── IMPORTAÇÃO EXCEL ───── */
-.zona-import{border:2px dashed rgba(200,16,46,.35);border-radius:6px;padding:10px;text-align:center;margin-bottom:10px;background:var(--vermelho-suave);}
-.zona-import p{font-size:12px;color:var(--cinza-texto);margin-bottom:6px;}
+.zona-import{border:2px dashed rgba(200,16,46,.35);border-radius:6px;padding:11px;text-align:center;margin-bottom:10px;background:var(--vermelho-suave);}
+.zona-import p{font-size:12px;color:var(--cinza-texto);margin-bottom:8px;line-height:1.5;}
 .zona-import strong{color:var(--preto);}
+.zona-import code{font-family:Consolas,'Courier New',monospace;font-size:11px;background:#fff;border:1px solid rgba(200,16,46,.2);border-radius:3px;padding:1px 5px;color:var(--vermelho);white-space:nowrap;display:inline-block;margin:1px;}
+.import-acoes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
+
+/* ───── DADOS DO RELATÓRIO NO REGISTRO ───── */
+.ref{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;}
+.ref span{font-size:11px;background:#F5F5F7;border:1px solid var(--cinza-borda);border-radius:4px;padding:3px 8px;color:var(--cinza-texto);white-space:nowrap;}
+.ref span b{color:var(--preto);font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums;}
+.ref span.queda{background:var(--vermelho-suave);border-color:rgba(200,16,46,.3);color:var(--vermelho);font-weight:800;}
+.ref span.alta{background:var(--verde-suave);border-color:rgba(30,122,60,.3);color:var(--verde);font-weight:800;}
 
 /* ───── AÇÕES FINAIS ───── */
 .acoes-finais{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
@@ -320,8 +329,19 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <li>Está sendo visitado ou contactado pela concorrência?</li>
       </ul>
     </div>
+    <div class="zona-import">
+      <p><strong>Relatório de clientes em risco — padrão Fiorella.</strong><br>
+      Colunas reconhecidas pelo nome: <code>RAZAO_SOCIAL</code> <code>CLI_LOJA</code> <code>VENDEDOR</code> <code>REGIAO</code> <code>MAIOR_MEDIA_TRIENIO</code> <code>MEDIA_ATUAL_COM_NE</code></p>
+      <div class="import-acoes">
+        <label class="btn btn-vermelho" for="excelRisco">Importar dados</label>
+        <input type="file" id="excelRisco" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaRisco','risco','statusImportRisco')">
+        <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes em risco')">Gerar modelo</button>
+      </div>
+      <div id="statusImportRisco"></div>
+    </div>
+
     <div id="listaRisco"></div>
-    <button type="button" class="btn btn-vermelho" onclick="addRegistroEmpresa('listaRisco','risco')">+ Adicionar empresa</button>
+    <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaRisco','risco')">+ Adicionar empresa manualmente</button>
   </div>
 </div>
 
@@ -348,9 +368,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     </div>
 
     <div class="zona-import">
-      <p><strong>Lance o relatório em Excel de clientes perdidos.</strong><br>
-      A planilha deve conter as colunas <strong>Código</strong> e <strong>Nome</strong> da empresa. Será aberto um campo de justificativa para cada empresa encontrada.</p>
-      <input type="file" id="excelPerdidos" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaPerdidos','perdido','statusImport')">
+      <p><strong>Relatório de clientes perdidos — padrão Fiorella.</strong><br>
+      Colunas reconhecidas pelo nome: <code>RAZAO_SOCIAL</code> <code>CLI_LOJA</code> <code>VENDEDOR</code> <code>REGIAO</code> <code>MAIOR_MEDIA_TRIENIO</code> <code>MEDIA_ATUAL_COM_NE</code></p>
+      <div class="import-acoes">
+        <label class="btn btn-vermelho" for="excelPerdidos">Importar dados</label>
+        <input type="file" id="excelPerdidos" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaPerdidos','perdido','statusImport')">
+        <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes perdidos')">Gerar modelo</button>
+      </div>
       <div id="statusImport"></div>
     </div>
 
@@ -391,9 +415,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
       Obs.: Após a pergunta, o ideal é apresentar os dados, caso o vendedor não os tenha ou hesite em responder.
     </div>
     <div class="zona-import">
-      <p><strong>Lance o relatório em Excel de clientes sem contato.</strong><br>
-      A planilha deve conter as colunas <strong>Código</strong> e <strong>Nome</strong> da empresa. Será aberto um campo de registro para cada empresa encontrada.</p>
-      <input type="file" id="excelSemContato" accept=".xls,.xlsx,.csv" onchange="importarExcel(this,'listaSemContato','semcontato','statusImportSC')">
+      <p><strong>Relatório de clientes sem contato — padrão Fiorella.</strong><br>
+      Colunas reconhecidas pelo nome: <code>RAZAO_SOCIAL</code> <code>CLI_LOJA</code> <code>VENDEDOR</code> <code>REGIAO</code> <code>MAIOR_MEDIA_TRIENIO</code> <code>MEDIA_ATUAL_COM_NE</code></p>
+      <div class="import-acoes">
+        <label class="btn btn-vermelho" for="excelSemContato">Importar dados</label>
+        <input type="file" id="excelSemContato" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaSemContato','semcontato','statusImportSC')">
+        <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes sem contato')">Gerar modelo</button>
+      </div>
       <div id="statusImportSC"></div>
     </div>
 
@@ -865,6 +893,32 @@ const PLACEHOLDERS = {
   oportunidade:'O que está em desenvolvimento, o que está parado e que apoio é necessário...'
 };
 
+/* Dados vindos do relatório — exibidos no card, fora do PDF */
+function fmtNum(v){
+  if(v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if(!isFinite(n)) return null;
+  return n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function htmlRef(ref){
+  if(!ref) return '';
+  const partes = [];
+  if(ref.regiao)   partes.push('<span>Região <b>' + esc(ref.regiao) + '</b></span>');
+  if(ref.vendedor) partes.push('<span>Vendedor <b>' + esc(ref.vendedor) + '</b></span>');
+  const t = fmtNum(ref.trienio), a = fmtNum(ref.atual);
+  if(t) partes.push('<span>Maior média triênio <b>' + t + '</b></span>');
+  if(a) partes.push('<span>Média atual <b>' + a + '</b></span>');
+  const nt = Number(ref.trienio), na = Number(ref.atual);
+  if(isFinite(nt) && nt > 0 && isFinite(na) && ref.atual !== '' && ref.atual !== null){
+    const v = (na / nt - 1) * 100;
+    const cls = v < 0 ? 'queda' : 'alta';
+    const seta = v < 0 ? '▼' : '▲';
+    partes.push('<span class="' + cls + '">' + seta + ' ' + Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%</span>');
+  }
+  return partes.length ? '<div class="ref">' + partes.join('') + '</div>' : '';
+}
+
 function addRegistroEmpresa(containerId, tipo, dados){
   dados = dados || {};
   contador++;
@@ -874,11 +928,13 @@ function addRegistroEmpresa(containerId, tipo, dados){
   div.className = 'registro';
   div.id = id;
   div.dataset.tipo = tipo;
+  if(dados.ref) div.dataset.ref = JSON.stringify(dados.ref);
   div.innerHTML = `
     <div class="registro-topo">
       <span class="rotulo">${ROTULOS[tipo]}</span>
       <button type="button" class="btn btn-remover" onclick="removerRegistro('${id}')">Remover</button>
     </div>
+    ${htmlRef(dados.ref)}
     <div class="linha">
       <div class="col-fixa">
         <label>Código da empresa</label>
@@ -961,7 +1017,83 @@ function limpaNome(n){
   return String(n).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(-80);
 }
 
+/* ═══════════════════ MODELO PADRÃO DE RELATÓRIO ═══════════════════ */
+const MODELO_COLUNAS = ['RAZAO_SOCIAL','CLI_LOJA','VENDEDOR','REGIAO','MAIOR_MEDIA_TRIENIO','MEDIA_ATUAL_COM_NE'];
+const MODELO_EXEMPLO = [
+  ['HUG FABRICACAO DE ARTIGOS INFANTIS LTDA EM RECUPERACAO JUDIC','23589/01','2109','SC',3160.94,656.62],
+  ['KYLY INDUSTRIA TEXTIL LTDA','20414/01','2109','SC',16462.50,9139.00]
+];
+
+function gerarModelo(rotulo){
+  const wb = XLSX.utils.book_new();
+  const larguras = [{wch:60},{wch:12},{wch:10},{wch:8},{wch:22},{wch:22}];
+
+  const wsModelo = XLSX.utils.aoa_to_sheet([MODELO_COLUNAS]);
+  wsModelo['!cols'] = larguras;
+  XLSX.utils.book_append_sheet(wb, wsModelo, 'MODELO');
+
+  const wsEx = XLSX.utils.aoa_to_sheet([MODELO_COLUNAS].concat(MODELO_EXEMPLO));
+  wsEx['!cols'] = larguras;
+  XLSX.utils.book_append_sheet(wb, wsEx, 'EXEMPLO');
+
+  const wsInfo = XLSX.utils.aoa_to_sheet([
+    ['MODELO DE RELATÓRIO — ATA DE REUNIÃO SEMANAL COMERCIAL FIORELLA'],
+    [''],
+    ['Preencha a aba MODELO e importe o arquivo no formulário da ata.'],
+    ['A aba EXEMPLO mostra o formato esperado e não é lida na importação.'],
+    [''],
+    ['COLUNA','CONTEÚDO','OBRIGATÓRIA'],
+    ['RAZAO_SOCIAL','Razão social da empresa','Sim'],
+    ['CLI_LOJA','Código do cliente/loja no sistema (ex.: 23589/01)','Sim'],
+    ['VENDEDOR','Código do vendedor responsável','Não'],
+    ['REGIAO','Região / UF de atendimento','Não'],
+    ['MAIOR_MEDIA_TRIENIO','Maior média de compra do triênio','Não'],
+    ['MEDIA_ATUAL_COM_NE','Média atual de compra','Não'],
+    [''],
+    ['As colunas são localizadas pelo NOME do cabeçalho, em qualquer ordem.'],
+    ['Colunas extras do seu relatório podem permanecer no arquivo — são ignoradas.'],
+    ['VENDEDOR, REGIAO e as médias aparecem no formulário como apoio à conversa e não entram na ata em PDF.']
+  ]);
+  wsInfo['!cols'] = [{wch:24},{wch:60},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, wsInfo, 'INSTRUCOES');
+
+  const sufixo = rotulo ? '_' + rotulo.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_') : '';
+  XLSX.writeFile(wb, 'MODELO_RELATORIO_FIORELLA' + sufixo + '.xlsx');
+  toast('Modelo gerado — preencha a aba MODELO e importe.');
+}
+
 /* ═══════════════════ IMPORTAÇÃO EXCEL ═══════════════════ */
+function normCab(s){
+  return String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+}
+
+function mapearColunas(cabecalho){
+  const c = cabecalho.map(normCab);
+  const m = {codigo:-1, nome:-1, vendedor:-1, regiao:-1, trienio:-1, atual:-1};
+  c.forEach((h,i)=>{
+    if(!h) return;
+    if(m.codigo<0   && (h==='cli_loja' || h.indexOf('cli_loja')>=0 || h.indexOf('cod')>=0)) m.codigo = i;
+    if(m.nome<0     && (h.indexOf('razao')>=0 || h.indexOf('social')>=0 || h.indexOf('nome')>=0 ||
+                        h.indexOf('empresa')>=0 || h.indexOf('fantasia')>=0 || h==='cliente')) m.nome = i;
+    if(m.vendedor<0 && h.indexOf('vended')>=0) m.vendedor = i;
+    if(m.regiao<0   && (h.indexOf('regia')>=0 || h.indexOf('regiao')>=0 || h==='uf')) m.regiao = i;
+    if(m.trienio<0  && h.indexOf('trienio')>=0) m.trienio = i;
+    if(m.atual<0    && h.indexOf('atual')>=0) m.atual = i;
+  });
+  return m;
+}
+
+function numBR(v){
+  if(v === null || v === undefined || v === '') return '';
+  if(typeof v === 'number') return isFinite(v) ? v : '';
+  let s = String(v).trim().replace(/[^\d,.-]/g,'');
+  if(s === '') return '';
+  if(s.indexOf(',') >= 0) s = s.replace(/\./g,'').replace(',', '.');
+  const n = Number(s);
+  return isFinite(n) ? n : '';
+}
+
 function importarExcel(input, containerId, tipo, statusId){
   const file = input.files[0];
   if(!file) return;
@@ -973,30 +1105,42 @@ function importarExcel(input, containerId, tipo, statusId){
       const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
       if(!rows.length){ alert('Planilha vazia.'); return; }
 
-      let colCod = -1, colNome = -1, inicio = 0;
-      const cab = rows[0].map(c => String(c).toLowerCase().trim());
-      cab.forEach((c,i)=>{
-        if(colCod<0 && (c.includes('cod') || c.includes('cód'))) colCod = i;
-        if(colNome<0 && (c.includes('nome')||c.includes('empresa')||c.includes('cliente')||c.includes('razão')||c.includes('razao')||c.includes('fantasia'))) colNome = i;
-      });
-      if(colCod>=0 || colNome>=0) inicio = 1;
-      if(colCod<0) colCod = 0;
-      if(colNome<0) colNome = (colCod===0 ? 1 : 0);
+      let m = mapearColunas(rows[0]);
+      let inicio = 1;
 
+      // sem cabeçalho reconhecível: assume o padrão RAZAO_SOCIAL na 1ª coluna e CLI_LOJA na 2ª
+      if(m.nome < 0 && m.codigo < 0){
+        m = {codigo:1, nome:0, vendedor:-1, regiao:-1, trienio:-1, atual:-1};
+        inicio = 0;
+      }else{
+        if(m.nome < 0)   m.nome   = (m.codigo === 0 ? 1 : 0);
+        if(m.codigo < 0) m.codigo = (m.nome === 0 ? 1 : 0);
+      }
+
+      const pega = (linha, i) => i >= 0 ? String(linha[i]==null?'':linha[i]).trim() : '';
       let importados = 0;
       for(let r=inicio; r<rows.length; r++){
         const linha = rows[r];
         if(!linha || linha.every(c=>String(c).trim()==='')) continue;
-        const codigo = String(linha[colCod]||'').trim();
-        const nome = String(linha[colNome]||'').trim();
+        const nome   = pega(linha, m.nome);
+        const codigo = pega(linha, m.codigo);
         if(!codigo && !nome) continue;
-        addRegistroEmpresa(containerId, tipo, {codigo:codigo, empresa:nome});
+        const ref = {
+          vendedor: pega(linha, m.vendedor),
+          regiao:   pega(linha, m.regiao),
+          trienio:  m.trienio >= 0 ? numBR(linha[m.trienio]) : '',
+          atual:    m.atual   >= 0 ? numBR(linha[m.atual])   : ''
+        };
+        const temRef = ref.vendedor || ref.regiao || ref.trienio !== '' || ref.atual !== '';
+        addRegistroEmpresa(containerId, tipo, {codigo:codigo, empresa:nome, ref: temRef ? ref : null});
         importados++;
       }
+
+      const achadas = ['nome','codigo','vendedor','regiao','trienio','atual'].filter(k => m[k] >= 0).length;
       document.getElementById(statusId).innerHTML =
         importados>0
-          ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — preencha o registro de cada uma</span>'
-          : '<span style="color:var(--vermelho);font-size:12px">Nenhuma empresa identificada na planilha (verifique as colunas Código e Nome).</span>';
+          ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — ' + achadas + ' coluna(s) do modelo reconhecida(s)</span>'
+          : '<span style="color:var(--vermelho);font-size:12px">Nenhuma empresa identificada. Confira o cabeçalho — use o botão <strong>Gerar modelo</strong> como referência.</span>';
       statusDoContainer(containerId);
     }catch(err){
       alert('Erro ao ler a planilha: ' + err.message);
@@ -1047,14 +1191,19 @@ function toggleSecao(id, btn){
 function coletarRegistros(containerId){
   const el = document.getElementById(containerId);
   if(!el) return [];
-  return Array.from(el.querySelectorAll('.registro')).map(div=>({
-    codigo: (div.querySelector('.campo-codigo')||{}).value || '',
-    empresa: (div.querySelector('.campo-empresa')||{}).value || '',
-    tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
-    texto: (div.querySelector('.campo-texto')||{}).value || '',
-    _docsKey: 'docs_' + div.id,
-    docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho}))
-  }));
+  return Array.from(el.querySelectorAll('.registro')).map(div=>{
+    let ref = null;
+    if(div.dataset.ref){ try{ ref = JSON.parse(div.dataset.ref); }catch(e){ ref = null; } }
+    return {
+      codigo: (div.querySelector('.campo-codigo')||{}).value || '',
+      empresa: (div.querySelector('.campo-empresa')||{}).value || '',
+      tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
+      texto: (div.querySelector('.campo-texto')||{}).value || '',
+      ref: ref,
+      _docsKey: 'docs_' + div.id,
+      docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho}))
+    };
+  });
 }
 
 function ativo(slug){ return !!visibilidade[slug] && !semRegistro[slug]; }
