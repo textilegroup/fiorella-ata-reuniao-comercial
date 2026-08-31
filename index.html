@@ -147,6 +147,7 @@ input[type=file]{font-size:12px;}
 .zona-import strong{color:var(--preto);}
 .zona-import code{font-family:Consolas,'Courier New',monospace;font-size:11px;background:#fff;border:1px solid rgba(200,16,46,.2);border-radius:3px;padding:1px 5px;color:var(--vermelho);white-space:nowrap;display:inline-block;margin:1px;}
 .import-acoes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.lista-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
 
 /* ───── DADOS DO RELATÓRIO NO REGISTRO ───── */
@@ -341,7 +342,11 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     </div>
 
     <div id="listaRisco"></div>
-    <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaRisco','risco')">+ Adicionar empresa manualmente</button>
+    <div class="lista-acoes">
+      <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaRisco','risco')">+ Adicionar empresa manualmente</button>
+      <button type="button" class="btn btn-remover" id="btnLimparRisco" style="display:none"
+              onclick="excluirTodos('listaRisco','statusImportRisco','Clientes em risco de perda')">Excluir todos</button>
+    </div>
   </div>
 </div>
 
@@ -379,7 +384,11 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     </div>
 
     <div id="listaPerdidos"></div>
-    <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaPerdidos','perdido')">+ Adicionar empresa manualmente</button>
+    <div class="lista-acoes">
+      <button type="button" class="btn btn-claro" onclick="addRegistroEmpresa('listaPerdidos','perdido')">+ Adicionar empresa manualmente</button>
+      <button type="button" class="btn btn-remover" id="btnLimparPerdidos" style="display:none"
+              onclick="excluirTodos('listaPerdidos','statusImport','Clientes perdidos')">Excluir todos</button>
+    </div>
 
     <div style="margin-top:10px">
       <label>Observações gerais — clientes perdidos</label>
@@ -879,6 +888,39 @@ function statusDoContainer(containerId){
   const el = document.getElementById(containerId);
   const card = el && el.closest('.card[data-slug]');
   if(card) atualizarStatus(card.dataset.slug);
+  atualizarBotoesLimpar();
+}
+
+/* ─── Botões "Excluir todos" ─── */
+const LISTAS_LIMPAVEIS = [
+  {lista:'listaRisco',    botao:'btnLimparRisco'},
+  {lista:'listaPerdidos', botao:'btnLimparPerdidos'}
+];
+
+function atualizarBotoesLimpar(){
+  LISTAS_LIMPAVEIS.forEach(l=>{
+    const el = document.getElementById(l.lista);
+    const btn = document.getElementById(l.botao);
+    if(!el || !btn) return;
+    const n = el.querySelectorAll('.registro').length;
+    btn.style.display = n ? '' : 'none';
+    btn.textContent = 'Excluir todos (' + n + ')';
+  });
+}
+
+function excluirTodos(containerId, statusId, rotulo){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const regs = Array.from(el.querySelectorAll('.registro'));
+  if(!regs.length){ alert('Não há empresas lançadas neste tópico.'); return; }
+  if(!confirm('Excluir as ' + regs.length + ' empresas lançadas em "' + rotulo + '"?\n\n' +
+              'Os documentos anexados a elas também serão descartados. Esta ação não pode ser desfeita.')) return;
+  regs.forEach(r => { delete arquivos['docs_' + r.id]; });
+  el.innerHTML = '';
+  const st = statusId && document.getElementById(statusId);
+  if(st) st.innerHTML = '';
+  statusDoContainer(containerId);
+  toast(regs.length + ' empresa(s) removida(s) de "' + rotulo + '".');
 }
 
 /* ═══════════════════ REGISTROS POR EMPRESA ═══════════════════ */
@@ -964,6 +1006,7 @@ function removerRegistro(id){
     delete arquivos['docs_' + id];
     el.remove();
     if(card) atualizarStatus(card.dataset.slug);
+    atualizarBotoesLimpar();
   }
 }
 
