@@ -18,17 +18,13 @@
   --cinza-texto:#6A6A73;
   --branco:#FFFFFF;
   --verde:#1E7A3C;
+  --verde-suave:#EAF6EE;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
 body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 
 /* ───── CABEÇALHO ───── */
-.header{
-  background:var(--branco);
-  color:var(--preto);
-  padding:14px 18px 12px;
-  border-bottom:3px solid var(--vermelho);
-}
+.header{background:var(--branco);color:var(--preto);padding:14px 18px 12px;border-bottom:3px solid var(--vermelho);}
 .header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
 .header h1{font-size:22px;letter-spacing:3px;font-weight:800;color:var(--preto);}
 .header h1 span{color:var(--vermelho);}
@@ -36,58 +32,58 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 .header-dir{display:flex;align-items:flex-end;gap:14px;}
 .relogio{text-align:right;font-size:11px;color:var(--cinza-texto);}
 .relogio .hora{font-size:16px;font-weight:700;color:var(--vermelho);font-variant-numeric:tabular-nums;}
-.btn-adm{
-  background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);
-  padding:6px 12px;border-radius:4px;font-size:10.5px;font-weight:800;letter-spacing:1px;cursor:pointer;
-}
+.btn-adm{background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);padding:6px 12px;border-radius:4px;font-size:10.5px;font-weight:800;letter-spacing:1px;cursor:pointer;}
 .btn-adm:hover{background:var(--vermelho);color:var(--branco);}
 
 .container{max-width:1000px;margin:12px auto;padding:0 10px;}
 
-/* ───── CARTÕES / SEÇÕES ───── */
-.card{
-  background:var(--branco);
-  border:1px solid var(--cinza-borda);
-  border-radius:6px;
-  margin-bottom:10px;
-  overflow:hidden;
-  box-shadow:0 1px 2px rgba(0,0,0,.04);
+/* ───── BARRA DE PROGRESSO ───── */
+.progresso{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);
+  border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--cinza-texto);
 }
+.progresso .barra{flex:1;min-width:140px;height:7px;background:#EFEFF2;border-radius:5px;overflow:hidden;}
+.progresso .barra i{display:block;height:100%;width:0;background:var(--verde);transition:width .3s;}
+.progresso b{color:var(--preto);font-variant-numeric:tabular-nums;}
+
+/* ───── CARTÕES ───── */
+.card{background:var(--branco);border:1px solid var(--cinza-borda);border-radius:6px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);}
 .card-titulo{
-  background:var(--branco);
-  color:var(--preto);
-  padding:9px 12px;
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  border-bottom:2px solid var(--vermelho);
+  background:var(--branco);color:var(--preto);padding:9px 12px;font-size:12px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;
+  gap:10px;border-bottom:2px solid var(--vermelho);flex-wrap:wrap;
 }
-.card-titulo>span:first-child{display:flex;align-items:center;}
-.card-titulo .num{
-  background:var(--vermelho);color:var(--branco);
-  min-width:21px;height:21px;border-radius:4px;
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:12px;margin-right:8px;flex:none;
+.ct-esq{display:flex;align-items:center;gap:9px;min-width:0;}
+.ct-dir{display:flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap;}
+.dot{width:11px;height:11px;border-radius:50%;background:#D5D5DC;flex:none;transition:background .2s;}
+.status{
+  font-size:9.5px;font-weight:800;letter-spacing:.8px;padding:3px 8px;border-radius:10px;
+  background:#F4F4F6;color:#8A8A93;border:1px solid var(--cinza-borda);white-space:nowrap;
 }
-.card-titulo .tag{
-  font-size:10px;background:var(--vermelho-suave);color:var(--vermelho);
-  border:1px solid rgba(200,16,46,.28);
-  padding:3px 8px;border-radius:3px;letter-spacing:1px;flex:none;font-weight:700;
+.sem-reg{
+  display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:var(--cinza-texto);text-transform:uppercase;cursor:pointer;margin:0;white-space:nowrap;
 }
+.sem-reg input{width:15px;height:15px;accent-color:var(--verde);cursor:pointer;margin:0;}
+
+.card.completo{border-color:rgba(30,122,60,.45);}
+.card.completo .card-titulo{border-bottom-color:var(--verde);background:var(--verde-suave);}
+.card.completo .dot{background:var(--verde);}
+.card.completo .status{background:var(--verde);color:#fff;border-color:var(--verde);}
+.card.semreg .card-corpo{opacity:.45;pointer-events:none;}
+
 .card-corpo{padding:10px 12px;}
-.guia{
-  background:var(--vermelho-suave);border-left:4px solid var(--vermelho);
-  padding:8px 11px;border-radius:0 4px 4px 0;margin-bottom:10px;
-  font-size:12px;color:var(--cinza-texto);line-height:1.45;
-}
+.guia{background:var(--vermelho-suave);border-left:4px solid var(--vermelho);padding:8px 11px;border-radius:0 4px 4px 0;margin-bottom:10px;font-size:12px;color:var(--cinza-texto);line-height:1.45;}
+.card.completo .guia{background:#F7F7F8;border-left-color:#C9C9D1;}
 .guia strong{color:var(--preto);}
 .guia ul{margin:3px 0 0 16px;}
 .guia li{margin:1px 0;}
+
+/* ───── SEPARADOR DE GRUPO ───── */
+.separador{display:flex;align-items:center;gap:14px;margin:24px 0 12px;}
+.separador:before,.separador:after{content:"";height:2px;flex:1;background:var(--vermelho);opacity:.3;}
+.separador span{font-size:12px;font-weight:800;letter-spacing:4px;color:var(--vermelho);text-transform:uppercase;white-space:nowrap;}
 
 /* ───── CAMPOS ───── */
 label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--cinza-texto);margin:0 0 3px;}
@@ -102,12 +98,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 .col-fixa{flex:0 0 190px;min-width:150px;}
 
 /* ───── BOTÕES ───── */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:7px 13px;border:none;border-radius:5px;cursor:pointer;
-  font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  transition:background .15s,color .15s;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:7px 13px;border:none;border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:background .15s,color .15s;}
 .btn:disabled{opacity:.55;cursor:not-allowed;}
 .btn-vermelho{background:var(--vermelho);color:var(--branco);}
 .btn-vermelho:hover:not(:disabled){background:var(--vermelho-escuro);}
@@ -115,17 +106,15 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 .btn-preto:hover:not(:disabled){background:var(--vermelho);color:var(--branco);}
 .btn-claro{background:var(--branco);color:var(--vermelho);border:1px solid var(--cinza-borda);}
 .btn-claro:hover:not(:disabled){border-color:var(--vermelho);background:var(--vermelho-suave);}
+.btn-verde{background:var(--verde);color:#fff;}
+.btn-verde:hover:not(:disabled){filter:brightness(1.1);}
 .btn-remover{background:transparent;color:var(--vermelho);border:1px solid var(--vermelho);padding:6px 12px;font-size:11px;}
 .btn-remover:hover{background:var(--vermelho);color:var(--branco);}
 .btn-grande{width:100%;padding:12px;font-size:13px;}
 .btn-mini{padding:4px 9px;font-size:10.5px;border-radius:4px;}
 
 /* ───── SUBCARTÕES ───── */
-.registro{
-  border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);
-  border-radius:0 6px 6px 0;
-  padding:9px 10px;margin-bottom:8px;background:var(--branco);position:relative;
-}
+.registro{border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);border-radius:0 6px 6px 0;padding:9px 10px;margin-bottom:8px;background:var(--branco);}
 .registro-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
 .registro-topo .rotulo{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--vermelho);text-transform:uppercase;}
 
@@ -134,11 +123,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 .docs-hint{font-size:11px;color:var(--cinza-texto);margin-top:5px;font-style:italic;}
 input[type=file]{font-size:12px;}
 .lista-arquivos{list-style:none;margin-top:8px;}
-.lista-arquivos li{
-  font-size:12px;background:var(--vermelho-suave);border:1px solid rgba(200,16,46,.18);
-  border-radius:4px;padding:5px 10px;margin:4px 0;
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
+.lista-arquivos li{font-size:12px;background:var(--vermelho-suave);border:1px solid rgba(200,16,46,.18);border-radius:4px;padding:5px 10px;margin:4px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .lista-arquivos li button{background:none;border:none;color:var(--vermelho);cursor:pointer;font-weight:700;}
 .lista-arquivos li a{color:var(--vermelho);text-decoration:none;font-weight:600;}
 .lista-arquivos li a:hover{text-decoration:underline;}
@@ -146,11 +131,10 @@ input[type=file]{font-size:12px;}
 /* ───── RECOLHÍVEIS ───── */
 .recolhivel .card-corpo{display:none;}
 .recolhivel.aberto .card-corpo{display:block;}
-.btn-toggle{
-  background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);
-  padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;letter-spacing:1px;flex:none;font-weight:700;
-}
+.btn-toggle{background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;letter-spacing:1px;flex:none;font-weight:700;}
 .btn-toggle:hover{background:var(--vermelho);color:var(--branco);}
+.card.completo .btn-toggle{border-color:var(--verde);color:var(--verde);}
+.card.completo .btn-toggle:hover{background:var(--verde);color:#fff;}
 .texto-orientativo{font-size:12.5px;line-height:1.5;color:#333;}
 .texto-orientativo h4{margin:10px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--vermelho);}
 .texto-orientativo h4:first-child{margin-top:0;}
@@ -158,41 +142,32 @@ input[type=file]{font-size:12px;}
 .texto-orientativo .destaque{background:var(--vermelho-suave);border-left:3px solid var(--vermelho);padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;}
 
 /* ───── IMPORTAÇÃO EXCEL ───── */
-.zona-import{
-  border:2px dashed rgba(200,16,46,.35);border-radius:6px;padding:10px;text-align:center;
-  margin-bottom:10px;background:var(--vermelho-suave);
-}
+.zona-import{border:2px dashed rgba(200,16,46,.35);border-radius:6px;padding:10px;text-align:center;margin-bottom:10px;background:var(--vermelho-suave);}
 .zona-import p{font-size:12px;color:var(--cinza-texto);margin-bottom:6px;}
 .zona-import strong{color:var(--preto);}
 .badge-ok{display:inline-block;background:var(--verde);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;}
 
 /* ───── AÇÕES FINAIS ───── */
-.acoes-finais{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.acoes-finais{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
 .acoes-finais .btn{flex:1;min-width:220px;}
 .nota-banco{font-size:11px;color:var(--cinza-texto);text-align:center;margin-top:8px;}
 .nota-banco b{color:var(--vermelho);}
-.aviso-salvo{
-  position:fixed;bottom:18px;right:18px;background:var(--branco);color:var(--preto);
-  padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;
-  border:1px solid var(--cinza-borda);border-left:4px solid var(--vermelho);
-  box-shadow:0 4px 14px rgba(0,0,0,.12);z-index:900;
-}
+.aviso-salvo{position:fixed;bottom:18px;right:18px;background:var(--branco);color:var(--preto);padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid var(--cinza-borda);border-left:4px solid var(--vermelho);box-shadow:0 4px 14px rgba(0,0,0,.12);z-index:900;}
 .aviso-salvo.mostrar{opacity:1;}
 
 /* ═════════ ÁREA ADM ═════════ */
-.adm{
-  display:none;position:fixed;inset:0;background:var(--branco);z-index:1000;overflow-y:auto;
-}
+.adm{display:none;position:fixed;inset:0;background:var(--branco);z-index:1000;overflow-y:auto;}
 .adm.aberto{display:block;}
-.adm-topo{
-  border-bottom:3px solid var(--vermelho);padding:14px 18px;
-  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
-  position:sticky;top:0;background:var(--branco);z-index:5;
-}
+.adm-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;background:var(--branco);z-index:5;}
 .adm-topo h2{font-size:16px;letter-spacing:2px;font-weight:800;}
 .adm-topo h2 span{color:var(--vermelho);}
 .adm-topo .sub{font-size:10px;letter-spacing:1.5px;color:var(--cinza-texto);text-transform:uppercase;margin-top:2px;}
 .adm-corpo{max-width:1180px;margin:16px auto;padding:0 14px;}
+
+.abas{display:flex;gap:4px;border-bottom:1px solid var(--cinza-borda);margin-bottom:16px;flex-wrap:wrap;}
+.aba{background:transparent;border:none;border-bottom:3px solid transparent;padding:9px 16px;font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--cinza-texto);cursor:pointer;}
+.aba:hover{color:var(--vermelho);}
+.aba.ativa{color:var(--vermelho);border-bottom-color:var(--vermelho);}
 
 .login-box{max-width:360px;margin:70px auto;border:1px solid var(--cinza-borda);border-top:3px solid var(--vermelho);border-radius:6px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
 .login-box h3{font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
@@ -200,10 +175,7 @@ input[type=file]{font-size:12px;}
 .erro{color:var(--vermelho);font-size:12px;margin-top:8px;font-weight:600;}
 
 .adm-cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
-.adm-card{
-  flex:1;min-width:150px;border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);
-  border-radius:0 6px 6px 0;padding:10px 12px;background:var(--branco);
-}
+.adm-card{flex:1;min-width:150px;border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);border-radius:0 6px 6px 0;padding:10px 12px;background:var(--branco);}
 .adm-card .rot{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza-texto);font-weight:700;}
 .adm-card .val{font-size:22px;font-weight:800;color:var(--preto);margin-top:2px;font-variant-numeric:tabular-nums;}
 .adm-card .val small{font-size:12px;font-weight:600;color:var(--cinza-texto);}
@@ -214,48 +186,57 @@ input[type=file]{font-size:12px;}
 
 .tabela-wrap{overflow-x:auto;border:1px solid var(--cinza-borda);border-radius:6px;}
 table.tabela{width:100%;border-collapse:collapse;font-size:12.5px;min-width:820px;}
-table.tabela thead th{
-  background:var(--vermelho);color:var(--branco);text-align:left;padding:8px 10px;
-  font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;
-}
+table.tabela thead th{background:var(--vermelho);color:var(--branco);text-align:left;padding:8px 10px;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;}
 table.tabela tbody td{padding:8px 10px;border-bottom:1px solid var(--cinza-borda);vertical-align:middle;}
 table.tabela tbody tr:nth-child(even){background:#FCFCFD;}
 table.tabela tbody tr:hover{background:var(--vermelho-suave);}
 table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
-.pill{
-  display:inline-block;background:var(--vermelho-suave);color:var(--vermelho);
-  border:1px solid rgba(200,16,46,.25);border-radius:10px;
-  padding:1px 7px;font-size:10.5px;font-weight:700;margin:1px 2px 1px 0;white-space:nowrap;
-}
+.pill{display:inline-block;background:var(--vermelho-suave);color:var(--vermelho);border:1px solid rgba(200,16,46,.25);border-radius:10px;padding:1px 7px;font-size:10.5px;font-weight:700;margin:1px 2px 1px 0;white-space:nowrap;}
 .pill.zero{background:#F7F7F8;color:#9A9AA2;border-color:var(--cinza-borda);}
 .vazio{padding:26px;text-align:center;color:var(--cinza-texto);font-size:13px;}
 
-/* ───── MODAL DETALHE ───── */
+/* ───── VISIBILIDADE DOS TÓPICOS ───── */
+.vis-aviso{background:var(--vermelho-suave);border-left:4px solid var(--vermelho);padding:9px 12px;border-radius:0 4px 4px 0;font-size:12.5px;color:var(--cinza-texto);line-height:1.5;margin-bottom:14px;}
+.vis-aviso strong{color:var(--preto);}
+.vis-grupo{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--vermelho);margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--cinza-borda);}
+.vis-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--cinza-borda);border-radius:6px;margin-bottom:7px;background:var(--branco);}
+.vis-item.off{background:#FAFAFB;border-style:dashed;}
+.vis-item .nome{flex:1;min-width:0;font-size:13.5px;font-weight:600;}
+.vis-item .nome small{display:block;font-size:11px;font-weight:400;color:var(--cinza-texto);margin-top:2px;}
+.vis-item.off .nome{color:#9A9AA2;}
+.vis-estado{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--verde);width:74px;text-align:right;flex:none;}
+.vis-item.off .vis-estado{color:#9A9AA2;}
+.sw{position:relative;display:inline-block;width:44px;height:23px;flex:none;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw i{position:absolute;inset:0;background:#D9D9DE;border-radius:23px;transition:.2s;cursor:pointer;}
+.sw i:before{content:"";position:absolute;width:17px;height:17px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw input:checked + i{background:var(--verde);}
+.sw input:checked + i:before{transform:translateX(21px);}
+.vis-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+
+/* ───── MODAL ───── */
 .modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:1100;padding:20px;overflow-y:auto;}
 .modal.aberto{display:block;}
-.modal-caixa{
-  max-width:900px;margin:0 auto;background:var(--branco);border-radius:8px;overflow:hidden;
-  border-top:4px solid var(--vermelho);box-shadow:0 10px 40px rgba(0,0,0,.25);
-}
+.modal-caixa{max-width:900px;margin:0 auto;background:var(--branco);border-radius:8px;overflow:hidden;border-top:4px solid var(--vermelho);box-shadow:0 10px 40px rgba(0,0,0,.25);}
 .modal-topo{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--cinza-borda);flex-wrap:wrap;}
 .modal-topo h3{font-size:14px;letter-spacing:1px;text-transform:uppercase;}
 .modal-topo h3 small{display:block;font-size:11px;color:var(--cinza-texto);letter-spacing:0;text-transform:none;font-weight:400;margin-top:2px;}
 .modal-corpo{padding:14px 16px 20px;}
 .bloco-sec{margin-bottom:14px;}
-.bloco-sec h4{
-  font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--vermelho);
-  border-bottom:1px solid var(--cinza-borda);padding-bottom:4px;margin-bottom:6px;font-weight:800;
-}
+.bloco-sec h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--vermelho);border-bottom:1px solid var(--cinza-borda);padding-bottom:4px;margin-bottom:6px;font-weight:800;}
 .bloco-sec .obs{font-size:12.5px;line-height:1.5;white-space:pre-wrap;color:#333;}
 .mini-tab{width:100%;border-collapse:collapse;font-size:12px;}
 .mini-tab th{background:var(--vermelho-suave);color:var(--vermelho);text-align:left;padding:5px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;border:1px solid rgba(200,16,46,.2);}
 .mini-tab td{padding:5px 8px;border:1px solid var(--cinza-borda);vertical-align:top;}
 .sem{color:var(--cinza-texto);font-style:italic;font-size:12px;}
+.marca-nada{color:var(--verde);font-weight:700;font-size:12px;}
+.marca-oculta{color:#9A9AA2;font-style:italic;font-size:12px;}
 
 @media(max-width:640px){
   .header-inner{flex-direction:column;align-items:flex-start;}
   .header-dir{width:100%;justify-content:space-between;align-items:center;}
   .relogio{text-align:left;}
+  .card-titulo{font-size:11px;}
 }
 </style>
 </head>
@@ -280,10 +261,22 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 
 <div class="container">
 
+<!-- ═══════════ PROGRESSO ═══════════ -->
+<div class="progresso">
+  <span>Preenchimento</span>
+  <div class="barra"><i id="barraProg"></i></div>
+  <span><b id="progTexto">0 de 0</b> tópicos concluídos</span>
+</div>
+
 <!-- ═══════════ DADOS DA REUNIÃO ═══════════ -->
 <div class="card recolhivel aberto" id="sec0">
-  <div class="card-titulo"><span><span class="num">✓</span>DADOS DA REUNIÃO</span>
-    <button type="button" class="btn-toggle" onclick="toggleSecao('sec0',this)">RECOLHER</button></div>
+  <div class="card-titulo">
+    <span class="ct-esq"><span class="dot"></span>DADOS DA REUNIÃO</span>
+    <span class="ct-dir">
+      <span class="status">OBRIGATÓRIO</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec0',this)">RECOLHER</button>
+    </span>
+  </div>
   <div class="card-corpo">
     <div class="linha">
       <div class="col-fixa">
@@ -308,13 +301,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 1. CLIENTES EM RISCO ═══════════ -->
-<div class="card recolhivel aberto" id="sec1">
+<!-- ═══════════ CLIENTES EM RISCO ═══════════ -->
+<div class="card recolhivel" id="sec1" data-slug="risco">
   <div class="card-titulo">
-    <span><span class="num">1</span>CLIENTES EM RISCO DE PERDA</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">CÓDIGO + EMPRESA</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>CLIENTES EM RISCO DE PERDA</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('risco',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -331,13 +325,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 2. CLIENTES PERDIDOS ═══════════ -->
-<div class="card recolhivel aberto" id="sec2">
+<!-- ═══════════ CLIENTES PERDIDOS ═══════════ -->
+<div class="card recolhivel" id="sec2" data-slug="perdidos">
   <div class="card-titulo">
-    <span><span class="num">2</span>CLIENTES PERDIDOS</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">LANÇAR RELATÓRIO</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec2',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>CLIENTES PERDIDOS</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('perdidos',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec2',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -375,13 +370,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 3. CLIENTES SEM CONTATO ═══════════ -->
-<div class="card recolhivel aberto" id="sec3">
+<!-- ═══════════ CLIENTES SEM CONTATO ═══════════ -->
+<div class="card recolhivel" id="sec3" data-slug="semcontato">
   <div class="card-titulo">
-    <span><span class="num">3</span>CLIENTES SEM CONTATO</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">LANÇAR RELATÓRIO</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec3',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>CLIENTES SEM CONTATO</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('semcontato',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec3',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -411,13 +407,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 4. OPORTUNIDADES RELEVANTES ═══════════ -->
-<div class="card recolhivel aberto" id="sec4">
+<!-- ═══════════ OPORTUNIDADES ═══════════ -->
+<div class="card recolhivel" id="sec4" data-slug="oportunidades">
   <div class="card-titulo">
-    <span><span class="num">4</span>OPORTUNIDADES RELEVANTES</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">CÓDIGO + EMPRESA</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>OPORTUNIDADES RELEVANTES</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('oportunidades',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -434,13 +431,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 5. AÇÕES DA SEMANA ANTERIOR ═══════════ -->
-<div class="card recolhivel aberto" id="sec5">
+<!-- ═══════════ AÇÕES DA SEMANA ANTERIOR ═══════════ -->
+<div class="card recolhivel" id="sec5" data-slug="acoes">
   <div class="card-titulo">
-    <span><span class="num">5</span>AÇÕES DA SEMANA ANTERIOR</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">REGISTRAR</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>AÇÕES DA SEMANA ANTERIOR</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('acoes',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -457,10 +455,21 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 6. UTILIZAÇÃO DO CRM ═══════════ -->
-<div class="card recolhivel aberto" id="sec6">
-  <div class="card-titulo"><span><span class="num">6</span>UTILIZAÇÃO DO CRM</span>
-    <button type="button" class="btn-toggle" onclick="toggleSecao('sec6',this)">RECOLHER</button></div>
+<!-- ═══════════════════════════════════════════════════════════
+     ORIENTAÇÕES
+═══════════════════════════════════════════════════════════ -->
+<div class="separador" id="sepOrientacoes"><span>Orientações</span></div>
+
+<!-- ═══════════ UTILIZAÇÃO DO CRM ═══════════ -->
+<div class="card recolhivel" id="sec6" data-slug="crm">
+  <div class="card-titulo">
+    <span class="ct-esq"><span class="dot"></span>UTILIZAÇÃO DO CRM</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('crm',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec6',this)">EXIBIR</button>
+    </span>
+  </div>
   <div class="card-corpo">
     <div class="guia"><strong>Verificar:</strong>
       <ul>
@@ -477,13 +486,14 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 7. NECESSIDADES DE APOIO ═══════════ -->
-<div class="card recolhivel aberto" id="sec7">
+<!-- ═══════════ NECESSIDADES DE APOIO ═══════════ -->
+<div class="card recolhivel" id="sec7" data-slug="apoio">
   <div class="card-titulo">
-    <span><span class="num">7</span>NECESSIDADES DE APOIO</span>
-    <span style="display:flex;gap:8px;align-items:center;flex:none">
-      <span class="tag">ABRIR CHAMADO</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec7',this)">RECOLHER</button>
+    <span class="ct-esq"><span class="dot"></span>NECESSIDADES DE APOIO</span>
+    <span class="ct-dir">
+      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('apoio',this)"> Nada a registrar</label>
+      <span class="status">PENDENTE</span>
+      <button type="button" class="btn-toggle" onclick="toggleSecao('sec7',this)">EXIBIR</button>
     </span>
   </div>
   <div class="card-corpo">
@@ -502,11 +512,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 8. TEMAS QUE DEVEM SER EVITADOS ═══════════ -->
-<div class="card recolhivel" id="secEvitados">
+<!-- ═══════════ TEMAS QUE DEVEM SER EVITADOS ═══════════ -->
+<div class="card recolhivel" id="secEvitados" data-slug="evitados">
   <div class="card-titulo">
-    <span><span class="num">8</span>TEMAS QUE DEVEM SER EVITADOS</span>
-    <button type="button" class="btn-toggle" onclick="toggleSecao('secEvitados',this)">EXIBIR</button>
+    <span class="ct-esq"><span class="dot"></span>TEMAS QUE DEVEM SER EVITADOS</span>
+    <span class="ct-dir">
+      <button type="button" class="btn-toggle" onclick="toggleSecao('secEvitados',this)">EXIBIR</button>
+    </span>
   </div>
   <div class="card-corpo">
     <div class="texto-orientativo">
@@ -564,11 +576,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<!-- ═══════════ 9. REGRA PRÁTICA ═══════════ -->
-<div class="card recolhivel" id="secRegra">
+<!-- ═══════════ REGRA PRÁTICA ═══════════ -->
+<div class="card recolhivel" id="secRegra" data-slug="regra">
   <div class="card-titulo">
-    <span><span class="num">9</span>REGRA PRÁTICA</span>
-    <button type="button" class="btn-toggle" onclick="toggleSecao('secRegra',this)">EXIBIR</button>
+    <span class="ct-esq"><span class="dot"></span>REGRA PRÁTICA</span>
+    <span class="ct-dir">
+      <button type="button" class="btn-toggle" onclick="toggleSecao('secRegra',this)">EXIBIR</button>
+    </span>
   </div>
   <div class="card-corpo">
     <div class="texto-orientativo">
@@ -599,7 +613,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="adm-topo">
     <div>
       <h2>FIORELLA<span>.</span> ADM</h2>
-      <div class="sub">Atas de reunião arquivadas</div>
+      <div class="sub">Administração das atas e do formulário</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn btn-claro btn-mini" id="btnExportar" onclick="admExportar()" style="display:none">Exportar Excel</button>
@@ -612,7 +626,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div id="admLogin">
     <div class="login-box">
       <h3>Acesso restrito</h3>
-      <p>Informe a senha administrativa para consultar, baixar ou excluir as atas arquivadas.</p>
+      <p>Informe a senha administrativa para consultar as atas arquivadas e configurar o formulário.</p>
       <label>Senha</label>
       <input type="password" id="admSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')admEntrar()">
       <div id="admErro" class="erro" style="display:none"></div>
@@ -622,37 +636,62 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 
   <!-- PAINEL -->
   <div class="adm-corpo" id="admConteudo" style="display:none">
-    <div class="adm-cards" id="admCards"></div>
 
-    <div class="adm-filtros">
-      <div class="campo">
-        <label>De</label>
-        <input type="date" id="filtroDe" onchange="admCarregar()">
-      </div>
-      <div class="campo">
-        <label>Até</label>
-        <input type="date" id="filtroAte" onchange="admCarregar()">
-      </div>
-      <div class="campo busca">
-        <label>Busca (vendedor, condutor, código ou nome da empresa)</label>
-        <input type="text" id="filtroBusca" placeholder="Digite e pressione Enter" onkeydown="if(event.key==='Enter')admCarregar()">
-      </div>
-      <button type="button" class="btn btn-vermelho" onclick="admCarregar()">Filtrar</button>
-      <button type="button" class="btn btn-claro" onclick="admLimparFiltros()">Limpar</button>
+    <div class="abas">
+      <button type="button" class="aba ativa" id="abaBtnAtas" onclick="admAba('atas')">Atas arquivadas</button>
+      <button type="button" class="aba" id="abaBtnSecoes" onclick="admAba('secoes')">Visibilidade dos tópicos</button>
     </div>
 
-    <div class="tabela-wrap">
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>Nº</th><th>Data</th><th>Vendedor</th><th>Cód.</th><th>Condutor</th>
-            <th>Conteúdo</th><th>Anexos</th><th>Arquivada em</th><th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="admLinhas"></tbody>
-      </table>
-      <div class="vazio" id="admVazio" style="display:none">Nenhuma ata encontrada.</div>
+    <!-- ─── ABA ATAS ─── -->
+    <div id="abaAtas">
+      <div class="adm-cards" id="admCards"></div>
+
+      <div class="adm-filtros">
+        <div class="campo">
+          <label>De</label>
+          <input type="date" id="filtroDe" onchange="admCarregar()">
+        </div>
+        <div class="campo">
+          <label>Até</label>
+          <input type="date" id="filtroAte" onchange="admCarregar()">
+        </div>
+        <div class="campo busca">
+          <label>Busca (vendedor, condutor, código ou nome da empresa)</label>
+          <input type="text" id="filtroBusca" placeholder="Digite e pressione Enter" onkeydown="if(event.key==='Enter')admCarregar()">
+        </div>
+        <button type="button" class="btn btn-vermelho" onclick="admCarregar()">Filtrar</button>
+        <button type="button" class="btn btn-claro" onclick="admLimparFiltros()">Limpar</button>
+      </div>
+
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>Nº</th><th>Data</th><th>Vendedor</th><th>Cód.</th><th>Condutor</th>
+              <th>Conteúdo</th><th>Anexos</th><th>Arquivada em</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="admLinhas"></tbody>
+        </table>
+        <div class="vazio" id="admVazio" style="display:none">Nenhuma ata encontrada.</div>
+      </div>
     </div>
+
+    <!-- ─── ABA VISIBILIDADE ─── -->
+    <div id="abaSecoes" style="display:none">
+      <div class="vis-aviso">
+        <strong>Controle geral dos tópicos do formulário.</strong> Os tópicos desligados aqui deixam de aparecer para os vendedores
+        e não entram na ata em PDF. A configuração vale para todos os usuários e passa a valer no próximo carregamento do formulário.
+        Atas já arquivadas não são afetadas — cada uma guarda a configuração vigente no dia em que foi gerada.
+      </div>
+      <div id="visLista"></div>
+      <div class="vis-acoes">
+        <button type="button" class="btn btn-verde" onclick="admSalvarSecoes()">Salvar configuração</button>
+        <button type="button" class="btn btn-claro" onclick="admTodosVisiveis()">Marcar todos como visíveis</button>
+        <button type="button" class="btn btn-claro" onclick="admCarregarSecoes()">Descartar alterações</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -670,15 +709,10 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
-<div class="aviso-salvo" id="avisoSalvo">Rascunho salvo automaticamente</div>
+<div class="aviso-salvo" id="avisoSalvo">Aviso</div>
 
 <script>
-/* ═══════════════════ CONFIGURAÇÃO SUPABASE ═══════════════════
-   Banco: textilegroup's Project
-   Tabelas: atas_reuniao, atas_reuniao_itens, atas_reuniao_anexos
-   Bucket : atas-anexos
-   Acesso : somente via funções SECURITY DEFINER (RLS sem políticas diretas)
-─────────────────────────────────────────────────────────────── */
+/* ═══════════════════ CONFIGURAÇÃO SUPABASE ═══════════════════ */
 const SUPABASE_URL  = 'https://eepmlsdbtcvsjxdcvimi.supabase.co';
 const SUPABASE_KEY  = 'sb_publishable_048Dv-jRALn34Ythhj9ngA_fZ1gsNI_';
 const BUCKET_ANEXOS = 'atas-anexos';
@@ -694,12 +728,31 @@ const BITRIX = {
   responsavelTarefas: 1
 };
 
+/* ═══════════════════ TÓPICOS DO FORMULÁRIO ═══════════════════ */
+const TOPICOS = [
+  {slug:'risco',         card:'sec1',         titulo:'CLIENTES EM RISCO DE PERDA',   chave:'risco',         preenchivel:true,  lista:'listaRisco'},
+  {slug:'perdidos',      card:'sec2',         titulo:'CLIENTES PERDIDOS',            chave:'perdidos',      preenchivel:true,  lista:'listaPerdidos'},
+  {slug:'semcontato',    card:'sec3',         titulo:'CLIENTES SEM CONTATO',         chave:'semContato',    preenchivel:true,  lista:'listaSemContato'},
+  {slug:'oportunidades', card:'sec4',         titulo:'OPORTUNIDADES RELEVANTES',     chave:'oportunidades', preenchivel:true,  lista:'listaOportunidades'},
+  {slug:'acoes',         card:'sec5',         titulo:'AÇÕES DA SEMANA ANTERIOR',     chave:null,            preenchivel:true},
+  {slug:'crm',           card:'sec6',         titulo:'UTILIZAÇÃO DO CRM',            chave:null,            preenchivel:true},
+  {slug:'apoio',         card:'sec7',         titulo:'NECESSIDADES DE APOIO',        chave:'chamados',      preenchivel:true,  lista:'listaChamados'},
+  {slug:'evitados',      card:'secEvitados',  titulo:'TEMAS QUE DEVEM SER EVITADOS', chave:null,            preenchivel:false},
+  {slug:'regra',         card:'secRegra',     titulo:'REGRA PRÁTICA',                chave:null,            preenchivel:false}
+];
+const TOP = {}; TOPICOS.forEach(t => TOP[t.slug] = t);
+const GRUPO_ORIENTACOES = ['crm','apoio','evitados','regra'];
+
+let visibilidade = {};   // {slug: true/false}
+let semRegistro  = {};   // {slug: true/false}
+
 /* ═══════════════════ ESTADO ═══════════════════ */
 let contador = 0;
-const arquivos = {};                 // {containerId: [{nome, tipo, tamanho, file}]}
-const LIMITE_ARQ = 5 * 1024 * 1024;  // 5MB
+const arquivos = {};
+const LIMITE_ARQ = 5 * 1024 * 1024;
 let admSenhaAtual = '';
 let admDados = [];
+let admSecoes = [];
 
 /* ═══════════════════ RELÓGIO ═══════════════════ */
 function tick(){
@@ -710,13 +763,100 @@ function tick(){
 }
 setInterval(tick,1000); tick();
 
+/* ═══════════════════ VISIBILIDADE ═══════════════════ */
+async function carregarVisibilidade(){
+  TOPICOS.forEach(t => visibilidade[t.slug] = true);
+  try{
+    const { data, error } = await sb.rpc('ata_secoes');
+    if(error) throw new Error(error.message);
+    (data||[]).forEach(s => { if(TOP[s.slug]) visibilidade[s.slug] = !!s.visivel; });
+  }catch(err){
+    toast('Não foi possível ler a configuração de tópicos — exibindo todos.');
+  }
+  aplicarVisibilidade();
+}
+
+function aplicarVisibilidade(){
+  TOPICOS.forEach(t=>{
+    const el = document.getElementById(t.card);
+    if(el) el.style.display = visibilidade[t.slug] ? '' : 'none';
+  });
+  const temOrient = GRUPO_ORIENTACOES.some(s => visibilidade[s]);
+  document.getElementById('sepOrientacoes').style.display = temOrient ? '' : 'none';
+  atualizarTodosStatus();
+}
+
+/* ═══════════════════ CONTROLE DE PREENCHIMENTO ═══════════════════ */
+function temConteudo(slug){
+  const t = TOP[slug];
+  const card = t && document.getElementById(t.card);
+  if(!card) return false;
+  const campos = card.querySelectorAll('input[type=text], textarea, select');
+  for(const c of campos){ if(String(c.value||'').trim() !== '') return true; }
+  const listas = card.querySelectorAll('.lista-arquivos');
+  for(const u of listas){ if((arquivos[u.id]||[]).length) return true; }
+  return false;
+}
+
+function atualizarStatus(slug){
+  const t = TOP[slug];
+  if(!t || !t.preenchivel) return;
+  const card = document.getElementById(t.card);
+  if(!card) return;
+  const chip = card.querySelector('.status');
+  const nada = !!semRegistro[slug];
+  const cheio = temConteudo(slug);
+  card.classList.toggle('semreg', nada);
+  card.classList.toggle('completo', nada || cheio);
+  if(chip) chip.textContent = nada ? 'SEM REGISTRO' : (cheio ? 'PREENCHIDO' : 'PENDENTE');
+  atualizarProgresso();
+}
+
+function atualizarTodosStatus(){
+  TOPICOS.forEach(t => { if(t.preenchivel) atualizarStatus(t.slug); });
+  atualizarProgresso();
+}
+
+function atualizarProgresso(){
+  const ativos = TOPICOS.filter(t => t.preenchivel && visibilidade[t.slug]);
+  const ok = ativos.filter(t => semRegistro[t.slug] || temConteudo(t.slug)).length;
+  const pct = ativos.length ? Math.round(ok / ativos.length * 100) : 0;
+  const barra = document.getElementById('barraProg');
+  if(barra) barra.style.width = pct + '%';
+  const txt = document.getElementById('progTexto');
+  if(txt) txt.textContent = ok + ' de ' + ativos.length;
+}
+
+function marcarSemRegistro(slug, chk){
+  if(chk.checked && temConteudo(slug)){
+    if(!confirm('Este tópico já tem informação preenchida.\n\nMarcar como "nada a registrar" faz com que esse conteúdo NÃO entre na ata. Continuar?')){
+      chk.checked = false; return;
+    }
+  }
+  semRegistro[slug] = chk.checked;
+  atualizarStatus(slug);
+}
+
+document.addEventListener('input', function(e){
+  const card = e.target.closest('.card[data-slug]');
+  if(card) atualizarStatus(card.dataset.slug);
+});
+document.addEventListener('change', function(e){
+  if(e.target.classList && e.target.classList.contains('chk-sem')) return;
+  const card = e.target.closest('.card[data-slug]');
+  if(card) atualizarStatus(card.dataset.slug);
+});
+
+function statusDoContainer(containerId){
+  const el = document.getElementById(containerId);
+  const card = el && el.closest('.card[data-slug]');
+  if(card) atualizarStatus(card.dataset.slug);
+}
+
 /* ═══════════════════ REGISTROS POR EMPRESA ═══════════════════ */
 const ROTULOS = {
-  risco:'Cliente em risco',
-  perdido:'Cliente perdido',
-  semcontato:'Cliente sem contato',
-  oportunidade:'Oportunidade',
-  chamado:'Chamado'
+  risco:'Cliente em risco', perdido:'Cliente perdido', semcontato:'Cliente sem contato',
+  oportunidade:'Oportunidade', chamado:'Chamado'
 };
 const PLACEHOLDERS = {
   risco:'Situação do cliente, mudança de padrão de compra, presença da concorrência e ação definida...',
@@ -757,18 +897,20 @@ function addRegistroEmpresa(containerId, tipo, dados){
       <ul class="lista-arquivos" id="${docsId}"></ul>
     </div>` : ''}`;
   document.getElementById(containerId).appendChild(div);
+  statusDoContainer(containerId);
   return div;
 }
 
 function removerRegistro(id){
   const el = document.getElementById(id);
   if(el && confirm('Remover este registro?')){
+    const card = el.closest('.card[data-slug]');
     delete arquivos['docs_' + id];
     el.remove();
+    if(card) atualizarStatus(card.dataset.slug);
   }
 }
 
-/* ═══════════════════ CHAMADOS (ITEM 7) ═══════════════════ */
 function addChamado(dados){
   dados = dados || {};
   contador++;
@@ -794,17 +936,18 @@ function addChamado(dados){
         <label>Tipo de apoio</label>
         <select class="campo-tipo">
           <option value="">Selecione...</option>
-          <option ${dados.tipoApoio==='Visita comercial'?'selected':''}>Visita comercial</option>
-          <option ${dados.tipoApoio==='Visita técnica'?'selected':''}>Visita técnica</option>
-          <option ${dados.tipoApoio==='Aprovação comercial'?'selected':''}>Aprovação comercial</option>
-          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Operacional)'?'selected':''}>Contato telefônico (Supervisão Operacional)</option>
-          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Administrativa)'?'selected':''}>Contato telefônico (Supervisão Administrativa)</option>
+          <option>Visita comercial</option>
+          <option>Visita técnica</option>
+          <option>Aprovação comercial</option>
+          <option>Contato telefônico (Supervisão Operacional)</option>
+          <option>Contato telefônico (Supervisão Administrativa)</option>
         </select>
       </div>
     </div>
     <label>Descrição do chamado</label>
     <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio..."></textarea>`;
   document.getElementById('listaChamados').appendChild(div);
+  statusDoContainer('listaChamados');
 }
 
 function esc(s){
@@ -818,7 +961,7 @@ function limpaNome(n){
   return String(n).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(-80);
 }
 
-/* ═══════════════════ IMPORTAÇÃO EXCEL — CÓDIGO + NOME ═══════════════════ */
+/* ═══════════════════ IMPORTAÇÃO EXCEL ═══════════════════ */
 function importarExcel(input, containerId, tipo, statusId){
   const file = input.files[0];
   if(!file) return;
@@ -854,6 +997,7 @@ function importarExcel(input, containerId, tipo, statusId){
         importados>0
           ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — preencha o registro de cada uma</span>'
           : '<span style="color:var(--vermelho);font-size:12px">Nenhuma empresa identificada na planilha (verifique as colunas Código e Nome).</span>';
+      statusDoContainer(containerId);
     }catch(err){
       alert('Erro ao ler a planilha: ' + err.message);
     }
@@ -867,10 +1011,7 @@ function anexar(input, containerId){
   const files = Array.from(input.files);
   if(!arquivos[containerId]) arquivos[containerId] = [];
   files.forEach(f=>{
-    if(f.size > LIMITE_ARQ){
-      alert('Arquivo "' + f.name + '" excede 5MB e não foi anexado.');
-      return;
-    }
+    if(f.size > LIMITE_ARQ){ alert('Arquivo "' + f.name + '" excede 5MB e não foi anexado.'); return; }
     arquivos[containerId].push({nome:f.name, tipo:f.type||'application/octet-stream', tamanho:f.size, file:f});
   });
   renderArquivos(containerId);
@@ -887,6 +1028,7 @@ function renderArquivos(containerId){
       '<button type="button" onclick="removerArquivo(\'' + containerId + '\',' + i + ')">✕</button>';
     ul.appendChild(li);
   });
+  statusDoContainer(containerId);
 }
 
 function removerArquivo(containerId, idx){
@@ -903,7 +1045,9 @@ function toggleSecao(id, btn){
 
 /* ═══════════════════ COLETA DE DADOS ═══════════════════ */
 function coletarRegistros(containerId){
-  return Array.from(document.getElementById(containerId).querySelectorAll('.registro')).map(div=>({
+  const el = document.getElementById(containerId);
+  if(!el) return [];
+  return Array.from(el.querySelectorAll('.registro')).map(div=>({
     codigo: (div.querySelector('.campo-codigo')||{}).value || '',
     empresa: (div.querySelector('.campo-empresa')||{}).value || '',
     tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
@@ -913,22 +1057,32 @@ function coletarRegistros(containerId){
   }));
 }
 
+function ativo(slug){ return !!visibilidade[slug] && !semRegistro[slug]; }
+function txt(id, slug){ return ativo(slug) ? (document.getElementById(id).value || '') : ''; }
+function regs(containerId, slug){ return ativo(slug) ? coletarRegistros(containerId) : []; }
+
 function coletarTudo(){
+  const vis = {}, nada = {};
+  TOPICOS.forEach(t=>{ vis[t.slug] = !!visibilidade[t.slug]; nada[t.slug] = !!(visibilidade[t.slug] && semRegistro[t.slug]); });
   return {
     dataReuniao: document.getElementById('dataReuniao').value,
     vendedorNome: document.getElementById('vendedorNome').value.trim(),
     vendedorCodigo: document.getElementById('vendedorCodigo').value.trim(),
     condutor: document.getElementById('condutor').value.trim(),
-    risco: coletarRegistros('listaRisco'),
-    perdidos: coletarRegistros('listaPerdidos'),
-    obsPerdidos: document.getElementById('obsPerdidos').value,
-    semContato: coletarRegistros('listaSemContato'),
-    obsSemContato: document.getElementById('obsSemContato').value,
-    obsAcoes: document.getElementById('obsAcoes').value,
-    obsCRM: document.getElementById('obsCRM').value,
-    oportunidades: coletarRegistros('listaOportunidades'),
-    chamados: coletarRegistros('listaChamados'),
-    docsGerais: (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, contexto:'perdidos'}))
+    secoesVisiveis: vis,
+    semRegistro: nada,
+    risco: regs('listaRisco','risco'),
+    perdidos: regs('listaPerdidos','perdidos'),
+    obsPerdidos: txt('obsPerdidos','perdidos'),
+    semContato: regs('listaSemContato','semcontato'),
+    obsSemContato: txt('obsSemContato','semcontato'),
+    obsAcoes: txt('obsAcoes','acoes'),
+    obsCRM: txt('obsCRM','crm'),
+    oportunidades: regs('listaOportunidades','oportunidades'),
+    chamados: regs('listaChamados','apoio'),
+    docsGerais: ativo('perdidos')
+      ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, contexto:'perdidos'}))
+      : []
   };
 }
 
@@ -937,7 +1091,7 @@ function limparTudo(){
   location.reload();
 }
 
-/* ═══════════════════ ENVIO DOS ANEXOS AO STORAGE ═══════════════════ */
+/* ═══════════════════ ANEXOS → STORAGE ═══════════════════ */
 async function enviarAnexos(ataId, d){
   async function subir(lista, meta, contexto){
     for(let i=0; i<meta.length; i++){
@@ -953,34 +1107,33 @@ async function enviarAnexos(ataId, d){
   }
   for(const r of d.risco){ await subir(arquivos[r._docsKey], r.docs, 'risco'); }
   await subir(arquivos['docsPerdidos'], d.docsGerais, 'perdidos');
-  // remove chaves internas antes de gravar
   ['risco','perdidos','semContato','oportunidades','chamados'].forEach(k=>{
     (d[k]||[]).forEach(r=>{ delete r._docsKey; });
   });
 }
 
-/* ═══════════════════ GRAVAÇÃO NO BANCO ═══════════════════ */
 async function salvarNoBanco(ataId, d){
   const { data, error } = await sb.rpc('ata_salvar', { p_dados: d, p_id: ataId });
   if(error) throw new Error(error.message);
   return data;
 }
 
-/* ═══════════════════ CONSTRUÇÃO DO PDF ═══════════════════ */
+/* ═══════════════════ PDF ═══════════════════ */
 function construirPDF(d, numero){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
   const W = doc.internal.pageSize.getWidth();
-  const PRETO=[26,26,26], VERMELHO=[200,16,46], CINZA=[106,106,115], BORDA=[230,230,234];
+  const PRETO=[26,26,26], VERMELHO=[200,16,46], CINZA=[106,106,115], BORDA=[230,230,234], VERDE=[30,122,60];
   let y = 0;
 
+  const vis  = d.secoesVisiveis || {};
+  const nada = d.semRegistro || {};
+  const mostrar = s => (vis[s] === undefined ? true : !!vis[s]);
   const dataFmt = String(d.dataReuniao||'').split('-').reverse().join('/');
 
-  // ── Cabeçalho ──
   doc.setFillColor(255,255,255); doc.rect(0,0,W,26,'F');
   doc.setFillColor(...VERMELHO); doc.rect(0,26,W,1.8,'F');
-  doc.setTextColor(...PRETO);
-  doc.setFont('helvetica','bold'); doc.setFontSize(18);
+  doc.setTextColor(...PRETO); doc.setFont('helvetica','bold'); doc.setFontSize(18);
   doc.text('FIORELLA', 14, 12);
   const larg = doc.getTextWidth('FIORELLA');
   doc.setTextColor(...VERMELHO); doc.text('.', 14 + larg + 0.5, 12);
@@ -1002,27 +1155,34 @@ function construirPDF(d, numero){
   });
   y = doc.lastAutoTable.finalY + 8;
 
-  function titulo(num, txt){
+  let n = 0;
+  function titulo(texto){
+    n++;
     if(y > 265){ doc.addPage(); y = 20; }
     doc.setFillColor(...VERMELHO); doc.rect(14, y-4.5, 6.5, 6.5, 'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-    doc.text(String(num), 17.2, y, {align:'center'});
+    doc.text(String(n), 17.2, y, {align:'center'});
     doc.setTextColor(...PRETO); doc.setFontSize(11);
-    doc.text(txt, 24, y);
+    doc.text(texto, 24, y);
     doc.setDrawColor(...VERMELHO); doc.setLineWidth(.4);
     doc.line(14, y+2.5, W-14, y+2.5);
     y += 8;
   }
 
-  function nomesDocs(r){
-    return (r.docs||[]).map(x=> typeof x === 'string' ? x : (x.nome||'')).filter(Boolean);
+  function semRegistroTexto(){
+    if(y > 275){ doc.addPage(); y = 20; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...VERDE);
+    doc.text('Nada a registrar nesta reunião — confirmado pelo vendedor.', 14, y);
+    doc.setTextColor(...PRETO); y += 9;
   }
+
+  function nomesDocs(r){ return (r.docs||[]).map(x=> typeof x === 'string' ? x : (x.nome||'')).filter(Boolean); }
 
   function tabelaRegistros(lista, comApoio, comDocs){
     lista = lista || [];
     if(!lista.length){
       doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(...CINZA);
-      doc.text('Sem registros nesta reunião.', 14, y); y += 8;
+      doc.text('Sem registros nesta reunião.', 14, y); doc.setTextColor(...PRETO); y += 8;
       return;
     }
     let head, body;
@@ -1031,7 +1191,7 @@ function construirPDF(d, numero){
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.tipoApoio||'—', r.texto||'—']);
     } else if(comDocs){
       head = [['CÓDIGO','EMPRESA','REGISTRO','DOCUMENTOS']];
-      body = lista.map(r=>{ const n = nomesDocs(r); return [r.codigo||'—', r.empresa||'—', r.texto||'—', n.length? n.join('\n') : '—']; });
+      body = lista.map(r=>{ const x = nomesDocs(r); return [r.codigo||'—', r.empresa||'—', r.texto||'—', x.length? x.join('\n') : '—']; });
     } else {
       head = [['CÓDIGO','EMPRESA','REGISTRO / JUSTIFICATIVA']];
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—']);
@@ -1064,39 +1224,49 @@ function construirPDF(d, numero){
     y += 5;
   }
 
-  titulo(1,'CLIENTES EM RISCO DE PERDA');
-  tabelaRegistros(d.risco, false, true);
+  if(mostrar('risco')){
+    titulo('CLIENTES EM RISCO DE PERDA');
+    if(nada.risco) semRegistroTexto(); else tabelaRegistros(d.risco, false, true);
+  }
+  if(mostrar('perdidos')){
+    titulo('CLIENTES PERDIDOS');
+    if(nada.perdidos) semRegistroTexto();
+    else { tabelaRegistros(d.perdidos); blocoTexto('Observações gerais', d.obsPerdidos, d.docsGerais); }
+  }
+  if(mostrar('semcontato')){
+    titulo('CLIENTES SEM CONTATO');
+    if(nada.semcontato) semRegistroTexto();
+    else { tabelaRegistros(d.semContato); if(d.obsSemContato && d.obsSemContato.trim()) blocoTexto('Observações gerais', d.obsSemContato); }
+  }
+  if(mostrar('oportunidades')){
+    titulo('OPORTUNIDADES RELEVANTES');
+    if(nada.oportunidades) semRegistroTexto(); else tabelaRegistros(d.oportunidades);
+  }
+  if(mostrar('acoes')){
+    titulo('AÇÕES DA SEMANA ANTERIOR');
+    if(nada.acoes) semRegistroTexto(); else blocoTexto('', d.obsAcoes);
+  }
+  if(mostrar('crm')){
+    titulo('UTILIZAÇÃO DO CRM');
+    if(nada.crm) semRegistroTexto(); else blocoTexto('', d.obsCRM);
+  }
+  if(mostrar('apoio')){
+    titulo('NECESSIDADES DE APOIO — CHAMADOS');
+    if(nada.apoio) semRegistroTexto(); else tabelaRegistros(d.chamados, true);
+  }
 
-  titulo(2,'CLIENTES PERDIDOS');
-  tabelaRegistros(d.perdidos);
-  blocoTexto('Observações gerais', d.obsPerdidos, d.docsGerais);
-
-  titulo(3,'CLIENTES SEM CONTATO');
-  tabelaRegistros(d.semContato);
-  if(d.obsSemContato && d.obsSemContato.trim()) blocoTexto('Observações gerais', d.obsSemContato);
-
-  titulo(4,'OPORTUNIDADES RELEVANTES');
-  tabelaRegistros(d.oportunidades);
-
-  titulo(5,'AÇÕES DA SEMANA ANTERIOR');
-  blocoTexto('', d.obsAcoes);
-
-  titulo(6,'UTILIZAÇÃO DO CRM');
-  blocoTexto('', d.obsCRM);
-
-  titulo(7,'NECESSIDADES DE APOIO — CHAMADOS');
-  tabelaRegistros(d.chamados, true);
-
-  if(y > 235){ doc.addPage(); y = 20; }
-  doc.setFillColor(253,242,244); doc.setDrawColor(...VERMELHO);
-  doc.roundedRect(14, y, W-28, 26, 2, 2, 'FD');
-  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...VERMELHO);
-  doc.text('REGRA PRÁTICA — TRÊS PERGUNTAS DA SEMANA', 18, y+6);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...PRETO);
-  doc.text('a) Quem estamos correndo risco de perder?', 18, y+12);
-  doc.text('b) Quem podemos recuperar?', 18, y+17);
-  doc.text('c) Quais ações concretas serão executadas até a próxima reunião?', 18, y+22);
-  y += 34;
+  if(mostrar('regra')){
+    if(y > 235){ doc.addPage(); y = 20; }
+    doc.setFillColor(253,242,244); doc.setDrawColor(...VERMELHO);
+    doc.roundedRect(14, y, W-28, 26, 2, 2, 'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...VERMELHO);
+    doc.text('REGRA PRÁTICA — TRÊS PERGUNTAS DA SEMANA', 18, y+6);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...PRETO);
+    doc.text('a) Quem estamos correndo risco de perder?', 18, y+12);
+    doc.text('b) Quem podemos recuperar?', 18, y+17);
+    doc.text('c) Quais ações concretas serão executadas até a próxima reunião?', 18, y+22);
+    y += 34;
+  }
 
   if(y > 255){ doc.addPage(); y = 30; } else { y = Math.max(y, 250); }
   doc.setDrawColor(...PRETO); doc.setLineWidth(.3);
@@ -1127,7 +1297,15 @@ async function gerarAtaPDF(){
   const d = coletarTudo();
   if(!d.dataReuniao || !d.vendedorNome){
     alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
+    document.getElementById('sec0').classList.add('aberto');
     return;
+  }
+
+  const pendentes = TOPICOS.filter(t => t.preenchivel && visibilidade[t.slug] && !semRegistro[t.slug] && !temConteudo(t.slug));
+  if(pendentes.length){
+    const nomes = pendentes.map(t => '• ' + t.titulo).join('\n');
+    if(!confirm('Estes tópicos estão sem preenchimento e sem a marcação "Nada a registrar":\n\n' + nomes +
+                '\n\nGerar a ata mesmo assim?')) return;
   }
 
   btn.disabled = true;
@@ -1168,7 +1346,6 @@ async function gerarAtaPDF(){
   setTimeout(function(){ location.reload(); }, 1800);
 }
 
-/* ═══════════════════ TOAST ═══════════════════ */
 function toast(msg){
   const av = document.getElementById('avisoSalvo');
   av.textContent = msg;
@@ -1188,27 +1365,35 @@ async function chamarBitrix(metodo, payload){
 }
 
 function montarResumoAta(d, dataFmt, numero){
+  const vis = d.secoesVisiveis || {}, nada = d.semRegistro || {};
+  const ver = s => (vis[s] === undefined ? true : !!vis[s]);
   const L = [];
   L.push('ATA DE REUNIÃO SEMANAL — FIORELLA' + (numero? ' (nº '+numero+')' : ''));
   L.push('Data: ' + dataFmt + ' | Vendedor: ' + d.vendedorNome + (d.vendedorCodigo? ' (cód. '+d.vendedorCodigo+')':'') + ' | Condutor: ' + (d.condutor||'—'));
   L.push('');
-  function bloco(titulo, lista){
+  function bloco(slug, titulo, lista){
+    if(!ver(slug)) return;
     L.push('— ' + titulo + ' —');
-    if(!lista || !lista.length){ L.push('Sem registros.'); }
+    if(nada[slug]) L.push('Nada a registrar — confirmado pelo vendedor.');
+    else if(!lista || !lista.length) L.push('Sem registros.');
     else lista.forEach(r=>L.push('• ' + (r.codigo||'s/ código') + ' | ' + (r.empresa||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—')));
     L.push('');
   }
-  bloco('1. CLIENTES EM RISCO', d.risco);
-  bloco('2. CLIENTES PERDIDOS', d.perdidos);
-  if((d.obsPerdidos||'').trim()){ L.push('Obs. gerais (perdidos): ' + d.obsPerdidos); L.push(''); }
-  bloco('3. CLIENTES SEM CONTATO', d.semContato);
-  if((d.obsSemContato||'').trim()){ L.push('Obs. gerais (sem contato): ' + d.obsSemContato); L.push(''); }
-  bloco('4. OPORTUNIDADES RELEVANTES', d.oportunidades);
-  L.push('— 5. AÇÕES DA SEMANA ANTERIOR —');
-  L.push((d.obsAcoes||'').trim() || 'Sem observações.'); L.push('');
-  L.push('— 6. UTILIZAÇÃO DO CRM —');
-  L.push((d.obsCRM||'').trim() || 'Sem observações.'); L.push('');
-  bloco('7. CHAMADOS / NECESSIDADES DE APOIO', d.chamados);
+  function blocoObs(slug, titulo, texto){
+    if(!ver(slug)) return;
+    L.push('— ' + titulo + ' —');
+    L.push(nada[slug] ? 'Nada a registrar — confirmado pelo vendedor.' : ((texto||'').trim() || 'Sem observações.'));
+    L.push('');
+  }
+  bloco('risco','CLIENTES EM RISCO', d.risco);
+  bloco('perdidos','CLIENTES PERDIDOS', d.perdidos);
+  if(ver('perdidos') && !nada.perdidos && (d.obsPerdidos||'').trim()){ L.push('Obs. gerais (perdidos): ' + d.obsPerdidos); L.push(''); }
+  bloco('semcontato','CLIENTES SEM CONTATO', d.semContato);
+  if(ver('semcontato') && !nada.semcontato && (d.obsSemContato||'').trim()){ L.push('Obs. gerais (sem contato): ' + d.obsSemContato); L.push(''); }
+  bloco('oportunidades','OPORTUNIDADES RELEVANTES', d.oportunidades);
+  blocoObs('acoes','AÇÕES DA SEMANA ANTERIOR', d.obsAcoes);
+  blocoObs('crm','UTILIZAÇÃO DO CRM', d.obsCRM);
+  bloco('apoio','CHAMADOS / NECESSIDADES DE APOIO', d.chamados);
   return L.join('\n');
 }
 
@@ -1250,12 +1435,22 @@ function fecharADM(){
   document.body.style.overflow = '';
 }
 function admSair(){
-  admSenhaAtual = ''; admDados = [];
+  admSenhaAtual = ''; admDados = []; admSecoes = [];
   document.getElementById('admSenha').value = '';
   document.getElementById('admLogin').style.display = '';
   document.getElementById('admConteudo').style.display = 'none';
   document.getElementById('btnSair').style.display = 'none';
   document.getElementById('btnExportar').style.display = 'none';
+}
+
+function admAba(qual){
+  const atas = qual === 'atas';
+  document.getElementById('abaAtas').style.display = atas ? '' : 'none';
+  document.getElementById('abaSecoes').style.display = atas ? 'none' : '';
+  document.getElementById('abaBtnAtas').classList.toggle('ativa', atas);
+  document.getElementById('abaBtnSecoes').classList.toggle('ativa', !atas);
+  document.getElementById('btnExportar').style.display = atas ? '' : 'none';
+  if(!atas && !admSecoes.length) admCarregarSecoes();
 }
 
 async function admEntrar(){
@@ -1270,7 +1465,7 @@ async function admEntrar(){
   document.getElementById('admLogin').style.display = 'none';
   document.getElementById('admConteudo').style.display = '';
   document.getElementById('btnSair').style.display = '';
-  document.getElementById('btnExportar').style.display = '';
+  admAba('atas');
   admCarregar();
 }
 
@@ -1323,9 +1518,7 @@ function dataHoraBR(iso){
   const d = new Date(iso);
   return isNaN(d) ? '—' : d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
-function pill(rot, qt){
-  return '<span class="pill'+(qt?'':' zero')+'">'+rot+' '+(qt||0)+'</span>';
-}
+function pill(rot, qt){ return '<span class="pill'+(qt?'':' zero')+'">'+rot+' '+(qt||0)+'</span>'; }
 
 function admRenderLista(){
   const tbody = document.getElementById('admLinhas');
@@ -1382,17 +1575,20 @@ async function admExcluir(id, numero){
 
 /* ─────────── DETALHE ─────────── */
 const SECOES_DET = [
-  ['risco','1. Clientes em risco de perda'],
-  ['perdido','2. Clientes perdidos'],
-  ['semcontato','3. Clientes sem contato'],
-  ['oportunidade','4. Oportunidades relevantes'],
-  ['chamado','7. Chamados / necessidades de apoio']
+  ['risco',        'risco',        'Clientes em risco de perda'],
+  ['perdido',      'perdidos',     'Clientes perdidos'],
+  ['semcontato',   'semcontato',   'Clientes sem contato'],
+  ['oportunidade', 'oportunidades','Oportunidades relevantes'],
+  ['chamado',      'apoio',        'Necessidades de apoio / chamados']
 ];
 
 async function admVer(id){
   try{
     const a = await admObter(id);
     const d = a.dados || {};
+    const vis = d.secoesVisiveis || {}, nada = d.semRegistro || {};
+    const ver = s => (vis[s] === undefined ? true : !!vis[s]);
+
     document.getElementById('modalTitulo').innerHTML =
       'Ata nº ' + String(a.numero).padStart(4,'0') +
       '<small>' + dataBR(a.data_reuniao) + ' · ' + esc(a.vendedor_nome) +
@@ -1401,9 +1597,11 @@ async function admVer(id){
     document.getElementById('modalBtnPDF').onclick = ()=>admBaixarPDF(id);
 
     let html = '';
-    SECOES_DET.forEach(([sec,rot])=>{
-      const itens = (a.itens||[]).filter(i=>i.secao===sec);
+    SECOES_DET.forEach(([sec, slug, rot])=>{
       html += '<div class="bloco-sec"><h4>'+rot+'</h4>';
+      if(!ver(slug)){ html += '<div class="marca-oculta">Tópico desativado no formulário nesta ata.</div></div>'; return; }
+      if(nada[slug]){ html += '<div class="marca-nada">✓ Nada a registrar — confirmado pelo vendedor.</div></div>'; return; }
+      const itens = (a.itens||[]).filter(i=>i.secao===sec);
       if(!itens.length){ html += '<div class="sem">Sem registros.</div>'; }
       else{
         html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:200px">Empresa</th>'+
@@ -1418,15 +1616,15 @@ async function admVer(id){
       html += '</div>';
     });
 
-    const obs = [
-      ['Observações — clientes perdidos', d.obsPerdidos],
-      ['Observações — clientes sem contato', d.obsSemContato],
-      ['5. Ações da semana anterior', d.obsAcoes],
-      ['6. Utilização do CRM', d.obsCRM]
-    ];
-    obs.forEach(([rot,txt])=>{
-      html += '<div class="bloco-sec"><h4>'+rot+'</h4><div class="obs">'+
-              (txt && String(txt).trim() ? esc(txt) : '<span class="sem">Sem observações.</span>')+'</div></div>';
+    [['perdidos','Observações — clientes perdidos', d.obsPerdidos],
+     ['semcontato','Observações — clientes sem contato', d.obsSemContato],
+     ['acoes','Ações da semana anterior', d.obsAcoes],
+     ['crm','Utilização do CRM', d.obsCRM]].forEach(([slug, rot, texto])=>{
+      html += '<div class="bloco-sec"><h4>'+rot+'</h4>';
+      if(!ver(slug)) html += '<div class="marca-oculta">Tópico desativado no formulário nesta ata.</div>';
+      else if(nada[slug]) html += '<div class="marca-nada">✓ Nada a registrar — confirmado pelo vendedor.</div>';
+      else html += '<div class="obs">' + (texto && String(texto).trim() ? esc(texto) : '<span class="sem">Sem observações.</span>') + '</div>';
+      html += '</div>';
     });
 
     html += '<div class="bloco-sec"><h4>Anexos</h4>';
@@ -1472,9 +1670,73 @@ function admExportar(){
   XLSX.writeFile(wb, 'ATAS_FIORELLA_' + new Date().toISOString().slice(0,10) + '.xlsx');
 }
 
+/* ─────────── VISIBILIDADE DOS TÓPICOS (ADM) ─────────── */
+async function admCarregarSecoes(){
+  const el = document.getElementById('visLista');
+  el.innerHTML = '<div class="vazio">Carregando...</div>';
+  const { data, error } = await sb.rpc('ata_secoes');
+  if(error){ el.innerHTML = '<div class="vazio" style="color:#C8102E">Erro: '+esc(error.message)+'</div>'; return; }
+  admSecoes = data || [];
+  admRenderSecoes();
+}
+
+function admRenderSecoes(){
+  const el = document.getElementById('visLista');
+  const grupos = [['topicos','Tópicos de preenchimento'], ['orientacoes','Orientações']];
+  let html = '';
+  grupos.forEach(([g, rot])=>{
+    const itens = admSecoes.filter(s => s.grupo === g);
+    if(!itens.length) return;
+    html += '<div class="vis-grupo">' + rot + '</div>';
+    itens.forEach(s=>{
+      html += `
+        <div class="vis-item ${s.visivel?'':'off'}" id="vis_${esc(s.slug)}">
+          <label class="sw">
+            <input type="checkbox" ${s.visivel?'checked':''} onchange="admAlternarSecao('${esc(s.slug)}',this.checked)">
+            <i></i>
+          </label>
+          <div class="nome">${esc(s.rotulo)}
+            <small>${s.preenchivel ? 'Tópico de preenchimento — entra na ata em PDF' : 'Bloco somente informativo — orientação de condução'}</small>
+          </div>
+          <div class="vis-estado">${s.visivel ? 'Visível' : 'Oculto'}</div>
+        </div>`;
+    });
+  });
+  el.innerHTML = html || '<div class="vazio">Nenhum tópico cadastrado.</div>';
+}
+
+function admAlternarSecao(slug, valor){
+  const s = admSecoes.find(x => x.slug === slug);
+  if(s) s.visivel = valor;
+  const item = document.getElementById('vis_' + slug);
+  if(item){
+    item.classList.toggle('off', !valor);
+    item.querySelector('.vis-estado').textContent = valor ? 'Visível' : 'Oculto';
+  }
+}
+
+function admTodosVisiveis(){
+  admSecoes.forEach(s => s.visivel = true);
+  admRenderSecoes();
+}
+
+async function admSalvarSecoes(){
+  const config = admSecoes.map(s => ({slug: s.slug, visivel: !!s.visivel}));
+  const ocultos = config.filter(s => !s.visivel).length;
+  if(ocultos === config.length){ alert('Pelo menos um tópico precisa continuar visível.'); return; }
+  const { data, error } = await sb.rpc('ata_admin_salvar_secoes', { p_senha: admSenhaAtual, p_config: config });
+  if(error){ alert('Erro ao salvar: ' + error.message); return; }
+  admSecoes = (data && data.secoes) || admSecoes;
+  admRenderSecoes();
+  (admSecoes||[]).forEach(s => { if(TOP[s.slug]) visibilidade[s.slug] = !!s.visivel; });
+  aplicarVisibilidade();
+  toast('Configuração salva — ' + ocultos + ' tópico(s) oculto(s).');
+}
+
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
 window.addEventListener('load', function(){
   document.getElementById('dataReuniao').value = new Date().toISOString().slice(0,10);
+  carregarVisibilidade();
   if(location.hash === '#adm') abrirADM();
 });
 document.addEventListener('keydown', function(e){
