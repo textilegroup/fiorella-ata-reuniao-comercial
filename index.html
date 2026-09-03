@@ -66,6 +66,10 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
   color:var(--cinza-texto);text-transform:uppercase;cursor:pointer;margin:0;white-space:nowrap;
 }
 .sem-reg input{width:15px;height:15px;accent-color:var(--verde);cursor:pointer;margin:0;}
+.sem-reg.ok{color:var(--verde);}
+.registro .sup{margin-top:8px;}
+.registro .sup label{color:var(--vermelho);}
+.registro .sup textarea{background:#FFFCFC;border-color:rgba(200,16,46,.28);min-height:42px;}
 
 .card.completo{border-color:rgba(30,122,60,.45);}
 .card.completo .card-titulo{border-bottom-color:var(--verde);background:var(--verde-suave);}
@@ -107,6 +111,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 .btn-claro{background:var(--branco);color:var(--vermelho);border:1px solid var(--cinza-borda);}
 .btn-claro:hover:not(:disabled){border-color:var(--vermelho);background:var(--vermelho-suave);}
 .btn-verde{background:var(--verde);color:#fff;}
+.btn-cinza{background:#8A8A93;color:#fff;}
+.btn-cinza:hover:not(:disabled){background:#71717A;}
 .btn-verde:hover:not(:disabled){filter:brightness(1.1);}
 .btn-remover{background:transparent;color:var(--vermelho);border:1px solid var(--vermelho);padding:6px 12px;font-size:11px;}
 .btn-remover:hover{background:var(--vermelho);color:var(--branco);}
@@ -340,6 +346,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES EM RISCO DE PERDA</span>
     <span class="ct-dir">
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('risco',this)"> Item concluído</label>
       <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('risco',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">EXIBIR</button>
@@ -361,6 +368,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <label class="btn btn-vermelho" for="excelRisco">Importar dados</label>
         <input type="file" id="excelRisco" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaRisco','risco','statusImportRisco')">
         <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes em risco')">Gerar modelo</button>
+        <button type="button" class="btn btn-claro" id="btnExp_listaRisco" disabled onclick="exportarDados('listaRisco','Clientes em risco')">Exportar dados</button>
       </div>
       <div id="statusImportRisco"></div>
     </div>
@@ -379,6 +387,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES PERDIDOS</span>
     <span class="ct-dir">
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('perdidos',this)"> Item concluído</label>
       <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('perdidos',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec2',this)">EXIBIR</button>
@@ -403,6 +412,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <label class="btn btn-vermelho" for="excelPerdidos">Importar dados</label>
         <input type="file" id="excelPerdidos" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaPerdidos','perdido','statusImport')">
         <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes perdidos')">Gerar modelo</button>
+        <button type="button" class="btn btn-claro" id="btnExp_listaPerdidos" disabled onclick="exportarDados('listaPerdidos','Clientes perdidos')">Exportar dados</button>
       </div>
       <div id="statusImport"></div>
     </div>
@@ -432,6 +442,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES SEM CONTATO</span>
     <span class="ct-dir">
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('semcontato',this)"> Item concluído</label>
       <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('semcontato',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec3',this)">EXIBIR</button>
@@ -454,6 +465,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <label class="btn btn-vermelho" for="excelSemContato">Importar dados</label>
         <input type="file" id="excelSemContato" accept=".xls,.xlsx,.csv" style="display:none" onchange="importarExcel(this,'listaSemContato','semcontato','statusImportSC')">
         <button type="button" class="btn btn-claro" onclick="gerarModelo('Clientes sem contato')">Gerar modelo</button>
+        <button type="button" class="btn btn-claro" id="btnExp_listaSemContato" disabled onclick="exportarDados('listaSemContato','Clientes sem contato')">Exportar dados</button>
       </div>
       <div id="statusImportSC"></div>
     </div>
@@ -473,6 +485,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>OPORTUNIDADES RELEVANTES</span>
     <span class="ct-dir">
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('oportunidades',this)"> Item concluído</label>
       <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('oportunidades',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">EXIBIR</button>
@@ -497,6 +510,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>AÇÕES DA SEMANA ANTERIOR</span>
     <span class="ct-dir">
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('acoes',this)"> Item concluído</label>
       <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('acoes',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">EXIBIR</button>
@@ -526,7 +540,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>UTILIZAÇÃO DO CRM</span>
     <span class="ct-dir">
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('crm',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec6',this)">EXIBIR</button>
     </span>
@@ -552,7 +565,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>NECESSIDADES DE APOIO</span>
     <span class="ct-dir">
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('apoio',this)"> Nada a registrar</label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec7',this)">EXIBIR</button>
     </span>
@@ -660,13 +672,16 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 
 <!-- ═══════════ AÇÕES FINAIS ═══════════ -->
 <div class="acoes-finais">
-  <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF()">GERAR ATA FINAL (PDF)</button>
+  <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">SALVAR E GERAR ATA SUPERVISÃO</button>
+  <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">SALVAR E GERAR ATA VENDEDOR</button>
+</div>
+<div class="acoes-finais">
   <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR PREPARAÇÃO (SEM PDF)</button>
-  <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR FORMULÁRIO</button>
+  <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR E GERAR NOVO FORMULÁRIO</button>
 </div>
 <div class="nota-banco">
+  <b>Ata supervisão</b> sai com o campo <b>Registro supervisão</b>; a <b>ata vendedor</b> sai sem ele. Os dois podem ser gerados da mesma ata.<br>
   <b>Preparação</b> guarda a ata para uma reunião futura, sem gerar PDF — depois é só reabri-la na Área ADM em <b>Editar</b>.
-  <b>Gerar ata final</b> conclui a ata e emite o PDF.
 </div>
 
 </div><!-- /container -->
@@ -767,7 +782,8 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
       <h3 id="modalTitulo">Ata</h3>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button type="button" class="btn btn-verde btn-mini" id="modalBtnEditar">Editar ata</button>
-        <button type="button" class="btn btn-vermelho btn-mini" id="modalBtnPDF">Baixar PDF</button>
+        <button type="button" class="btn btn-vermelho btn-mini" id="modalBtnPDF">PDF supervisão</button>
+        <button type="button" class="btn btn-cinza btn-mini" id="modalBtnPDFVend">PDF vendedor</button>
         <button type="button" class="btn btn-claro btn-mini" onclick="fecharModal()">Fechar</button>
       </div>
     </div>
@@ -795,22 +811,24 @@ const BITRIX = {
 };
 
 /* ═══════════════════ TÓPICOS DO FORMULÁRIO ═══════════════════ */
+/* controlavel = tem as caixas "Item concluído" / "Nada a registrar" e entra na barra de progresso */
 const TOPICOS = [
-  {slug:'risco',         card:'sec1',         titulo:'CLIENTES EM RISCO DE PERDA',   chave:'risco',         preenchivel:true,  lista:'listaRisco'},
-  {slug:'perdidos',      card:'sec2',         titulo:'CLIENTES PERDIDOS',            chave:'perdidos',      preenchivel:true,  lista:'listaPerdidos'},
-  {slug:'semcontato',    card:'sec3',         titulo:'CLIENTES SEM CONTATO',         chave:'semContato',    preenchivel:true,  lista:'listaSemContato'},
-  {slug:'oportunidades', card:'sec4',         titulo:'OPORTUNIDADES RELEVANTES',     chave:'oportunidades', preenchivel:true,  lista:'listaOportunidades'},
-  {slug:'acoes',         card:'sec5',         titulo:'AÇÕES DA SEMANA ANTERIOR',     chave:null,            preenchivel:true},
-  {slug:'crm',           card:'sec6',         titulo:'UTILIZAÇÃO DO CRM',            chave:null,            preenchivel:true},
-  {slug:'apoio',         card:'sec7',         titulo:'NECESSIDADES DE APOIO',        chave:'chamados',      preenchivel:true,  lista:'listaChamados'},
-  {slug:'evitados',      card:'secEvitados',  titulo:'TEMAS QUE DEVEM SER EVITADOS', chave:null,            preenchivel:false},
-  {slug:'regra',         card:'secRegra',     titulo:'REGRA PRÁTICA',                chave:null,            preenchivel:false}
+  {slug:'risco',         card:'sec1',         titulo:'CLIENTES EM RISCO DE PERDA',   chave:'risco',         preenchivel:true,  controlavel:true,  lista:'listaRisco'},
+  {slug:'perdidos',      card:'sec2',         titulo:'CLIENTES PERDIDOS',            chave:'perdidos',      preenchivel:true,  controlavel:true,  lista:'listaPerdidos'},
+  {slug:'semcontato',    card:'sec3',         titulo:'CLIENTES SEM CONTATO',         chave:'semContato',    preenchivel:true,  controlavel:true,  lista:'listaSemContato'},
+  {slug:'oportunidades', card:'sec4',         titulo:'OPORTUNIDADES RELEVANTES',     chave:'oportunidades', preenchivel:true,  controlavel:true,  lista:'listaOportunidades'},
+  {slug:'acoes',         card:'sec5',         titulo:'AÇÕES DA SEMANA ANTERIOR',     chave:null,            preenchivel:true,  controlavel:true},
+  {slug:'crm',           card:'sec6',         titulo:'UTILIZAÇÃO DO CRM',            chave:null,            preenchivel:true,  controlavel:false},
+  {slug:'apoio',         card:'sec7',         titulo:'NECESSIDADES DE APOIO',        chave:'chamados',      preenchivel:true,  controlavel:false, lista:'listaChamados'},
+  {slug:'evitados',      card:'secEvitados',  titulo:'TEMAS QUE DEVEM SER EVITADOS', chave:null,            preenchivel:false, controlavel:false},
+  {slug:'regra',         card:'secRegra',     titulo:'REGRA PRÁTICA',                chave:null,            preenchivel:false, controlavel:false}
 ];
 const TOP = {}; TOPICOS.forEach(t => TOP[t.slug] = t);
 const GRUPO_ORIENTACOES = ['crm','apoio','evitados','regra'];
 
 let visibilidade = {};   // {slug: true/false}
 let semRegistro  = {};   // {slug: true/false}
+let concluido    = {};   // {slug: true/false}
 
 /* ═══════════════════ ESTADO ═══════════════════ */
 let contador = 0;
@@ -821,6 +839,7 @@ let admDados = [];
 let admSecoes = [];
 let editandoId = null;
 let editandoNumero = null;
+let ultimoPayloadSalvo = null;
 let anexosOriginais = [];
 
 /* ═══════════════════ RELÓGIO ═══════════════════ */
@@ -867,28 +886,30 @@ function temConteudo(slug){
   return false;
 }
 
+/* Verde SOMENTE quando uma das duas caixas do tópico é marcada.
+   Lançar dados ou importar planilha não marca nada. */
 function atualizarStatus(slug){
   const t = TOP[slug];
-  if(!t || !t.preenchivel) return;
+  if(!t || !t.controlavel) return;
   const card = document.getElementById(t.card);
   if(!card) return;
   const chip = card.querySelector('.status');
   const nada = !!semRegistro[slug];
-  const cheio = temConteudo(slug);
+  const ok = !!concluido[slug];
   card.classList.toggle('semreg', nada);
-  card.classList.toggle('completo', nada || cheio);
-  if(chip) chip.textContent = nada ? 'SEM REGISTRO' : (cheio ? 'PREENCHIDO' : 'PENDENTE');
+  card.classList.toggle('completo', nada || ok);
+  if(chip) chip.textContent = nada ? 'SEM REGISTRO' : (ok ? 'CONCLUÍDO' : 'PENDENTE');
   atualizarProgresso();
 }
 
 function atualizarTodosStatus(){
-  TOPICOS.forEach(t => { if(t.preenchivel) atualizarStatus(t.slug); });
+  TOPICOS.forEach(t => { if(t.controlavel) atualizarStatus(t.slug); });
   atualizarProgresso();
 }
 
 function atualizarProgresso(){
-  const ativos = TOPICOS.filter(t => t.preenchivel && visibilidade[t.slug]);
-  const ok = ativos.filter(t => semRegistro[t.slug] || temConteudo(t.slug)).length;
+  const ativos = TOPICOS.filter(t => t.controlavel && visibilidade[t.slug]);
+  const ok = ativos.filter(t => semRegistro[t.slug] || concluido[t.slug]).length;
   const pct = ativos.length ? Math.round(ok / ativos.length * 100) : 0;
   const barra = document.getElementById('barraProg');
   if(barra) barra.style.width = pct + '%';
@@ -903,6 +924,23 @@ function marcarSemRegistro(slug, chk){
     }
   }
   semRegistro[slug] = chk.checked;
+  if(chk.checked){
+    concluido[slug] = false;
+    const card = document.getElementById(TOP[slug].card);
+    const outro = card && card.querySelector('.chk-ok');
+    if(outro) outro.checked = false;
+  }
+  atualizarStatus(slug);
+}
+
+function marcarConcluido(slug, chk){
+  concluido[slug] = chk.checked;
+  if(chk.checked){
+    semRegistro[slug] = false;
+    const card = document.getElementById(TOP[slug].card);
+    const outro = card && card.querySelector('.chk-sem');
+    if(outro) outro.checked = false;
+  }
   atualizarStatus(slug);
 }
 
@@ -911,7 +949,7 @@ document.addEventListener('input', function(e){
   if(card) atualizarStatus(card.dataset.slug);
 });
 document.addEventListener('change', function(e){
-  if(e.target.classList && e.target.classList.contains('chk-sem')) return;
+  if(e.target.classList && (e.target.classList.contains('chk-sem') || e.target.classList.contains('chk-ok'))) return;
   const card = e.target.closest('.card[data-slug]');
   if(card) atualizarStatus(card.dataset.slug);
 });
@@ -938,6 +976,7 @@ function atualizarBotoesLimpar(){
     btn.style.display = n ? '' : 'none';
     btn.textContent = 'Excluir todos (' + n + ')';
   });
+  atualizarBotoesExportar();
 }
 
 function excluirTodos(containerId, statusId, rotulo){
@@ -1019,8 +1058,12 @@ function addRegistroEmpresa(containerId, tipo, dados){
         <input type="text" class="campo-empresa" placeholder="Nome da empresa no sistema" value="${esc(dados.empresa||'')}">
       </div>
     </div>
-    <label>${tipo==='perdido' ? 'Justificativa' : 'Registro'}</label>
+    <label>${tipo==='perdido' ? 'Justificativa (registro em ata)' : 'Registro em ata'}</label>
     <textarea class="campo-texto" placeholder="${PLACEHOLDERS[tipo]}">${esc(dados.texto||'')}</textarea>
+    <div class="sup">
+      <label>Registro supervisão</label>
+      <textarea class="campo-supervisao" placeholder="Observação da supervisão — sai apenas na ata da supervisão...">${esc(dados.supervisao||'')}</textarea>
+    </div>
     ${tipo==='risco' ? `<div class="docs-area">
       <label>Documentos</label>
       <input type="file" multiple onchange="anexar(this,'${docsId}')">
@@ -1137,6 +1180,45 @@ function gerarModelo(rotulo){
   toast('Modelo gerado — preencha a aba MODELO e importe.');
 }
 
+/* ═══════════════════ EXPORTAÇÃO DOS DADOS LANÇADOS ═══════════════════ */
+const EXPORT_COLUNAS = MODELO_COLUNAS.concat(['REGISTRO_EM_ATA','REGISTRO_SUPERVISAO']);
+const LISTAS_EXPORTAVEIS = ['listaRisco','listaPerdidos','listaSemContato'];
+
+function atualizarBotoesExportar(){
+  LISTAS_EXPORTAVEIS.forEach(id=>{
+    const el = document.getElementById(id);
+    const btn = document.getElementById('btnExp_' + id);
+    if(!el || !btn) return;
+    const n = el.querySelectorAll('.registro').length;
+    btn.disabled = n === 0;
+    btn.textContent = n ? 'Exportar dados (' + n + ')' : 'Exportar dados';
+  });
+}
+
+function exportarDados(containerId, rotulo){
+  const regs = coletarRegistros(containerId);
+  if(!regs.length){ alert('Não há empresas lançadas neste tópico.'); return; }
+
+  const linhas = regs.map(r=>{
+    const ref = r.ref || {};
+    return [ r.empresa||'', r.codigo||'', ref.vendedor||'', ref.regiao||'',
+             (ref.trienio===''||ref.trienio===undefined||ref.trienio===null) ? '' : Number(ref.trienio),
+             (ref.atual===''  ||ref.atual===undefined  ||ref.atual===null)   ? '' : Number(ref.atual),
+             r.texto||'', r.supervisao||'' ];
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([EXPORT_COLUNAS].concat(linhas));
+  ws['!cols'] = [{wch:60},{wch:12},{wch:10},{wch:8},{wch:22},{wch:22},{wch:60},{wch:60}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'DADOS');
+
+  const vend = (document.getElementById('vendedorNome').value || '').trim().split(' ')[0].toUpperCase();
+  const data = (document.getElementById('dataReuniao').value || '').split('-').reverse().join('-');
+  const alvo = String(rotulo).toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]+/g,'_');
+  XLSX.writeFile(wb, 'DADOS_' + alvo + (data? '_'+data : '') + (vend? '_'+vend : '') + '.xlsx');
+  toast(regs.length + ' empresa(s) exportada(s) de "' + rotulo + '".');
+}
+
 /* ═══════════════════ IMPORTAÇÃO EXCEL ═══════════════════ */
 function normCab(s){
   return String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'')
@@ -1145,7 +1227,7 @@ function normCab(s){
 
 function mapearColunas(cabecalho){
   const c = cabecalho.map(normCab);
-  const m = {codigo:-1, nome:-1, vendedor:-1, regiao:-1, trienio:-1, atual:-1};
+  const m = {codigo:-1, nome:-1, vendedor:-1, regiao:-1, trienio:-1, atual:-1, registro:-1, supervisao:-1};
   c.forEach((h,i)=>{
     if(!h) return;
     if(m.codigo<0   && (h==='cli_loja' || h.indexOf('cli_loja')>=0 || h.indexOf('cod')>=0)) m.codigo = i;
@@ -1155,6 +1237,9 @@ function mapearColunas(cabecalho){
     if(m.regiao<0   && (h.indexOf('regia')>=0 || h.indexOf('regiao')>=0 || h==='uf')) m.regiao = i;
     if(m.trienio<0  && h.indexOf('trienio')>=0) m.trienio = i;
     if(m.atual<0    && h.indexOf('atual')>=0) m.atual = i;
+    // devolve um arquivo exportado pelo próprio formulário
+    if(m.supervisao<0 && h.indexOf('supervis')>=0) m.supervisao = i;
+    if(m.registro<0   && h.indexOf('registro')>=0 && h.indexOf('supervis')<0) m.registro = i;
   });
   return m;
 }
@@ -1207,11 +1292,14 @@ function importarExcel(input, containerId, tipo, statusId){
           atual:    m.atual   >= 0 ? numBR(linha[m.atual])   : ''
         };
         const temRef = ref.vendedor || ref.regiao || ref.trienio !== '' || ref.atual !== '';
-        addRegistroEmpresa(containerId, tipo, {codigo:codigo, empresa:nome, ref: temRef ? ref : null});
+        addRegistroEmpresa(containerId, tipo, {
+          codigo: codigo, empresa: nome, ref: temRef ? ref : null,
+          texto: pega(linha, m.registro), supervisao: pega(linha, m.supervisao)
+        });
         importados++;
       }
 
-      const achadas = ['nome','codigo','vendedor','regiao','trienio','atual'].filter(k => m[k] >= 0).length;
+      const achadas = ['nome','codigo','vendedor','regiao','trienio','atual','registro','supervisao'].filter(k => m[k] >= 0).length;
       document.getElementById(statusId).innerHTML =
         importados>0
           ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — ' + achadas + ' coluna(s) do modelo reconhecida(s)</span>'
@@ -1274,6 +1362,7 @@ function coletarRegistros(containerId){
       empresa: (div.querySelector('.campo-empresa')||{}).value || '',
       tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
       texto: (div.querySelector('.campo-texto')||{}).value || '',
+      supervisao: (div.querySelector('.campo-supervisao')||{}).value || '',
       ref: ref,
       _docsKey: 'docs_' + div.id,
       docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||''}))
@@ -1286,9 +1375,14 @@ function txt(id, slug){ return ativo(slug) ? (document.getElementById(id).value 
 function regs(containerId, slug){ return ativo(slug) ? coletarRegistros(containerId) : []; }
 
 function coletarTudo(){
-  const vis = {}, nada = {};
-  TOPICOS.forEach(t=>{ vis[t.slug] = !!visibilidade[t.slug]; nada[t.slug] = !!(visibilidade[t.slug] && semRegistro[t.slug]); });
+  const vis = {}, nada = {}, feito = {};
+  TOPICOS.forEach(t=>{
+    vis[t.slug]   = !!visibilidade[t.slug];
+    nada[t.slug]  = !!(visibilidade[t.slug] && semRegistro[t.slug]);
+    feito[t.slug] = !!(visibilidade[t.slug] && concluido[t.slug]);
+  });
   return {
+    concluido: feito,
     dataReuniao: document.getElementById('dataReuniao').value,
     vendedorNome: document.getElementById('vendedorNome').value.trim(),
     vendedorCodigo: document.getElementById('vendedorCodigo').value.trim(),
@@ -1311,7 +1405,7 @@ function coletarTudo(){
 }
 
 function limparTudo(){
-  if(!confirm('Limpar todo o formulário? Esta ação não pode ser desfeita.')) return;
+  if(!confirm('Limpar tudo e abrir um formulário novo?\n\nO que estiver na tela e não tiver sido salvo será perdido. Atas já arquivadas não são afetadas.')) return;
   location.reload();
 }
 
@@ -1320,11 +1414,14 @@ async function enviarAnexos(ataId, d){
   async function subir(lista, meta, contexto){
     for(let i=0; i<meta.length; i++){
       const orig = (lista||[])[i];
-      if(!orig || !orig.file) continue;
+      if(!orig) continue;
+      if(orig.caminho){ meta[i].caminho = orig.caminho; continue; }   // já está no Storage
+      if(!orig.file) continue;
       const caminho = ataId + '/' + contexto + '/' + uid() + '-' + limpaNome(orig.nome);
       const { error } = await sb.storage.from(BUCKET_ANEXOS)
         .upload(caminho, orig.file, {contentType: orig.tipo||'application/octet-stream', upsert:false});
       if(error) throw new Error('Falha ao enviar o anexo "' + orig.nome + '": ' + error.message);
+      orig.caminho = caminho;                 // não reenvia nas próximas gravações
       meta[i].caminho = caminho;
       meta[i].tamanho = String(meta[i].tamanho||'');
     }
@@ -1337,6 +1434,10 @@ async function enviarAnexos(ataId, d){
 }
 
 /* ═══════════════════ GRAVAÇÃO (nova ata ou edição) ═══════════════════ */
+function chavePayload(d){
+  return JSON.stringify(d, (k,v) => k === '_docsKey' ? undefined : v);
+}
+
 async function salvarAta(finalizar){
   const d = coletarTudo();
   if(!d.dataReuniao || !d.vendedorNome){
@@ -1346,6 +1447,12 @@ async function salvarAta(finalizar){
   }
 
   const alvo = editandoId || uid();
+
+  // gerar a segunda versão do PDF sem ter mexido em nada não precisa regravar
+  if(editandoId && ultimoPayloadSalvo === chavePayload(d)){
+    return { dados: d, id: editandoId, numero: editandoNumero, semAlteracao: true };
+  }
+
   toast('Enviando anexos...');
   await enviarAnexos(alvo, d);
   toast(editandoId ? 'Salvando alterações...' : 'Arquivando ata no banco...');
@@ -1365,6 +1472,7 @@ async function salvarAta(finalizar){
     if(error) throw new Error(error.message);
     res = data;
   }
+  ultimoPayloadSalvo = chavePayload(d);
   return { dados: d, id: (res && res.id) || alvo, numero: res && res.numero };
 }
 
@@ -1417,7 +1525,7 @@ function carregarAtaNoFormulario(a){
    ['semContato','listaSemContato','semcontato'], ['oportunidades','listaOportunidades','oportunidade']]
   .forEach(([chave, lista, tipo])=>{
     (d[chave]||[]).forEach(r=>{
-      const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, ref:r.ref});
+      const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref});
       const docs = (r.docs||[]).filter(x => x && x.caminho);
       if(docs.length){
         const k = 'docs_' + div.id;
@@ -1435,13 +1543,17 @@ function carregarAtaNoFormulario(a){
     renderArquivos('docsPerdidos');
   }
 
-  semRegistro = {};
+  semRegistro = {}; concluido = {};
   TOPICOS.forEach(t=>{
-    const v = !!(d.semRegistro && d.semRegistro[t.slug]);
-    semRegistro[t.slug] = v;
     const card = document.getElementById(t.card);
-    const chk = card && card.querySelector('.chk-sem');
-    if(chk) chk.checked = v;
+    const nada = !!(d.semRegistro && d.semRegistro[t.slug]);
+    const ok   = !nada && !!(d.concluido && d.concluido[t.slug]);
+    semRegistro[t.slug] = nada;
+    concluido[t.slug]   = ok;
+    const chkN = card && card.querySelector('.chk-sem');
+    const chkO = card && card.querySelector('.chk-ok');
+    if(chkN) chkN.checked = nada;
+    if(chkO) chkO.checked = ok;
   });
 
   anexosOriginais = (a.anexos||[]).map(x=>x.caminho);
@@ -1468,7 +1580,7 @@ async function salvarPreparacao(){
 }
 
 /* ═══════════════════ PDF ═══════════════════ */
-function construirPDF(d, numero){
+function construirPDF(d, numero, comSupervisao){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
   const W = doc.internal.pageSize.getWidth();
@@ -1487,7 +1599,7 @@ function construirPDF(d, numero){
   const larg = doc.getTextWidth('FIORELLA');
   doc.setTextColor(...VERMELHO); doc.text('.', 14 + larg + 0.5, 12);
   doc.setTextColor(...CINZA); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
-  doc.text('ATA DE REUNIÃO SEMANAL — VENDEDORES' + (numero ? '   ·   ATA Nº ' + numero : ''), 14, 19);
+  doc.text('ATA DE REUNIÃO SEMANAL — ' + (comSupervisao ? 'SUPERVISÃO' : 'VENDEDOR') + (numero ? '   ·   ATA Nº ' + numero : ''), 14, 19);
   doc.setTextColor(...PRETO); doc.setFont('helvetica','bold'); doc.setFontSize(10);
   doc.text('Data: ' + dataFmt, W-14, 12, {align:'right'});
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...CINZA);
@@ -1534,23 +1646,32 @@ function construirPDF(d, numero){
       doc.text('Sem registros nesta reunião.', 14, y); doc.setTextColor(...PRETO); y += 8;
       return;
     }
-    let head, body;
+    let head, body, cols;
+    const sup = !!comSupervisao;
     if(comApoio){
       head = [['CÓDIGO','EMPRESA','TIPO DE APOIO','DESCRIÇÃO']];
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.tipoApoio||'—', r.texto||'—']);
+      cols = {0:{cellWidth:22}, 1:{cellWidth:42}, 2:{cellWidth:32}};
     } else if(comDocs){
-      head = [['CÓDIGO','EMPRESA','REGISTRO','DOCUMENTOS']];
-      body = lista.map(r=>{ const x = nomesDocs(r); return [r.codigo||'—', r.empresa||'—', r.texto||'—', x.length? x.join('\n') : '—']; });
+      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA'].concat(sup?['REGISTRO SUPERVISÃO']:[]).concat(['DOCUMENTOS'])];
+      body = lista.map(r=>{
+        const x = nomesDocs(r);
+        return [r.codigo||'—', r.empresa||'—', r.texto||'—']
+          .concat(sup?[r.supervisao||'—']:[])
+          .concat([x.length? x.join('\n') : '—']);
+      });
+      cols = sup ? {0:{cellWidth:17}, 1:{cellWidth:33}, 4:{cellWidth:25}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
     } else {
-      head = [['CÓDIGO','EMPRESA','REGISTRO / JUSTIFICATIVA']];
-      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—']);
+      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA'].concat(sup?['REGISTRO SUPERVISÃO']:[])];
+      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—'].concat(sup?[r.supervisao||'—']:[]));
+      cols = sup ? {0:{cellWidth:18}, 1:{cellWidth:38}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
     }
     doc.autoTable({
       startY:y, theme:'grid', head, body,
       headStyles:{fillColor:VERMELHO, textColor:[255,255,255], fontSize:7.5},
       styles:{fontSize:8.5, cellPadding:2, valign:'top', lineColor:BORDA, textColor:PRETO},
       alternateRowStyles:{fillColor:[253,242,244]},
-      columnStyles:{0:{cellWidth:22}, 1:{cellWidth:48}},
+      columnStyles:cols,
       margin:{left:14, right:14}
     });
     y = doc.lastAutoTable.finalY + 8;
@@ -1630,29 +1751,39 @@ function construirPDF(d, numero){
     doc.setDrawColor(...VERMELHO); doc.setLineWidth(.4);
     doc.line(14, 288, W-14, 288);
     doc.setFontSize(7); doc.setTextColor(...CINZA);
-    doc.text('FIORELLA — Ata de Reunião Semanal Comercial — ' + dataFmt + (numero? '  ·  Ata nº '+numero : ''), 14, 292);
+    doc.text('FIORELLA — Ata de Reunião Semanal Comercial (' + (comSupervisao?'supervisão':'vendedor') + ') — ' + dataFmt + (numero? '  ·  Ata nº '+numero : ''), 14, 292);
     doc.text('Página ' + p + ' de ' + total, W-14, 292, {align:'right'});
   }
 
-  const nomeArquivo = 'ATA_FIORELLA_' + (numero? String(numero).padStart(4,'0')+'_' : '') +
+  const nomeArquivo = 'ATA_FIORELLA_' + (comSupervisao?'SUPERVISAO_':'VENDEDOR_') +
+    (numero? String(numero).padStart(4,'0')+'_' : '') +
     dataFmt.replace(/\//g,'-') + '_' + String(d.vendedorNome||'').split(' ')[0].toUpperCase() + '.pdf';
 
   return { doc, nomeArquivo, dataFmt };
 }
 
-/* ═══════════════════ GERAÇÃO DA ATA ═══════════════════ */
-async function gerarAtaPDF(){
-  const btn = document.getElementById('btnGerar');
+/* ═══════════════════ GERAÇÃO DA ATA ═══════════════════
+   comSupervisao = true  → ata da supervisão (inclui "Registro supervisão")
+   comSupervisao = false → ata do vendedor (sem esse campo)
+   Os dois PDFs saem da mesma ata; o formulário permanece aberto para
+   gerar a outra versão. Use "Limpar e gerar novo formulário" para recomeçar.
+─────────────────────────────────────────────────────────── */
+let bitrixJaRegistrado = false;
+
+async function gerarAtaPDF(comSupervisao){
+  const btn = document.getElementById(comSupervisao ? 'btnGerar' : 'btnGerarVend');
+  const rotuloVersao = comSupervisao ? 'supervisão' : 'vendedor';
+
   if(!document.getElementById('dataReuniao').value || !document.getElementById('vendedorNome').value.trim()){
     alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
     document.getElementById('sec0').classList.add('aberto');
     return;
   }
 
-  const pendentes = TOPICOS.filter(t => t.preenchivel && visibilidade[t.slug] && !semRegistro[t.slug] && !temConteudo(t.slug));
+  const pendentes = TOPICOS.filter(t => t.controlavel && visibilidade[t.slug] && !semRegistro[t.slug] && !concluido[t.slug]);
   if(pendentes.length){
     const nomes = pendentes.map(t => '• ' + t.titulo).join('\n');
-    if(!confirm('Estes tópicos estão sem preenchimento e sem a marcação "Nada a registrar":\n\n' + nomes +
+    if(!confirm('Estes tópicos ainda não foram marcados como "Item concluído" nem como "Nada a registrar":\n\n' + nomes +
                 '\n\nGerar a ata mesmo assim?')) return;
   }
 
@@ -1663,32 +1794,51 @@ async function gerarAtaPDF(){
     const r = await salvarAta(true);
     if(!r){ btn.disabled = false; return; }
     d = r.dados; numero = r.numero;
+    // a partir daqui o formulário fica ligado a esta ata: gerar a outra versão
+    // atualiza o mesmo registro em vez de criar uma nova ata
+    if(!editandoId) entrarModoEdicao(r.id, r.numero, true, new Date().toISOString());
   }catch(err){
-    btn.disabled = false;
-    alert('Não foi possível arquivar a ata no banco:\n\n' + err.message +
-          '\n\nO formulário NÃO foi limpo. Verifique a conexão e tente novamente.');
-    return;
+    const finalizadaBloqueada = /finalizada/i.test(err.message || '');
+    if(finalizadaBloqueada){
+      if(!confirm('Esta ata já está finalizada e as alterações feitas agora não podem ser gravadas fora da Área ADM.\n\n' +
+                  'Gerar o PDF (' + rotuloVersao + ') assim mesmo, com o conteúdo da tela?\n' +
+                  'A versão arquivada continuará com o conteúdo anterior.')){
+        btn.disabled = false; return;
+      }
+      d = coletarTudo(); numero = editandoNumero;
+    }else{
+      btn.disabled = false;
+      alert('Não foi possível arquivar a ata no banco:\n\n' + err.message +
+            '\n\nNada foi perdido no formulário. Verifique a conexão e tente novamente.');
+      return;
+    }
   }
 
-  const { doc, nomeArquivo, dataFmt } = construirPDF(d, numero);
+  const { doc, nomeArquivo, dataFmt } = construirPDF(d, numero, comSupervisao);
   const pdfBase64 = doc.output('datauristring').split(',')[1];
   doc.save(nomeArquivo);
 
-  if(BITRIX.webhook){
+  if(BITRIX.webhook && !bitrixJaRegistrado){
     toast('Registrando ata no Bitrix24...');
     try{
       await registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt, numero);
-      toast('Ata nº ' + numero + ' arquivada e registrada — limpando formulário...');
+      bitrixJaRegistrado = true;
+      toast('Ata nº ' + String(numero).padStart(4,'0') + ' (' + rotuloVersao + ') gerada e registrada no Bitrix24.');
     }catch(err){
-      alert('A ata nº ' + numero + ' foi ARQUIVADA com sucesso e o PDF foi gerado.\n\n' +
+      bitrixJaRegistrado = true;
+      alert('A ata nº ' + numero + ' foi ARQUIVADA e o PDF (' + rotuloVersao + ') foi gerado.\n\n' +
             'Apenas o registro no Bitrix24 falhou:\n' + err.message +
             '\n\nNada foi perdido — a ata continua disponível na Área ADM.');
     }
   } else {
-    toast('Ata nº ' + numero + ' arquivada — limpando formulário...');
+    toast('Ata nº ' + String(numero).padStart(4,'0') + ' (' + rotuloVersao + ') gerada e arquivada.');
   }
 
-  setTimeout(function(){ location.reload(); }, 1800);
+  const outro = comSupervisao ? 'ata do vendedor' : 'ata da supervisão';
+  const info = document.getElementById('edInfo');
+  if(info) info.textContent = 'Ata finalizada. Você ainda pode gerar a ' + outro +
+                              ' ou usar "Limpar e gerar novo formulário" para começar outra.';
+  btn.disabled = false;
 }
 
 function toast(msg){
@@ -1887,7 +2037,8 @@ function admRenderLista(){
       <td><div class="acoes">
         <button type="button" class="btn btn-claro btn-mini" onclick="admVer('${a.id}')">Ver</button>
         <button type="button" class="btn btn-verde btn-mini" onclick="admEditar('${a.id}')">Editar</button>
-        <button type="button" class="btn btn-preto btn-mini" onclick="admBaixarPDF('${a.id}')">PDF</button>
+        <button type="button" class="btn btn-preto btn-mini" onclick="admBaixarPDF('${a.id}',true)">PDF sup.</button>
+        <button type="button" class="btn btn-cinza btn-mini" onclick="admBaixarPDF('${a.id}',false)">PDF vend.</button>
         <button type="button" class="btn btn-vermelho btn-mini" onclick="admExcluir('${a.id}',${a.numero})">Excluir</button>
       </div></td>`;
     tbody.appendChild(tr);
@@ -1913,10 +2064,10 @@ async function admEditar(id){
   }catch(err){ alert('Erro ao abrir a ata para edição: ' + err.message); }
 }
 
-async function admBaixarPDF(id){
+async function admBaixarPDF(id, comSupervisao){
   try{
     const a = await admObter(id);
-    const { doc, nomeArquivo } = construirPDF(a.dados, a.numero);
+    const { doc, nomeArquivo } = construirPDF(a.dados, a.numero, comSupervisao !== false);
     doc.save(nomeArquivo);
   }catch(err){ alert('Erro ao gerar o PDF: ' + err.message); }
 }
@@ -1958,7 +2109,8 @@ async function admVer(id){
       (a.vendedor_codigo? ' (cód. '+esc(a.vendedor_codigo)+')' : '') +
       ' · Condutor: ' + esc(a.condutor||'—') +
       (a.atualizado_em ? ' · editada em ' + dataHoraBR(a.atualizado_em) : '') + '</small>';
-    document.getElementById('modalBtnPDF').onclick = ()=>admBaixarPDF(id);
+    document.getElementById('modalBtnPDF').onclick = ()=>admBaixarPDF(id, true);
+    document.getElementById('modalBtnPDFVend').onclick = ()=>admBaixarPDF(id, false);
     document.getElementById('modalBtnEditar').onclick = ()=>{ fecharModal(); admEditar(id); };
 
     let html = '';
@@ -1969,12 +2121,15 @@ async function admVer(id){
       const itens = (a.itens||[]).filter(i=>i.secao===sec);
       if(!itens.length){ html += '<div class="sem">Sem registros.</div>'; }
       else{
-        html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:200px">Empresa</th>'+
-                (sec==='chamado'?'<th style="width:150px">Tipo de apoio</th>':'')+'<th>Registro</th></tr></thead><tbody>';
+        const temSup = sec !== 'chamado' && itens.some(i => (i.supervisao||'').trim());
+        html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:180px">Empresa</th>'+
+                (sec==='chamado'?'<th style="width:150px">Tipo de apoio</th>':'')+'<th>Registro em ata</th>'+
+                (temSup?'<th>Registro supervisão</th>':'')+'</tr></thead><tbody>';
         itens.forEach(i=>{
           html += '<tr><td>'+esc(i.codigo||'—')+'</td><td>'+esc(i.empresa||'—')+'</td>'+
                   (sec==='chamado'?'<td>'+esc(i.tipoApoio||'—')+'</td>':'')+
-                  '<td>'+esc(i.texto||'—')+'</td></tr>';
+                  '<td>'+esc(i.texto||'—')+'</td>'+
+                  (temSup?'<td style="background:#FFFCFC">'+esc(i.supervisao||'—')+'</td>':'')+'</tr>';
         });
         html += '</tbody></table>';
       }
