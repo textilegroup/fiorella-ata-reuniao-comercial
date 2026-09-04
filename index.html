@@ -8,8 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<!-- Central de Acesso: verificacao de login. Uma linha, nao editar. -->
-<script src="https://textilegroup.github.io/wendell-users/guard.js" data-app="atas"></script>
+<!-- Central de Acesso da FIORELLA: verificacao de login. Uma linha, nao editar.
+     O endereco precisa ser o do repositorio fiorella-users: e dele que o
+     guard tira o hub de login. Apontando para outro portal, a pessoa cai
+     no hub errado e e recusada. -->
+<script src="https://textilegroup.github.io/fiorella-users/guard.js" data-app="atas"></script>
 <style>
 :root{
   --preto:#1A1A1A;
@@ -202,9 +205,7 @@ input[type=file]{font-size:12px;}
 .aba:hover{color:var(--vermelho);}
 .aba.ativa{color:var(--vermelho);border-bottom-color:var(--vermelho);}
 
-.login-box{max-width:360px;margin:70px auto;border:1px solid var(--cinza-borda);border-top:3px solid var(--vermelho);border-radius:6px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
-.login-box h3{font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.login-box p{font-size:12px;color:var(--cinza-texto);margin-bottom:14px;}
+/* .login-box removido: sobra do login antigo, que virou a Central de Acesso. */
 .erro{color:var(--vermelho);font-size:12px;margin-top:8px;font-weight:600;}
 
 .adm-cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
