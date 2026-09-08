@@ -8,11 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<!-- Central de Acesso da FIORELLA: verificacao de login. Uma linha, nao editar.
-     O endereco precisa ser o do repositorio fiorella-users: e dele que o
-     guard tira o hub de login. Apontando para outro portal, a pessoa cai
-     no hub errado e e recusada. -->
-<script src="https://textilegroup.github.io/fiorella-users/guard.js" data-app="atas"></script>
+<!-- Central de Acesso: verificacao de login. Uma linha, nao editar. -->
+<script src="https://textilegroup.github.io/wendell-users/guard.js" data-app="atas"></script>
 <style>
 :root{
   --preto:#1A1A1A;
@@ -205,7 +202,9 @@ input[type=file]{font-size:12px;}
 .aba:hover{color:var(--vermelho);}
 .aba.ativa{color:var(--vermelho);border-bottom-color:var(--vermelho);}
 
-/* .login-box removido: sobra do login antigo, que virou a Central de Acesso. */
+.login-box{max-width:360px;margin:70px auto;border:1px solid var(--cinza-borda);border-top:3px solid var(--vermelho);border-radius:6px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.login-box h3{font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.login-box p{font-size:12px;color:var(--cinza-texto);margin-bottom:14px;}
 .erro{color:var(--vermelho);font-size:12px;margin-top:8px;font-weight:600;}
 
 .adm-cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
@@ -700,11 +699,22 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn btn-claro btn-mini" id="btnExportar" onclick="admExportar()" style="display:none">Exportar Excel</button>
+      <button type="button" class="btn btn-claro btn-mini" id="btnSair" onclick="admSair()" style="display:none">Sair</button>
       <button type="button" class="btn btn-preto btn-mini" onclick="fecharADM()">Voltar ao formulário</button>
     </div>
   </div>
 
-  <!-- A senha da Area ADM saiu daqui: quem libera e a Central de Acesso. -->
+  <!-- LOGIN -->
+  <div id="admLogin">
+    <div class="login-box">
+      <h3>Acesso restrito</h3>
+      <p>Informe a senha administrativa para consultar as atas arquivadas e configurar o formulário.</p>
+      <label>Senha</label>
+      <input type="password" id="admSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')admEntrar()">
+      <div id="admErro" class="erro" style="display:none"></div>
+      <button type="button" class="btn btn-vermelho btn-grande" style="margin-top:12px" onclick="admEntrar()">ENTRAR</button>
+    </div>
+  </div>
 
   <!-- PAINEL -->
   <div class="adm-corpo" id="admConteudo" style="display:none">
@@ -788,21 +798,16 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <script>
 /* ═══════════════════ CONFIGURAÇÃO SUPABASE ═══════════════════ */
 const SUPABASE_URL  = 'https://eepmlsdbtcvsjxdcvimi.supabase.co';
-const SUPABASE_KEY  = 'sb_publishable_048Dv-jRALn34Ythhj9ngA_fZ1gsNI_';
 const BUCKET_ANEXOS = 'atas-anexos';
 
-/* O client vem do guard.js, ja autenticado. E atribuido na inicializacao,
-   depois de "await APP.pronto". Antes disso nao existe sessao e o banco
-   devolveria vazio sem erro nenhum. */
+/* O client vem do guard.js já autenticado. É atribuído na inicialização,
+   depois de "await APP.pronto" — antes disso não existe sessão e o banco
+   devolveria vazio, sem erro nenhum. */
 let sb = null;
 
 /* ═══════════════════ CONFIGURAÇÃO BITRIX24 ═══════════════════ */
-/* O webhook do Bitrix NAO fica aqui. Um token de webhook da acesso total ao
-   CRM e este arquivo e publico: qualquer pessoa que abrisse o codigo-fonte
-   herdava o CRM inteiro. A chamada passa pela Edge Function "bitrix-ata",
-   que guarda o token do lado do servidor. */
 const BITRIX = {
-  ativo: true,
+  webhook: 'https://fiorella.bitrix24.com.br/rest/1/1kalsjfoz13rhglc/',
   categoryId: 67,
   stageId: '',
   campoArquivo: '',
@@ -834,7 +839,8 @@ let concluido    = {};   // {slug: true/false}
 let contador = 0;
 const arquivos = {};
 const LIMITE_ARQ = 5 * 1024 * 1024;
-let admLiberado = false;   // true quando o guard confirma gestao da Fiorella
+let admSenhaAtual = null;   // senha digitada (uso fora do portal)
+let admLiberado  = false;   // true quando o portal confirma admin da Fiorella
 let admDados = [];
 let admSecoes = [];
 let editandoId = null;
@@ -1460,7 +1466,7 @@ async function salvarAta(finalizar){
   let res;
   if(editandoId){
     const chamada = admLiberado
-      ? sb.rpc('ata_admin_atualizar', { p_senha: null, p_id: editandoId, p_dados: d, p_finalizada: finalizar })
+      ? sb.rpc('ata_admin_atualizar', { p_senha: admSenhaAtual, p_id: editandoId, p_dados: d, p_finalizada: finalizar })
       : sb.rpc('ata_atualizar_preparacao', { p_id: editandoId, p_dados: d, p_finalizada: finalizar });
     const { data, error } = await chamada;
     if(error) throw new Error(error.message);
@@ -1818,7 +1824,7 @@ async function gerarAtaPDF(comSupervisao){
   const pdfBase64 = doc.output('datauristring').split(',')[1];
   doc.save(nomeArquivo);
 
-  if(BITRIX.ativo && !bitrixJaRegistrado){
+  if(BITRIX.webhook && !bitrixJaRegistrado){
     toast('Registrando ata no Bitrix24...');
     try{
       await registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt, numero);
@@ -1851,14 +1857,12 @@ function toast(msg){
 
 /* ═══════════════════ BITRIX24 ═══════════════════ */
 async function chamarBitrix(metodo, payload){
-  const { data, error } = await sb.functions.invoke('bitrix-ata', { body: { metodo, payload } });
-  if(error){
-    let detalhe = error.message || 'falha na chamada';
-    try{ const c = await error.context.json(); if(c && c.erro) detalhe = c.erro; }catch(e){}
-    throw new Error(detalhe);
-  }
-  if(data && data.erro) throw new Error(data.erro);
-  return data && data.result;
+  const resp = await fetch(BITRIX.webhook.replace(/\/+$/,'') + '/' + metodo + '.json', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+  });
+  const json = await resp.json();
+  if(json.error) throw new Error(json.error_description || json.error);
+  return json.result;
 }
 
 function montarResumoAta(d, dataFmt, numero){
@@ -1923,18 +1927,32 @@ async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt, numero){
    ÁREA ADM
 ═══════════════════════════════════════════════════════════ */
 function abrirADM(){
-  // Esconder o painel e conforto visual, nao seguranca: quem barra de verdade
-  // e o servidor, que confere a permissao pelo JWT em toda funcao ata_admin_*.
-  if(!admLiberado) return;
   document.getElementById('admPainel').classList.add('aberto');
   document.body.style.overflow = 'hidden';
+  if(admLiberado){ admAbrirPainel(); return; }          // já autorizado pelo portal
+  setTimeout(()=>{ const c = document.getElementById('admSenha'); if(c) c.focus(); }, 100);
+}
+
+/* Mostra o conteúdo da ADM. Usado tanto pelo login do portal quanto pela senha. */
+function admAbrirPainel(){
+  admLiberado = true;
+  document.getElementById('admLogin').style.display = 'none';
   document.getElementById('admConteudo').style.display = '';
-  document.getElementById('btnExportar').style.display = '';
-  if(!admDados.length){ admAba('atas'); admCarregar(); }
+  document.getElementById('btnSair').style.display = admSenhaAtual ? '' : 'none';
+  admAba('atas');
+  admCarregar();
 }
 function fecharADM(){
   document.getElementById('admPainel').classList.remove('aberto');
   document.body.style.overflow = '';
+}
+function admSair(){
+  admSenhaAtual = null; admLiberado = false; admDados = []; admSecoes = [];
+  document.getElementById('admSenha').value = '';
+  document.getElementById('admLogin').style.display = '';
+  document.getElementById('admConteudo').style.display = 'none';
+  document.getElementById('btnSair').style.display = 'none';
+  document.getElementById('btnExportar').style.display = 'none';
 }
 
 function admAba(qual){
@@ -1945,6 +1963,18 @@ function admAba(qual){
   document.getElementById('abaBtnSecoes').classList.toggle('ativa', !atas);
   document.getElementById('btnExportar').style.display = atas ? '' : 'none';
   if(!atas && !admSecoes.length) admCarregarSecoes();
+}
+
+async function admEntrar(){
+  const senha = document.getElementById('admSenha').value;
+  const erro = document.getElementById('admErro');
+  erro.style.display = 'none';
+  if(!senha){ erro.textContent = 'Informe a senha.'; erro.style.display='block'; return; }
+  const { data, error } = await sb.rpc('ata_admin_ok', { p_senha: senha });
+  if(error){ erro.textContent = 'Erro de conexão: ' + error.message; erro.style.display='block'; return; }
+  if(!data){ erro.textContent = 'Senha inválida.'; erro.style.display='block'; return; }
+  admSenhaAtual = senha;
+  admAbrirPainel();
 }
 
 function admLimparFiltros(){
@@ -1964,8 +1994,8 @@ async function admCarregar(){
   tbody.innerHTML = '<tr><td colspan="10" style="padding:18px;color:#6A6A73">Carregando...</td></tr>';
 
   const [lista, resumo] = await Promise.all([
-    sb.rpc('ata_admin_listar', { p_senha: null, p_de: de, p_ate: ate, p_busca: busca }),
-    sb.rpc('ata_admin_resumo', { p_senha: null })
+    sb.rpc('ata_admin_listar', { p_senha: admSenhaAtual, p_de: de, p_ate: ate, p_busca: busca }),
+    sb.rpc('ata_admin_resumo', { p_senha: admSenhaAtual })
   ]);
 
   if(lista.error){ tbody.innerHTML = '<tr><td colspan="10" style="padding:18px;color:#C8102E">Erro: '+esc(lista.error.message)+'</td></tr>'; return; }
@@ -2029,7 +2059,7 @@ function admRenderLista(){
 }
 
 async function admObter(id){
-  const { data, error } = await sb.rpc('ata_admin_obter', { p_senha: null, p_id: id });
+  const { data, error } = await sb.rpc('ata_admin_obter', { p_senha: admSenhaAtual, p_id: id });
   if(error) throw new Error(error.message);
   return data;
 }
@@ -2058,7 +2088,7 @@ async function admBaixarPDF(id, comSupervisao){
 async function admExcluir(id, numero){
   if(!confirm('Excluir definitivamente a ata nº ' + String(numero).padStart(4,'0') + '?\n\nOs itens e anexos também serão removidos. Esta ação não pode ser desfeita.')) return;
   try{
-    const { data, error } = await sb.rpc('ata_admin_excluir', { p_senha: null, p_id: id });
+    const { data, error } = await sb.rpc('ata_admin_excluir', { p_senha: admSenhaAtual, p_id: id });
     if(error) throw new Error(error.message);
     const caminhos = (data && data.arquivos) || [];
     if(caminhos.length){ await sb.storage.from(BUCKET_ANEXOS).remove(caminhos); }
@@ -2081,17 +2111,6 @@ async function admVer(id){
   try{
     const a = await admObter(id);
     const d = a.dados || {};
-
-    /* O bucket dos anexos e privado. O link de download e assinado na hora,
-       vale 1 hora e so sai para quem esta logado — link publico permanente
-       vazaria os anexos de toda reuniao para quem tivesse o endereco. */
-    const assinadas = {};
-    const caminhosAnexos = (a.anexos||[]).map(x=>x.caminho).filter(Boolean);
-    if(caminhosAnexos.length){
-      const { data: urls } = await sb.storage.from(BUCKET_ANEXOS)
-        .createSignedUrls(caminhosAnexos, 3600);
-      (urls||[]).forEach(u => { if(u && u.signedUrl) assinadas[u.path] = u.signedUrl; });
-    }
     const vis = d.secoesVisiveis || {}, nada = d.semRegistro || {};
     const ver = s => (vis[s] === undefined ? true : !!vis[s]);
 
@@ -2146,10 +2165,9 @@ async function admVer(id){
     else{
       html += '<ul class="lista-arquivos">';
       a.anexos.forEach(x=>{
-        const url = assinadas[x.caminho];
+        const url = SUPABASE_URL + '/storage/v1/object/public/' + BUCKET_ANEXOS + '/' + encodeURI(x.caminho);
         html += '<li><span>📎 '+esc(x.nome)+' <small style="color:#6A6A73">('+esc(x.contexto)+')</small></span>'+
-                (url ? '<a href="'+url+'" target="_blank" rel="noopener">baixar</a>'
-                     : '<small style="color:#6A6A73">arquivo indisponível</small>')+'</li>';
+                '<a href="'+url+'" target="_blank" rel="noopener">baixar</a></li>';
       });
       html += '</ul>';
     }
@@ -2239,7 +2257,7 @@ async function admSalvarSecoes(){
   const config = admSecoes.map(s => ({slug: s.slug, visivel: !!s.visivel}));
   const ocultos = config.filter(s => !s.visivel).length;
   if(ocultos === config.length){ alert('Pelo menos um tópico precisa continuar visível.'); return; }
-  const { data, error } = await sb.rpc('ata_admin_salvar_secoes', { p_senha: null, p_config: config });
+  const { data, error } = await sb.rpc('ata_admin_salvar_secoes', { p_senha: admSenhaAtual, p_config: config });
   if(error){ alert('Erro ao salvar: ' + error.message); return; }
   admSecoes = (data && data.secoes) || admSecoes;
   admRenderSecoes();
@@ -2249,21 +2267,41 @@ async function admSalvarSecoes(){
 }
 
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
-window.addEventListener('load', async function(){
+async function iniciar(){
   document.getElementById('dataReuniao').value = new Date().toISOString().slice(0,10);
 
-  // Sem este await a primeira consulta sai antes de a sessao existir e o
-  // banco devolve vazio sem erro nenhum: a tela carrega e fica sem dados.
-  await APP.pronto;
-  sb = APP.sb;
+  // 1) espera o guard confirmar a sessão e usa o client dele
+  let temPortal = false;
+  try{
+    if(window.APP && window.APP.pronto){
+      await window.APP.pronto;
+      sb = window.APP.sb;
+      temPortal = true;
+      admLiberado = typeof window.APP.eAdmin === 'function' ? window.APP.eAdmin()
+                                                            : window.APP.permissao === 'admin';
+    }
+  }catch(e){
+    // guard bloqueou ou falhou: ele mesmo já mostrou a tela de aviso
+  }
 
-  admLiberado = APP.eAdmin();
-  const btnADM = document.getElementById('btnAreaADM');
-  if(btnADM) btnADM.style.display = admLiberado ? '' : 'none';
+  // 2) sem guard (arquivo aberto fora do portal): chave pública + senha
+  if(!sb){
+    sb = window.supabase.createClient(SUPABASE_URL, 'sb_publishable_048Dv-jRALn34Ythhj9ngA_fZ1gsNI_');
+    admLiberado = false;
+  }
+
+  /* 3) Botão da Área ADM:
+        - logado no portal como admin  → aparece e entra direto;
+        - logado no portal sem ser admin → não aparece;
+        - fora do portal (contingência) → aparece e pede a senha. */
+  const btn = document.getElementById('btnAreaADM');
+  if(btn) btn.style.display = (admLiberado || !temPortal) ? '' : 'none';
 
   await carregarVisibilidade();
-  if(location.hash === '#adm') abrirADM();
-});
+  if(location.hash === '#adm' && admLiberado) abrirADM();
+}
+
+window.addEventListener('load', iniciar);
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
     if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
