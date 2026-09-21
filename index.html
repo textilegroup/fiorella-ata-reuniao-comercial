@@ -293,23 +293,37 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .funil-col.col-arquivo .funil-card{border-left-color:#8A8A93;background:#FAFAFB;}
 .funil-vazio{font-size:11.5px;color:var(--cinza-texto);text-align:center;padding:14px 6px;font-style:italic;}
 
-.cal-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
-.cal-topo .mes{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--preto);min-width:170px;text-align:center;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-.cal-dow{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--cinza-texto);text-align:center;padding-bottom:4px;}
-.cal-dia{border:1px solid var(--cinza-borda);border-radius:6px;min-height:64px;padding:5px;font-size:11px;background:var(--branco);}
+/* Calendário compacto: é a guia inicial do Funil, então fica pequeno,
+   centralizado, e não disputa espaço com o resto da tela. */
+#funilAbaCalendario{max-width:640px;margin:0 auto;}
+.cal-topo{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.cal-topo .mes{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--preto);min-width:140px;text-align:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dow{font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--cinza-texto);text-align:center;padding-bottom:3px;}
+.cal-dia{border:1px solid var(--cinza-borda);border-radius:5px;min-height:40px;padding:3px 4px;font-size:10px;background:var(--branco);}
 .cal-dia.fora{background:#FAFAFB;color:#C4C4CC;}
 .cal-dia.hoje{border-color:var(--vermelho);border-width:2px;}
 .cal-dia .n{font-weight:700;}
-.cal-dia .pontos{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
-.cal-ponto{width:7px;height:7px;border-radius:50%;background:var(--vermelho);flex:none;}
+.cal-dia .pontos{display:flex;gap:2px;flex-wrap:wrap;margin-top:3px;}
+.cal-ponto{width:6px;height:6px;border-radius:50%;background:var(--vermelho);flex:none;}
 .cal-ponto.realizada,.cal-ponto.em_andamento{background:var(--verde);}
 .cal-ponto.arquivo{background:#8A8A93;}
+.cal-ponto.plano{background:var(--preto);}
 .cal-dia.com-item{cursor:pointer;}
 .cal-dia.com-item:hover{border-color:var(--vermelho);}
 
 @media(max-width:900px){ .funil-board{grid-template-columns:1fr 1fr;} }
-@media(max-width:560px){ .funil-board{grid-template-columns:1fr;} .cal-dia{min-height:44px;font-size:10px;} }
+@media(max-width:640px){
+  #funilAbaCalendario{max-width:100%;}
+  .funil-board{grid-template-columns:1fr;}
+  .funil-corpo{padding:0 8px 20px;}
+  .funil-topo{padding:10px 12px;}
+  .cal-dia{min-height:34px;font-size:9px;padding:2px 3px;}
+  .cal-dow{font-size:7.5px;}
+  .cal-topo .mes{min-width:0;flex:1;}
+  .funil-abas{gap:2px;}
+  .funil-abas .aba{padding:7px 10px;font-size:10.5px;}
+}
 
 /* ───── MODAL ───── */
 .modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:100100;padding:20px;overflow-y:auto;}
@@ -747,6 +761,56 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
+<!-- ═══════════ PLANO DE AÇÃO ═══════════ -->
+<div class="card" id="secPlano">
+  <div class="card-titulo">
+    <span class="ct-esq"><span class="dot" id="planoDot"></span>PLANO DE AÇÃO</span>
+    <span class="ct-dir">
+      <label class="sem-reg" id="planoLabel">
+        <input type="checkbox" id="planoAtivo" onchange="togglePlanoAcao()"> Registrar plano de ação
+      </label>
+    </span>
+  </div>
+  <div class="card-corpo" id="planoCorpo" style="display:none">
+    <label>Descrição do plano de ação</label>
+    <textarea id="planoTexto" style="min-height:110px" placeholder="Descreva as ações combinadas para resolver o que foi discutido na reunião..."></textarea>
+    <button type="button" class="btn btn-claro btn-mini" style="margin-top:10px" onclick="abrirDetalhePlano()">Envolvidos, prazo e status</button>
+    <div class="ref" id="planoResumo" style="margin-top:8px"></div>
+    <input type="hidden" id="planoEnvolvidosVal">
+    <input type="hidden" id="planoPrazoVal">
+    <input type="hidden" id="planoStatusVal" value="nao_iniciado">
+  </div>
+</div>
+
+<!-- MODAL ENVOLVIDOS / PRAZO / STATUS DO PLANO DE AÇÃO -->
+<div class="modal" id="modalPlano">
+  <div class="modal-caixa" style="max-width:460px">
+    <div class="modal-topo">
+      <h3>Envolvidos, prazo e status</h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharDetalhePlano()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <label>Envolvidos</label>
+      <input type="text" id="planoEnvolvidosInput" placeholder="Nomes separados por vírgula">
+      <div class="linha" style="margin-top:8px">
+        <div class="col-fixa">
+          <label>Prazo</label>
+          <input type="date" id="planoPrazoInput" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col">
+          <label>Status</label>
+          <select id="planoStatusInput">
+            <option value="nao_iniciado">Não iniciado</option>
+            <option value="em_andamento">Em andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" class="btn btn-vermelho btn-grande" style="margin-top:10px" onclick="salvarDetalhePlano()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ AÇÕES FINAIS ═══════════ -->
 <div class="acoes-finais">
   <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">SALVAR E GERAR ATA SUPERVISÃO</button>
@@ -870,15 +934,11 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
   <div class="funil-corpo">
     <div class="funil-abas">
-      <button type="button" class="aba ativa" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
-      <button type="button" class="aba" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
+      <button type="button" class="aba ativa" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
+      <button type="button" class="aba" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
     </div>
 
-    <div id="funilAbaBoard">
-      <div class="funil-board" id="funilBoard"></div>
-    </div>
-
-    <div id="funilAbaCalendario" style="display:none">
+    <div id="funilAbaCalendario">
       <div class="cal-topo">
         <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(-1)">◂ Anterior</button>
         <div class="mes" id="calMesRotulo">—</div>
@@ -886,6 +946,10 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
       </div>
       <div class="cal-grid" id="calGrid"></div>
       <div id="calDiaDetalhe" style="margin-top:16px"></div>
+    </div>
+
+    <div id="funilAbaBoard" style="display:none">
+      <div class="funil-board" id="funilBoard"></div>
     </div>
   </div>
 </div>
@@ -1232,10 +1296,10 @@ function addRegistroEmpresa(containerId, tipo, dados){
         <input type="text" class="campo-empresa" placeholder="Nome da empresa no sistema" value="${esc(dados.empresa||'')}">
       </div>
     </div>
-    <label>${tipo==='perdido' ? 'Justificativa (registro em ata)' : 'Registro em ata'}</label>
+    <label>${tipo==='perdido' ? 'Justificativa (registro em ata)' : 'Registro em ata (informação pública)'}</label>
     <textarea class="campo-texto" placeholder="${PLACEHOLDERS[tipo]}">${esc(dados.texto||'')}</textarea>
     <div class="sup">
-      <label>Registro supervisão</label>
+      <label>Registro supervisão (informação apenas p/ supervisão)</label>
       <textarea class="campo-supervisao" placeholder="Observação da supervisão — sai apenas na ata da supervisão...">${esc(dados.supervisao||'')}</textarea>
     </div>
     ${tipo==='risco' ? `<div class="docs-area">
@@ -1574,13 +1638,57 @@ function coletarTudo(){
     chamados: regs('listaChamados','apoio'),
     docsGerais: ativo('perdidos')
       ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||'', contexto:'perdidos'}))
-      : []
+      : [],
+    planoAcaoAtivo: document.getElementById('planoAtivo').checked,
+    planoAcaoTexto: document.getElementById('planoTexto').value.trim(),
+    planoAcaoEnvolvidos: document.getElementById('planoEnvolvidosVal').value,
+    planoAcaoPrazo: document.getElementById('planoPrazoVal').value,
+    planoAcaoStatus: document.getElementById('planoStatusVal').value || 'nao_iniciado'
   };
 }
 
 function limparTudo(){
   if(!confirm('Limpar tudo e abrir um formulário novo?\n\nO que estiver na tela e não tiver sido salvo será perdido. Atas já arquivadas não são afetadas.')) return;
   location.reload();
+}
+
+/* ═══════════════════ PLANO DE AÇÃO ═══════════════════
+   Some no "hub" (calendário/funil) por conta própria: o prazo definido
+   aqui vira um card no calendário — ver ata_funil_listar() (tipo "plano"). */
+const STATUS_PLANO_LABEL = { nao_iniciado:'Não iniciado', em_andamento:'Em andamento', concluido:'Concluído' };
+
+function togglePlanoAcao(){
+  const ativo = document.getElementById('planoAtivo').checked;
+  document.getElementById('planoCorpo').style.display = ativo ? '' : 'none';
+  document.getElementById('planoDot').style.background = ativo ? 'var(--verde)' : '';
+}
+
+function atualizarResumoPlano(){
+  const env = document.getElementById('planoEnvolvidosVal').value.trim();
+  const prazo = document.getElementById('planoPrazoVal').value;
+  const status = document.getElementById('planoStatusVal').value || 'nao_iniciado';
+  const box = document.getElementById('planoResumo');
+  if(!env && !prazo){ box.innerHTML = ''; return; }
+  box.innerHTML =
+    (env ? '<span>Envolvidos<b>'+esc(env)+'</b></span>' : '') +
+    (prazo ? '<span>Prazo<b>'+dataBR(prazo)+'</b></span>' : '') +
+    '<span>Status<b>'+esc(STATUS_PLANO_LABEL[status]||status)+'</b></span>';
+}
+
+function abrirDetalhePlano(){
+  document.getElementById('planoEnvolvidosInput').value = document.getElementById('planoEnvolvidosVal').value;
+  document.getElementById('planoPrazoInput').value = document.getElementById('planoPrazoVal').value;
+  document.getElementById('planoStatusInput').value = document.getElementById('planoStatusVal').value || 'nao_iniciado';
+  document.getElementById('modalPlano').classList.add('aberto');
+}
+function fecharDetalhePlano(){ document.getElementById('modalPlano').classList.remove('aberto'); }
+
+function salvarDetalhePlano(){
+  document.getElementById('planoEnvolvidosVal').value = document.getElementById('planoEnvolvidosInput').value.trim();
+  document.getElementById('planoPrazoVal').value = document.getElementById('planoPrazoInput').value;
+  document.getElementById('planoStatusVal').value = document.getElementById('planoStatusInput').value;
+  atualizarResumoPlano();
+  fecharDetalhePlano();
 }
 
 /* ═══════════════════ ANEXOS → STORAGE ═══════════════════ */
@@ -1738,6 +1846,14 @@ function carregarAtaNoFormulario(a){
     if(chkO) chkO.checked = ok;
   });
 
+  document.getElementById('planoAtivo').checked = !!(a.plano_acao_ativo || d.planoAcaoAtivo);
+  document.getElementById('planoTexto').value = a.plano_acao_texto || d.planoAcaoTexto || '';
+  document.getElementById('planoEnvolvidosVal').value = a.plano_acao_envolvidos || d.planoAcaoEnvolvidos || '';
+  document.getElementById('planoPrazoVal').value = a.plano_acao_prazo || d.planoAcaoPrazo || '';
+  document.getElementById('planoStatusVal').value = a.plano_acao_status || d.planoAcaoStatus || 'nao_iniciado';
+  togglePlanoAcao();
+  atualizarResumoPlano();
+
   anexosOriginais = (a.anexos||[]).map(x=>x.caminho);
   entrarModoEdicao(a.id, a.numero, a.finalizada !== false, a.criado_em);
   aplicarVisibilidade();
@@ -1833,7 +1949,7 @@ function construirPDF(d, numero, comSupervisao){
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.tipoApoio||'—', r.texto||'—']);
       cols = {0:{cellWidth:22}, 1:{cellWidth:42}, 2:{cellWidth:32}};
     } else if(comDocs){
-      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA'].concat(sup?['REGISTRO SUPERVISÃO']:[]).concat(['DOCUMENTOS'])];
+      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[]).concat(['DOCUMENTOS'])];
       body = lista.map(r=>{
         const x = nomesDocs(r);
         return [r.codigo||'—', r.empresa||'—', r.texto||'—']
@@ -1842,7 +1958,7 @@ function construirPDF(d, numero, comSupervisao){
       });
       cols = sup ? {0:{cellWidth:17}, 1:{cellWidth:33}, 4:{cellWidth:25}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
     } else {
-      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA'].concat(sup?['REGISTRO SUPERVISÃO']:[])];
+      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[])];
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—'].concat(sup?[r.supervisao||'—']:[]));
       cols = sup ? {0:{cellWidth:18}, 1:{cellWidth:38}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
     }
@@ -2310,8 +2426,8 @@ async function admVer(id){
       else{
         const temSup = sec !== 'chamado' && itens.some(i => (i.supervisao||'').trim());
         html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:180px">Empresa</th>'+
-                (sec==='chamado'?'<th style="width:150px">Tipo de apoio</th>':'')+'<th>Registro em ata</th>'+
-                (temSup?'<th>Registro supervisão</th>':'')+'</tr></thead><tbody>';
+                (sec==='chamado'?'<th style="width:150px">Tipo de apoio</th>':'')+'<th>Registro em ata (informação pública)</th>'+
+                (temSup?'<th>Registro supervisão (informação apenas p/ supervisão)</th>':'')+'</tr></thead><tbody>';
         itens.forEach(i=>{
           html += '<tr><td>'+esc(i.codigo||'—')+'</td><td>'+esc(i.empresa||'—')+'</td>'+
                   (sec==='chamado'?'<td>'+esc(i.tipoApoio||'—')+'</td>':'')+
@@ -2465,7 +2581,7 @@ async function abrirFunil(){
   document.getElementById('btnConfigFunil').style.display = admLiberado ? '' : 'none';
   const hoje = new Date();
   if(calAno === undefined){ calAno = hoje.getFullYear(); calMes = hoje.getMonth(); }
-  funilAba('board');
+  funilAba('calendario');
   await funilCarregar();
 }
 function fecharFunil(){
@@ -2491,9 +2607,12 @@ async function funilCarregar(){
     rot.textContent = 'Arquiva automaticamente após ' + funilDiasArquivar + ' dia(s) sem alteração.';
     rot.style.display = admLiberado ? '' : 'none';
     funilRenderBoard();
+    calRender();
   }catch(err){
-    document.getElementById('funilBoard').innerHTML =
-      '<div class="funil-vazio" style="grid-column:1/-1">Não foi possível carregar o funil: ' + esc(err.message) + '</div>';
+    const msg = '<div class="funil-vazio" style="grid-column:1/-1">Não foi possível carregar o funil: ' + esc(err.message) + '</div>';
+    document.getElementById('funilBoard').innerHTML = msg;
+    document.getElementById('calGrid').innerHTML = '';
+    document.getElementById('calDiaDetalhe').innerHTML = msg;
   }
 }
 
@@ -2695,6 +2814,17 @@ function calMostrarDia(key, itens){
   const box = document.getElementById('calDiaDetalhe');
   let html = '<div class="card"><div class="card-titulo"><span class="ct-esq">' + dataBR(key) + '</span></div><div class="card-corpo">';
   itens.forEach(c=>{
+    if(c.tipo === 'plano'){
+      html += '<div class="funil-card" style="margin-bottom:7px">' +
+        '<div class="vend">Plano de ação · ' + esc(c.vendedor_nome) +
+        (c.numero ? ' (ata nº ' + String(c.numero).padStart(4,'0') + ')' : '') + '</div>' +
+        (c.texto ? '<div class="num">' + esc(c.texto) + '</div>' : '') +
+        '<div class="num">' +
+        (c.envolvidos ? 'Envolvidos: ' + esc(c.envolvidos) + ' · ' : '') +
+        'Status: ' + esc(STATUS_PLANO_LABEL[c.status] || c.status || 'Não iniciado') +
+        '</div></div>';
+      return;
+    }
     const et = ETAPAS_FUNIL.find(e=>e.slug===c.etapa);
     html += '<div class="funil-card" style="margin-bottom:7px">' +
       '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
@@ -2743,7 +2873,8 @@ async function iniciar(){
 window.addEventListener('load', iniciar);
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
-    if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
+    if(document.getElementById('modalPlano').classList.contains('aberto')) fecharDetalhePlano();
+    else if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
     else if(document.getElementById('modalConfigFunil').classList.contains('aberto')) fecharConfigFunil();
     else if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
     else if(document.getElementById('funilPainel').classList.contains('aberto')) fecharFunil();
@@ -2758,6 +2889,9 @@ document.getElementById('modalAgenda').addEventListener('click', function(e){
 });
 document.getElementById('modalConfigFunil').addEventListener('click', function(e){
   if(e.target === this) fecharConfigFunil();
+});
+document.getElementById('modalPlano').addEventListener('click', function(e){
+  if(e.target === this) fecharDetalhePlano();
 });
 </script>
 </body>
