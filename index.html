@@ -21,6 +21,8 @@
   --branco:#FFFFFF;
   --verde:#1E7A3C;
   --verde-suave:#EAF6EE;
+  --azul:#1E5A9E;
+  --azul-suave:#EAF2FB;
 }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
 body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
@@ -141,6 +143,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 .registro{border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);border-radius:0 6px 6px 0;padding:9px 10px;margin-bottom:8px;background:var(--branco);}
 .registro-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
 .registro-topo .rotulo{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--vermelho);text-transform:uppercase;}
+/* Card com plano de ação ligado: fica marcado em outra cor (azul), pra
+   diferenciar de relance dos demais registros da reunião. */
+.registro.tem-plano{border-left-color:var(--azul);background:var(--azul-suave);}
+.plano-toggle{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--cinza-borda);}
+.plano-toggle span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--azul);}
+.plano-bloco{margin-top:9px;padding:9px 10px;border:1px solid rgba(30,90,158,.25);border-left:3px solid var(--azul);border-radius:0 6px 6px 0;background:var(--branco);}
+.plano-bloco label{color:var(--azul);}
 
 /* ───── ARQUIVOS ───── */
 .docs-area{margin-top:8px;}
@@ -308,7 +317,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .cal-ponto{width:6px;height:6px;border-radius:50%;background:var(--vermelho);flex:none;}
 .cal-ponto.realizada,.cal-ponto.em_andamento{background:var(--verde);}
 .cal-ponto.arquivo{background:#8A8A93;}
-.cal-ponto.plano{background:var(--preto);}
+.cal-ponto.plano{background:var(--azul);}
 .cal-dia.com-item{cursor:pointer;}
 .cal-dia.com-item:hover{border-color:var(--vermelho);}
 
@@ -757,56 +766,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
         <li><strong>c)</strong> Quais ações concretas serão executadas até a próxima reunião?</li>
       </ul>
       <div class="destaque">Se a reunião responder essas três perguntas toda semana, ela provavelmente estará atacando os pontos que mais impactam o faturamento da Fiorella.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════ PLANO DE AÇÃO ═══════════ -->
-<div class="card" id="secPlano">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot" id="planoDot"></span>PLANO DE AÇÃO</span>
-    <span class="ct-dir">
-      <label class="sem-reg" id="planoLabel">
-        <input type="checkbox" id="planoAtivo" onchange="togglePlanoAcao()"> Registrar plano de ação
-      </label>
-    </span>
-  </div>
-  <div class="card-corpo" id="planoCorpo" style="display:none">
-    <label>Descrição do plano de ação</label>
-    <textarea id="planoTexto" style="min-height:110px" placeholder="Descreva as ações combinadas para resolver o que foi discutido na reunião..."></textarea>
-    <button type="button" class="btn btn-claro btn-mini" style="margin-top:10px" onclick="abrirDetalhePlano()">Envolvidos, prazo e status</button>
-    <div class="ref" id="planoResumo" style="margin-top:8px"></div>
-    <input type="hidden" id="planoEnvolvidosVal">
-    <input type="hidden" id="planoPrazoVal">
-    <input type="hidden" id="planoStatusVal" value="nao_iniciado">
-  </div>
-</div>
-
-<!-- MODAL ENVOLVIDOS / PRAZO / STATUS DO PLANO DE AÇÃO -->
-<div class="modal" id="modalPlano">
-  <div class="modal-caixa" style="max-width:460px">
-    <div class="modal-topo">
-      <h3>Envolvidos, prazo e status</h3>
-      <button type="button" class="btn btn-claro btn-mini" onclick="fecharDetalhePlano()">Fechar</button>
-    </div>
-    <div class="modal-corpo">
-      <label>Envolvidos</label>
-      <input type="text" id="planoEnvolvidosInput" placeholder="Nomes separados por vírgula">
-      <div class="linha" style="margin-top:8px">
-        <div class="col-fixa">
-          <label>Prazo</label>
-          <input type="date" id="planoPrazoInput" onclick="this.showPicker && this.showPicker()">
-        </div>
-        <div class="col">
-          <label>Status</label>
-          <select id="planoStatusInput">
-            <option value="nao_iniciado">Não iniciado</option>
-            <option value="em_andamento">Em andamento</option>
-            <option value="concluido">Concluído</option>
-          </select>
-        </div>
-      </div>
-      <button type="button" class="btn btn-vermelho btn-grande" style="margin-top:10px" onclick="salvarDetalhePlano()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1270,13 +1229,55 @@ function htmlRef(ref){
   return partes.length ? '<div class="ref">' + partes.join('') + '</div>' : '';
 }
 
+/* ═══════════════════ PLANO DE AÇÃO (por card) ═══════════════════
+   Cada card de registro (empresa ou chamado) pode ter o próprio plano de
+   ação — não é mais um único plano por ata. Ao ligar, o card ganha outra
+   cor e o prazo (data final) some automaticamente no calendário/funil —
+   ver ata_gravar_conteudo() e ata_funil_listar() no banco. */
+function blocoPlanoAcao(dados){
+  dados = dados || {};
+  const ligado = !!dados.planoAtivo;
+  return `
+    <div class="plano-toggle">
+      <label class="sw"><input type="checkbox" class="campo-plano-ativo"${ligado?' checked':''} onchange="togglePlanoCard(this)"><i></i></label>
+      <span>Gerar Plano de Ação</span>
+    </div>
+    <div class="plano-bloco" style="display:${ligado?'':'none'}">
+      <label>REGISTRO DE PLANO DE AÇÃO</label>
+      <textarea class="campo-plano-texto" placeholder="Descreva o plano de ação combinado...">${esc(dados.planoTexto||'')}</textarea>
+      <div class="linha" style="margin-top:8px">
+        <div class="col">
+          <label>Envolvidos</label>
+          <input type="text" class="campo-plano-envolvidos" placeholder="Nomes separados por vírgula" value="${esc(dados.planoEnvolvidos||'')}">
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Data inicial</label>
+          <input type="date" class="campo-plano-data-inicial" value="${esc(dados.planoDataInicial||'')}" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Data final</label>
+          <input type="date" class="campo-plano-data-final" value="${esc(dados.planoDataFinal||'')}" onclick="this.showPicker && this.showPicker()">
+        </div>
+      </div>
+    </div>`;
+}
+function togglePlanoCard(chk){
+  const registro = chk.closest('.registro');
+  if(!registro) return;
+  const bloco = registro.querySelector('.plano-bloco');
+  if(bloco) bloco.style.display = chk.checked ? '' : 'none';
+  registro.classList.toggle('tem-plano', chk.checked);
+}
+
 function addRegistroEmpresa(containerId, tipo, dados){
   dados = dados || {};
   contador++;
   const id = 'reg_' + contador;
   const docsId = 'docs_' + id;
   const div = document.createElement('div');
-  div.className = 'registro';
+  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '');
   div.id = id;
   div.dataset.tipo = tipo;
   if(dados.ref) div.dataset.ref = JSON.stringify(dados.ref);
@@ -1306,7 +1307,8 @@ function addRegistroEmpresa(containerId, tipo, dados){
       <label>Documentos</label>
       <input type="file" multiple onchange="anexar(this,'${docsId}')">
       <ul class="lista-arquivos" id="${docsId}"></ul>
-    </div>` : ''}`;
+    </div>` : ''}
+    ${blocoPlanoAcao(dados)}`;
   document.getElementById(containerId).appendChild(div);
   statusDoContainer(containerId);
   return div;
@@ -1328,7 +1330,7 @@ function addChamado(dados){
   contador++;
   const id = 'cham_' + contador;
   const div = document.createElement('div');
-  div.className = 'registro';
+  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '');
   div.id = id;
   div.innerHTML = `
     <div class="registro-topo">
@@ -1357,7 +1359,8 @@ function addChamado(dados){
       </div>
     </div>
     <label>Descrição do chamado</label>
-    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio...">${esc(dados.texto||'')}</textarea>`;
+    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio...">${esc(dados.texto||'')}</textarea>
+    ${blocoPlanoAcao(dados)}`;
   document.getElementById('listaChamados').appendChild(div);
   statusDoContainer('listaChamados');
 }
@@ -1603,7 +1606,12 @@ function coletarRegistros(containerId){
       supervisao: (div.querySelector('.campo-supervisao')||{}).value || '',
       ref: ref,
       _docsKey: 'docs_' + div.id,
-      docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||''}))
+      docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||''})),
+      planoAtivo: (div.querySelector('.campo-plano-ativo')||{}).checked || false,
+      planoTexto: (div.querySelector('.campo-plano-texto')||{}).value || '',
+      planoEnvolvidos: (div.querySelector('.campo-plano-envolvidos')||{}).value || '',
+      planoDataInicial: (div.querySelector('.campo-plano-data-inicial')||{}).value || '',
+      planoDataFinal: (div.querySelector('.campo-plano-data-final')||{}).value || ''
     };
   });
 }
@@ -1638,57 +1646,13 @@ function coletarTudo(){
     chamados: regs('listaChamados','apoio'),
     docsGerais: ativo('perdidos')
       ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||'', contexto:'perdidos'}))
-      : [],
-    planoAcaoAtivo: document.getElementById('planoAtivo').checked,
-    planoAcaoTexto: document.getElementById('planoTexto').value.trim(),
-    planoAcaoEnvolvidos: document.getElementById('planoEnvolvidosVal').value,
-    planoAcaoPrazo: document.getElementById('planoPrazoVal').value,
-    planoAcaoStatus: document.getElementById('planoStatusVal').value || 'nao_iniciado'
+      : []
   };
 }
 
 function limparTudo(){
   if(!confirm('Limpar tudo e abrir um formulário novo?\n\nO que estiver na tela e não tiver sido salvo será perdido. Atas já arquivadas não são afetadas.')) return;
   location.reload();
-}
-
-/* ═══════════════════ PLANO DE AÇÃO ═══════════════════
-   Some no "hub" (calendário/funil) por conta própria: o prazo definido
-   aqui vira um card no calendário — ver ata_funil_listar() (tipo "plano"). */
-const STATUS_PLANO_LABEL = { nao_iniciado:'Não iniciado', em_andamento:'Em andamento', concluido:'Concluído' };
-
-function togglePlanoAcao(){
-  const ativo = document.getElementById('planoAtivo').checked;
-  document.getElementById('planoCorpo').style.display = ativo ? '' : 'none';
-  document.getElementById('planoDot').style.background = ativo ? 'var(--verde)' : '';
-}
-
-function atualizarResumoPlano(){
-  const env = document.getElementById('planoEnvolvidosVal').value.trim();
-  const prazo = document.getElementById('planoPrazoVal').value;
-  const status = document.getElementById('planoStatusVal').value || 'nao_iniciado';
-  const box = document.getElementById('planoResumo');
-  if(!env && !prazo){ box.innerHTML = ''; return; }
-  box.innerHTML =
-    (env ? '<span>Envolvidos<b>'+esc(env)+'</b></span>' : '') +
-    (prazo ? '<span>Prazo<b>'+dataBR(prazo)+'</b></span>' : '') +
-    '<span>Status<b>'+esc(STATUS_PLANO_LABEL[status]||status)+'</b></span>';
-}
-
-function abrirDetalhePlano(){
-  document.getElementById('planoEnvolvidosInput').value = document.getElementById('planoEnvolvidosVal').value;
-  document.getElementById('planoPrazoInput').value = document.getElementById('planoPrazoVal').value;
-  document.getElementById('planoStatusInput').value = document.getElementById('planoStatusVal').value || 'nao_iniciado';
-  document.getElementById('modalPlano').classList.add('aberto');
-}
-function fecharDetalhePlano(){ document.getElementById('modalPlano').classList.remove('aberto'); }
-
-function salvarDetalhePlano(){
-  document.getElementById('planoEnvolvidosVal').value = document.getElementById('planoEnvolvidosInput').value.trim();
-  document.getElementById('planoPrazoVal').value = document.getElementById('planoPrazoInput').value;
-  document.getElementById('planoStatusVal').value = document.getElementById('planoStatusInput').value;
-  atualizarResumoPlano();
-  fecharDetalhePlano();
 }
 
 /* ═══════════════════ ANEXOS → STORAGE ═══════════════════ */
@@ -1815,7 +1779,8 @@ function carregarAtaNoFormulario(a){
    ['semContato','listaSemContato','semcontato'], ['oportunidades','listaOportunidades','oportunidade']]
   .forEach(([chave, lista, tipo])=>{
     (d[chave]||[]).forEach(r=>{
-      const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref});
+      const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref,
+        planoAtivo:r.planoAtivo, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos, planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal});
       const docs = (r.docs||[]).filter(x => x && x.caminho);
       if(docs.length){
         const k = 'docs_' + div.id;
@@ -1825,7 +1790,8 @@ function carregarAtaNoFormulario(a){
     });
   });
 
-  (d.chamados||[]).forEach(c=>addChamado({codigo:c.codigo, empresa:c.empresa, tipoApoio:c.tipoApoio, texto:c.texto}));
+  (d.chamados||[]).forEach(c=>addChamado({codigo:c.codigo, empresa:c.empresa, tipoApoio:c.tipoApoio, texto:c.texto,
+    planoAtivo:c.planoAtivo, planoTexto:c.planoTexto, planoEnvolvidos:c.planoEnvolvidos, planoDataInicial:c.planoDataInicial, planoDataFinal:c.planoDataFinal}));
 
   const docsG = (d.docsGerais||[]).filter(x => x && x.caminho);
   if(docsG.length){
@@ -1845,14 +1811,6 @@ function carregarAtaNoFormulario(a){
     if(chkN) chkN.checked = nada;
     if(chkO) chkO.checked = ok;
   });
-
-  document.getElementById('planoAtivo').checked = !!(a.plano_acao_ativo || d.planoAcaoAtivo);
-  document.getElementById('planoTexto').value = a.plano_acao_texto || d.planoAcaoTexto || '';
-  document.getElementById('planoEnvolvidosVal').value = a.plano_acao_envolvidos || d.planoAcaoEnvolvidos || '';
-  document.getElementById('planoPrazoVal').value = a.plano_acao_prazo || d.planoAcaoPrazo || '';
-  document.getElementById('planoStatusVal').value = a.plano_acao_status || d.planoAcaoStatus || 'nao_iniciado';
-  togglePlanoAcao();
-  atualizarResumoPlano();
 
   anexosOriginais = (a.anexos||[]).map(x=>x.caminho);
   entrarModoEdicao(a.id, a.numero, a.finalizada !== false, a.criado_em);
@@ -2815,13 +2773,17 @@ function calMostrarDia(key, itens){
   let html = '<div class="card"><div class="card-titulo"><span class="ct-esq">' + dataBR(key) + '</span></div><div class="card-corpo">';
   itens.forEach(c=>{
     if(c.tipo === 'plano'){
+      const periodo = c.data_inicial && c.data_final && c.data_inicial !== c.data_final
+        ? dataBR(c.data_inicial) + ' – ' + dataBR(c.data_final)
+        : dataBR(c.data_final || c.data_inicial);
       html += '<div class="funil-card" style="margin-bottom:7px">' +
         '<div class="vend">Plano de ação · ' + esc(c.vendedor_nome) +
+        (c.empresa ? ' · ' + esc(c.empresa) : '') +
         (c.numero ? ' (ata nº ' + String(c.numero).padStart(4,'0') + ')' : '') + '</div>' +
         (c.texto ? '<div class="num">' + esc(c.texto) + '</div>' : '') +
         '<div class="num">' +
         (c.envolvidos ? 'Envolvidos: ' + esc(c.envolvidos) + ' · ' : '') +
-        'Status: ' + esc(STATUS_PLANO_LABEL[c.status] || c.status || 'Não iniciado') +
+        'Período: ' + periodo +
         '</div></div>';
       return;
     }
@@ -2873,8 +2835,7 @@ async function iniciar(){
 window.addEventListener('load', iniciar);
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
-    if(document.getElementById('modalPlano').classList.contains('aberto')) fecharDetalhePlano();
-    else if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
+    if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
     else if(document.getElementById('modalConfigFunil').classList.contains('aberto')) fecharConfigFunil();
     else if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
     else if(document.getElementById('funilPainel').classList.contains('aberto')) fecharFunil();
@@ -2889,9 +2850,6 @@ document.getElementById('modalAgenda').addEventListener('click', function(e){
 });
 document.getElementById('modalConfigFunil').addEventListener('click', function(e){
   if(e.target === this) fecharConfigFunil();
-});
-document.getElementById('modalPlano').addEventListener('click', function(e){
-  if(e.target === this) fecharDetalhePlano();
 });
 </script>
 </body>
