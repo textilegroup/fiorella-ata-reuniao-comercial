@@ -25,14 +25,16 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
 body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 
-/* ───── CABEÇALHO (mesmo padrão das ferramentas Wendell: faixa fixa em
-   degradê, logo circular, marca + ações que quebram a linha em vez de
-   cortar — só a cor muda para o vermelho Fiorella) ───── */
+/* ───── CABEÇALHO (mesmo padrão das ferramentas Wendell: degradê, logo
+   circular, marca + ações que quebram a linha em vez de cortar — só a cor
+   muda para o vermelho Fiorella). NÃO fixo no topo: ao contrário dos outros
+   apps Wendell (que escondem a barra da Central com data-barra="nao"), a
+   Fiorella mantém essa barra — ela já é sticky (z-index alto, do guard.js),
+   então um segundo cabeçalho também fixo colidiria com ela ao rolar. */
 .header{
   background:linear-gradient(100deg,var(--vermelho-escuro) 0%,var(--vermelho) 62%,var(--vermelho-escuro) 100%);
   color:var(--branco);
   padding:10px 16px;
-  position:sticky; top:0; z-index:40;
 }
 .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;}
@@ -203,7 +205,7 @@ input[type=file]{font-size:12px;}
 .aviso-salvo.mostrar{opacity:1;}
 
 /* ═════════ ÁREA ADM ═════════ */
-.adm{display:none;position:fixed;inset:0;background:var(--branco);z-index:1000;overflow-y:auto;}
+.adm{display:none;position:fixed;inset:0;background:var(--branco);z-index:100000;overflow-y:auto;}
 .adm.aberto{display:block;}
 .adm-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;background:var(--branco);z-index:5;}
 .adm-topo h2{font-size:16px;letter-spacing:2px;font-weight:800;}
@@ -262,7 +264,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .vis-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
 
 /* ═════════ FUNIL & AGENDA ═════════ */
-.funil-painel{display:none;position:fixed;inset:0;background:var(--branco);z-index:1000;overflow-y:auto;}
+.funil-painel{display:none;position:fixed;inset:0;background:var(--branco);z-index:100000;overflow-y:auto;}
 .funil-painel.aberto{display:block;}
 .funil-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;background:var(--branco);z-index:5;}
 .funil-topo h2{font-size:16px;letter-spacing:2px;font-weight:800;}
@@ -310,7 +312,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 @media(max-width:560px){ .funil-board{grid-template-columns:1fr;} .cal-dia{min-height:44px;font-size:10px;} }
 
 /* ───── MODAL ───── */
-.modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:1100;padding:20px;overflow-y:auto;}
+.modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:100100;padding:20px;overflow-y:auto;}
 .modal.aberto{display:block;}
 .modal-caixa{max-width:900px;margin:0 auto;background:var(--branco);border-radius:8px;overflow:hidden;border-top:4px solid var(--vermelho);box-shadow:0 10px 40px rgba(0,0,0,.25);}
 .modal-topo{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--cinza-borda);flex-wrap:wrap;}
@@ -350,7 +352,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
     <div class="brand">
       <div class="logo-badge">F</div>
       <div class="brand-text">
-        <h1>FIORELLA<span>.</span></h1>
+        <h1>FIORELLA BRASIL</h1>
         <div class="subtitulo">Ata de Reunião Semanal — Vendedores</div>
       </div>
     </div>
@@ -767,7 +769,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <div class="adm" id="admPainel">
   <div class="adm-topo">
     <div>
-      <h2>FIORELLA<span>.</span> ADM</h2>
+      <h2>FIORELLA BRASIL ADM</h2>
       <div class="sub">Administração das atas e do formulário</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -856,7 +858,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <div class="funil-painel" id="funilPainel">
   <div class="funil-topo">
     <div>
-      <h2>FIORELLA<span>.</span> FUNIL</h2>
+      <h2>FIORELLA BRASIL FUNIL</h2>
       <div class="sub">Reuniões, atas e planos de ação do hub</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -1775,9 +1777,7 @@ function construirPDF(d, numero, comSupervisao){
   doc.setFillColor(255,255,255); doc.rect(0,0,W,26,'F');
   doc.setFillColor(...VERMELHO); doc.rect(0,26,W,1.8,'F');
   doc.setTextColor(...PRETO); doc.setFont('helvetica','bold'); doc.setFontSize(18);
-  doc.text('FIORELLA', 14, 12);
-  const larg = doc.getTextWidth('FIORELLA');
-  doc.setTextColor(...VERMELHO); doc.text('.', 14 + larg + 0.5, 12);
+  doc.text('FIORELLA BRASIL', 14, 12);
   doc.setTextColor(...CINZA); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
   doc.text('ATA DE REUNIÃO SEMANAL — ' + (comSupervisao ? 'SUPERVISÃO' : 'VENDEDOR') + (numero ? '   ·   ATA Nº ' + numero : ''), 14, 19);
   doc.setTextColor(...PRETO); doc.setFont('helvetica','bold'); doc.setFontSize(10);
