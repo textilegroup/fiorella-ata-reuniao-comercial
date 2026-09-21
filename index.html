@@ -25,17 +25,31 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,Helvetica,sans-serif;}
 body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 
-/* ───── CABEÇALHO ───── */
-.header{background:var(--branco);color:var(--preto);padding:14px 18px 12px;border-bottom:3px solid var(--vermelho);}
-.header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
-.header h1{font-size:22px;letter-spacing:3px;font-weight:800;color:var(--preto);}
-.header h1 span{color:var(--vermelho);}
-.header .subtitulo{font-size:10px;letter-spacing:1.5px;color:var(--cinza-texto);text-transform:uppercase;margin-top:3px;}
-.header-dir{display:flex;align-items:flex-end;gap:14px;}
-.relogio{text-align:right;font-size:11px;color:var(--cinza-texto);}
-.relogio .hora{font-size:16px;font-weight:700;color:var(--vermelho);font-variant-numeric:tabular-nums;}
-.btn-adm{background:transparent;border:1px solid var(--vermelho);color:var(--vermelho);padding:6px 12px;border-radius:4px;font-size:10.5px;font-weight:800;letter-spacing:1px;cursor:pointer;}
-.btn-adm:hover{background:var(--vermelho);color:var(--branco);}
+/* ───── CABEÇALHO (mesmo padrão das ferramentas Wendell: faixa fixa em
+   degradê, logo circular, marca + ações que quebram a linha em vez de
+   cortar — só a cor muda para o vermelho Fiorella) ───── */
+.header{
+  background:linear-gradient(100deg,var(--vermelho-escuro) 0%,var(--vermelho) 62%,var(--vermelho-escuro) 100%);
+  color:var(--branco);
+  padding:10px 16px;
+  position:sticky; top:0; z-index:40;
+}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;}
+.logo-badge{
+  width:38px;height:38px;flex:none;background:var(--branco);border-radius:50%;
+  border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;
+  font-size:16px;font-weight:800;color:var(--vermelho);
+}
+.brand-text{min-width:0;}
+.header h1{font-size:19px;letter-spacing:2px;font-weight:800;line-height:1.15;color:var(--branco);margin:0;}
+.header h1 span{opacity:.85;}
+.header .subtitulo{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.78);text-transform:uppercase;margin-top:2px;}
+.header-dir{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto;}
+.relogio{text-align:right;font-size:10.5px;color:rgba(255,255,255,.78);}
+.relogio .hora{font-size:15px;font-weight:700;color:var(--branco);font-variant-numeric:tabular-nums;}
+.btn-adm{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.45);color:var(--branco);padding:6px 12px;border-radius:6px;font-size:10.5px;font-weight:800;letter-spacing:1px;cursor:pointer;white-space:nowrap;}
+.btn-adm:hover{background:var(--branco);color:var(--vermelho-escuro);}
 
 .container{max-width:1000px;margin:12px auto;padding:0 10px;}
 
@@ -247,6 +261,54 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .sw input:checked + i:before{transform:translateX(21px);}
 .vis-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
 
+/* ═════════ FUNIL & AGENDA ═════════ */
+.funil-painel{display:none;position:fixed;inset:0;background:var(--branco);z-index:1000;overflow-y:auto;}
+.funil-painel.aberto{display:block;}
+.funil-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;background:var(--branco);z-index:5;}
+.funil-topo h2{font-size:16px;letter-spacing:2px;font-weight:800;}
+.funil-topo h2 span{color:var(--vermelho);}
+.funil-topo .sub{font-size:10px;letter-spacing:1.5px;color:var(--cinza-texto);text-transform:uppercase;margin-top:2px;}
+.funil-corpo{max-width:1300px;margin:16px auto;padding:0 14px 30px;}
+.funil-abas{display:flex;gap:4px;border-bottom:1px solid var(--cinza-borda);margin-bottom:16px;flex-wrap:wrap;}
+
+.funil-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;}
+.funil-col{background:#FAFAFB;border:1px solid var(--cinza-borda);border-radius:8px;overflow:hidden;min-width:0;}
+.funil-col-head{padding:10px 12px;border-bottom:2px solid var(--vermelho);background:var(--branco);}
+.funil-col-head .tit{font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--vermelho);}
+.funil-col-head .qt{font-size:11px;color:var(--cinza-texto);margin-top:2px;}
+.funil-col-corpo{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:60px;}
+.funil-card{background:var(--branco);border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);border-radius:0 6px 6px 0;padding:8px 10px;font-size:12px;}
+.funil-card.clicavel{cursor:pointer;}
+.funil-card.clicavel:hover{border-left-color:var(--vermelho-escuro);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.funil-card .data{font-weight:800;color:var(--preto);font-variant-numeric:tabular-nums;}
+.funil-card .vend{color:var(--cinza-texto);margin-top:2px;}
+.funil-card .num{font-size:10px;color:var(--cinza-texto);margin-top:3px;}
+.funil-card .adm-ctl{display:flex;align-items:center;gap:5px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--cinza-borda);}
+.funil-card .adm-ctl button{background:transparent;border:1px solid var(--cinza-borda);color:var(--vermelho);border-radius:4px;font-size:11px;padding:2px 7px;cursor:pointer;}
+.funil-card .adm-ctl button:hover{background:var(--vermelho-suave);}
+.funil-card .adm-ctl .manual{font-size:9.5px;color:var(--cinza-texto);font-style:italic;margin-left:auto;}
+.funil-col.col-agenda .funil-card{border-left-color:#8A8A93;}
+.funil-col.col-arquivo .funil-card{border-left-color:#8A8A93;background:#FAFAFB;}
+.funil-vazio{font-size:11.5px;color:var(--cinza-texto);text-align:center;padding:14px 6px;font-style:italic;}
+
+.cal-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.cal-topo .mes{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--preto);min-width:170px;text-align:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cal-dow{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--cinza-texto);text-align:center;padding-bottom:4px;}
+.cal-dia{border:1px solid var(--cinza-borda);border-radius:6px;min-height:64px;padding:5px;font-size:11px;background:var(--branco);}
+.cal-dia.fora{background:#FAFAFB;color:#C4C4CC;}
+.cal-dia.hoje{border-color:var(--vermelho);border-width:2px;}
+.cal-dia .n{font-weight:700;}
+.cal-dia .pontos{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
+.cal-ponto{width:7px;height:7px;border-radius:50%;background:var(--vermelho);flex:none;}
+.cal-ponto.realizada,.cal-ponto.em_andamento{background:var(--verde);}
+.cal-ponto.arquivo{background:#8A8A93;}
+.cal-dia.com-item{cursor:pointer;}
+.cal-dia.com-item:hover{border-color:var(--vermelho);}
+
+@media(max-width:900px){ .funil-board{grid-template-columns:1fr 1fr;} }
+@media(max-width:560px){ .funil-board{grid-template-columns:1fr;} .cal-dia{min-height:44px;font-size:10px;} }
+
 /* ───── MODAL ───── */
 .modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:1100;padding:20px;overflow-y:auto;}
 .modal.aberto{display:block;}
@@ -265,6 +327,13 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .marca-nada{color:var(--verde);font-weight:700;font-size:12px;}
 .marca-oculta{color:#9A9AA2;font-style:italic;font-size:12px;}
 
+/* Barra do guard.js (Central de Acesso): mantém usuário logado e "Sair",
+   só esconde o link "← Central" — esta ferramenta É a Wendell/Fiorella,
+   não faz sentido linkar de volta para um hub externo. Não dá para editar
+   guard.js (compartilhado por todos os apps), então a barra continua
+   existindo, só este link específico some. */
+[data-guard-barra] > a:first-child{display:none!important;}
+
 @media(max-width:640px){
   .header-inner{flex-direction:column;align-items:flex-start;}
   .header-dir{width:100%;justify-content:space-between;align-items:center;}
@@ -278,11 +347,15 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <!-- ═══════════ CABEÇALHO ═══════════ -->
 <div class="header">
   <div class="header-inner">
-    <div>
-      <h1>FIORELLA<span>.</span></h1>
-      <div class="subtitulo">Ata de Reunião Semanal — Vendedores</div>
+    <div class="brand">
+      <div class="logo-badge">F</div>
+      <div class="brand-text">
+        <h1>FIORELLA<span>.</span></h1>
+        <div class="subtitulo">Ata de Reunião Semanal — Vendedores</div>
+      </div>
     </div>
     <div class="header-dir">
+      <button type="button" class="btn-adm" id="btnFunil" onclick="abrirFunil()">FUNIL &amp; AGENDA</button>
       <button type="button" class="btn-adm" id="btnAreaADM" onclick="abrirADM()" style="display:none">ÁREA ADM</button>
       <div class="relogio">
         <div class="hora" id="relogioHora">--:--:--</div>
@@ -774,6 +847,99 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FUNIL & AGENDA
+═══════════════════════════════════════════════════════════ -->
+<div class="funil-painel" id="funilPainel">
+  <div class="funil-topo">
+    <div>
+      <h2>FIORELLA<span>.</span> FUNIL</h2>
+      <div class="sub">Reuniões, atas e planos de ação do hub</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span id="funilRegra" style="display:none;font-size:11px;color:var(--cinza-texto)"></span>
+      <button type="button" class="btn btn-claro btn-mini" id="btnConfigFunil" onclick="abrirConfigFunil()" style="display:none">Regra de arquivamento</button>
+      <button type="button" class="btn btn-vermelho btn-mini" id="btnAgendarReuniao" onclick="abrirModalAgenda()" style="display:none">+ Agendar reunião</button>
+      <button type="button" class="btn btn-preto btn-mini" onclick="fecharFunil()">Voltar ao formulário</button>
+    </div>
+  </div>
+  <div class="funil-corpo">
+    <div class="funil-abas">
+      <button type="button" class="aba ativa" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
+      <button type="button" class="aba" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
+    </div>
+
+    <div id="funilAbaBoard">
+      <div class="funil-board" id="funilBoard"></div>
+    </div>
+
+    <div id="funilAbaCalendario" style="display:none">
+      <div class="cal-topo">
+        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(-1)">◂ Anterior</button>
+        <div class="mes" id="calMesRotulo">—</div>
+        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="calDiaDetalhe" style="margin-top:16px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGENDAR REUNIÃO (Área ADM) -->
+<div class="modal" id="modalAgenda">
+  <div class="modal-caixa" style="max-width:480px">
+    <div class="modal-topo">
+      <h3>Agendar reunião</h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharModalAgenda()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Data</label>
+          <input type="date" id="agData" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col">
+          <label>Vendedor</label>
+          <input type="text" id="agVendedor" placeholder="Nome do vendedor">
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Código do vendedor</label>
+          <input type="text" id="agCodigo" placeholder="Ex.: 2000">
+        </div>
+        <div class="col">
+          <label>Observação (opcional)</label>
+          <input type="text" id="agObs" placeholder="Pauta, contexto...">
+        </div>
+      </div>
+      <div id="agendaErro" class="erro" style="display:none"></div>
+      <button type="button" class="btn btn-vermelho btn-grande" style="margin-top:8px" onclick="salvarAgendamento()">Agendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIG DO FUNIL (Área ADM) -->
+<div class="modal" id="modalConfigFunil">
+  <div class="modal-caixa" style="max-width:420px">
+    <div class="modal-topo">
+      <h3>Regra de arquivamento</h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharConfigFunil()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <p style="font-size:12.5px;color:var(--cinza-texto);line-height:1.5;margin-bottom:10px">
+        Uma ata finalizada cai em <strong>Planos de ação em andamento</strong>. Depois de quantos dias sem
+        nenhuma alteração ela deve cair sozinha em <strong>Arquivo</strong>? Qualquer card pode ser movido
+        manualmente a qualquer momento — isso só define a regra automática.
+      </p>
+      <label>Dias até arquivar automaticamente</label>
+      <input type="text" inputmode="numeric" id="cfgDiasArquivar" placeholder="Ex.: 21">
+      <div id="configFunilErro" class="erro" style="display:none"></div>
+      <button type="button" class="btn btn-vermelho btn-grande" style="margin-top:10px" onclick="salvarConfigFunil()">Salvar regra</button>
+    </div>
   </div>
 </div>
 
@@ -1477,6 +1643,14 @@ async function salvarAta(finalizar){
     const { data, error } = await sb.rpc('ata_salvar', { p_dados: d, p_id: alvo, p_finalizada: finalizar });
     if(error) throw new Error(error.message);
     res = data;
+    // Se esta ata nasceu de um card agendado no Funil (etapa "Reuniões a
+    // serem realizadas"), o agendamento vira esta própria ata — some da
+    // etapa 1 e passa a aparecer nas etapas seguintes.
+    if(agendaOrigemId){
+      try{ await sb.rpc('ata_agenda_vincular', { p_agenda_id: agendaOrigemId, p_ata_id: (data && data.id) || alvo }); }
+      catch(e){ /* a ata já foi salva; só a ligação com a agenda falhou */ }
+      agendaOrigemId = null;
+    }
   }
   ultimoPayloadSalvo = chavePayload(d);
   return { dados: d, id: (res && res.id) || alvo, numero: res && res.numero };
@@ -2266,6 +2440,271 @@ async function admSalvarSecoes(){
   toast('Configuração salva — ' + ocultos + ' tópico(s) oculto(s).');
 }
 
+/* ═══════════════════════════════════════════════════════════
+   FUNIL & AGENDA — 4 etapas: reunião agendada (ADM cria) → vira a
+   própria ata ao ser iniciada → finalizada cai em "planos de ação em
+   andamento" → depois de N dias sem alteração, arquivo. A regra é
+   automática (ver ata_funil_listar/dias_arquivar), mas a Área ADM pode
+   mover qualquer card manualmente a qualquer momento.
+═══════════════════════════════════════════════════════════ */
+const ETAPAS_FUNIL = [
+  { slug:'agenda',       titulo:'Reuniões a serem realizadas' },
+  { slug:'realizada',    titulo:'Atas de reuniões realizadas' },
+  { slug:'em_andamento', titulo:'Planos de ação em andamento' },
+  { slug:'arquivo',      titulo:'Arquivo' }
+];
+let funilCards = [];
+let funilDiasArquivar = 21;
+let agendaOrigemId = null;   // id do agendamento em curso, ligado à próxima ata salva
+let calAno, calMes;          // mês em exibição no calendário (0-based)
+
+async function abrirFunil(){
+  document.getElementById('funilPainel').classList.add('aberto');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('btnAgendarReuniao').style.display = admLiberado ? '' : 'none';
+  document.getElementById('btnConfigFunil').style.display = admLiberado ? '' : 'none';
+  const hoje = new Date();
+  if(calAno === undefined){ calAno = hoje.getFullYear(); calMes = hoje.getMonth(); }
+  funilAba('board');
+  await funilCarregar();
+}
+function fecharFunil(){
+  document.getElementById('funilPainel').classList.remove('aberto');
+  document.body.style.overflow = '';
+}
+function funilAba(qual){
+  const board = qual === 'board';
+  document.getElementById('funilAbaBoard').style.display = board ? '' : 'none';
+  document.getElementById('funilAbaCalendario').style.display = board ? 'none' : '';
+  document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', board);
+  document.getElementById('funilAbaBtnCal').classList.toggle('ativa', !board);
+  if(!board) calRender();
+}
+
+async function funilCarregar(){
+  try{
+    const { data, error } = await sb.rpc('ata_funil_listar');
+    if(error) throw new Error(error.message);
+    funilCards = (data && data.cards) || [];
+    funilDiasArquivar = (data && data.dias_arquivar) || 21;
+    const rot = document.getElementById('funilRegra');
+    rot.textContent = 'Arquiva automaticamente após ' + funilDiasArquivar + ' dia(s) sem alteração.';
+    rot.style.display = admLiberado ? '' : 'none';
+    funilRenderBoard();
+  }catch(err){
+    document.getElementById('funilBoard').innerHTML =
+      '<div class="funil-vazio" style="grid-column:1/-1">Não foi possível carregar o funil: ' + esc(err.message) + '</div>';
+  }
+}
+
+function funilRenderBoard(){
+  const board = document.getElementById('funilBoard');
+  board.innerHTML = '';
+  ETAPAS_FUNIL.forEach((et, idx)=>{
+    const cards = funilCards.filter(c => c.etapa === et.slug);
+    const col = document.createElement('div');
+    col.className = 'funil-col col-' + et.slug;
+    col.innerHTML =
+      '<div class="funil-col-head"><div class="tit">' + esc(et.titulo) + '</div>' +
+      '<div class="qt">' + cards.length + ' item(ns)</div></div>' +
+      '<div class="funil-col-corpo"></div>';
+    board.appendChild(col);
+    const corpo = col.querySelector('.funil-col-corpo');
+    if(!cards.length){
+      corpo.innerHTML = '<div class="funil-vazio">Nenhum item aqui.</div>';
+      return;
+    }
+    cards.forEach(c => corpo.appendChild(funilMontarCard(c, idx)));
+  });
+}
+
+function funilMontarCard(c, idxEtapa){
+  const div = document.createElement('div');
+  const clicavel = c.tipo === 'ata' && admLiberado;
+  div.className = 'funil-card' + (clicavel ? ' clicavel' : '');
+  div.innerHTML =
+    '<div class="data">' + dataBR(c.data) + '</div>' +
+    '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
+    (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '');
+
+  if(c.tipo === 'agenda'){
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'btn btn-vermelho btn-mini'; btn.style.marginTop = '7px';
+    btn.textContent = 'Iniciar ata';
+    btn.onclick = (ev)=>{ ev.stopPropagation(); iniciarAtaDeAgenda(c); };
+    div.appendChild(btn);
+  }else if(clicavel){
+    div.onclick = ()=>admVer(c.id);
+  }
+
+  if(admLiberado){
+    const ctl = document.createElement('div');
+    ctl.className = 'adm-ctl';
+    if(idxEtapa > 0){
+      const b = document.createElement('button'); b.type='button'; b.textContent='◂';
+      b.title = 'Mover para "' + ETAPAS_FUNIL[idxEtapa-1].titulo + '"';
+      b.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaFunil(c.tipo, c.id, ETAPAS_FUNIL[idxEtapa-1].slug); };
+      ctl.appendChild(b);
+    }
+    if(idxEtapa < ETAPAS_FUNIL.length - 1){
+      const b = document.createElement('button'); b.type='button'; b.textContent='▸';
+      b.title = 'Mover para "' + ETAPAS_FUNIL[idxEtapa+1].titulo + '"';
+      b.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaFunil(c.tipo, c.id, ETAPAS_FUNIL[idxEtapa+1].slug); };
+      ctl.appendChild(b);
+    }
+    if(c.manual){
+      const m = document.createElement('span'); m.className = 'manual'; m.textContent = 'movido manualmente';
+      const rst = document.createElement('button'); rst.type='button'; rst.textContent='automático'; rst.style.marginLeft = '4px';
+      rst.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaFunil(c.tipo, c.id, null); };
+      ctl.appendChild(m); ctl.appendChild(rst);
+    }
+    div.appendChild(ctl);
+  }
+  return div;
+}
+
+async function moverEtapaFunil(tipo, id, novaEtapa){
+  try{
+    const { error } = await sb.rpc('ata_funil_definir_etapa',
+      { p_senha: admSenhaAtual, p_tipo: tipo, p_id: id, p_etapa: novaEtapa });
+    if(error) throw new Error(error.message);
+    await funilCarregar();
+    toast(novaEtapa ? 'Card movido.' : 'Card voltou para a regra automática.');
+  }catch(err){ alert('Não foi possível mover o card: ' + err.message); }
+}
+
+/* ── Agendar reunião (Área ADM) ── */
+function abrirModalAgenda(){
+  document.getElementById('agData').value = new Date().toISOString().slice(0,10);
+  document.getElementById('agVendedor').value = '';
+  document.getElementById('agCodigo').value = '';
+  document.getElementById('agObs').value = '';
+  document.getElementById('agendaErro').style.display = 'none';
+  document.getElementById('modalAgenda').classList.add('aberto');
+}
+function fecharModalAgenda(){ document.getElementById('modalAgenda').classList.remove('aberto'); }
+
+async function salvarAgendamento(){
+  const data = document.getElementById('agData').value;
+  const vendedor = document.getElementById('agVendedor').value.trim();
+  const codigo = document.getElementById('agCodigo').value.trim();
+  const obs = document.getElementById('agObs').value.trim();
+  const err = document.getElementById('agendaErro');
+  err.style.display = 'none';
+  if(!data || !vendedor){
+    err.textContent = 'Informe a data e o nome do vendedor.'; err.style.display = ''; return;
+  }
+  try{
+    const { error } = await sb.rpc('ata_agenda_criar', {
+      p_senha: admSenhaAtual, p_data: data, p_vendedor_nome: vendedor,
+      p_vendedor_codigo: codigo || null, p_observacao: obs || null
+    });
+    if(error) throw new Error(error.message);
+    fecharModalAgenda();
+    await funilCarregar();
+    toast('Reunião agendada para ' + dataBR(data) + '.');
+  }catch(e){ err.textContent = e.message; err.style.display = ''; }
+}
+
+/* ── Regra de arquivamento (Área ADM) ── */
+function abrirConfigFunil(){
+  document.getElementById('cfgDiasArquivar').value = funilDiasArquivar;
+  document.getElementById('configFunilErro').style.display = 'none';
+  document.getElementById('modalConfigFunil').classList.add('aberto');
+}
+function fecharConfigFunil(){ document.getElementById('modalConfigFunil').classList.remove('aberto'); }
+
+async function salvarConfigFunil(){
+  const dias = parseInt(document.getElementById('cfgDiasArquivar').value, 10);
+  const err = document.getElementById('configFunilErro');
+  err.style.display = 'none';
+  if(!dias || dias < 1){ err.textContent = 'Informe um número de dias válido.'; err.style.display = ''; return; }
+  try{
+    const { error } = await sb.rpc('ata_config_dias_arquivar', { p_senha: admSenhaAtual, p_dias: dias });
+    if(error) throw new Error(error.message);
+    fecharConfigFunil();
+    await funilCarregar();
+    toast('Regra atualizada: arquiva após ' + dias + ' dia(s).');
+  }catch(e){ err.textContent = e.message; err.style.display = ''; }
+}
+
+/* ── Reunião agendada → vira a própria ata ao ser iniciada ── */
+function iniciarAtaDeAgenda(c){
+  if(editandoId){
+    if(!confirm('Você já está editando outra ata. Iniciar esta descarta as alterações não salvas. Continuar?')) return;
+  }
+  agendaOrigemId = c.id;
+  document.getElementById('dataReuniao').value = c.data;
+  document.getElementById('vendedorNome').value = c.vendedor_nome || '';
+  document.getElementById('vendedorCodigo').value = c.vendedor_codigo || '';
+  fecharFunil();
+  document.getElementById('sec0').classList.add('aberto');
+  window.scrollTo({top:0, behavior:'smooth'});
+  toast('Reunião de ' + dataBR(c.data) + ' carregada — preencha e salve a ata normalmente.');
+}
+
+/* ── Calendário: mesmas cartas do funil, em vista de mês ── */
+const CAL_DOW = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+const CAL_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function calMudarMes(delta){
+  calMes += delta;
+  if(calMes < 0){ calMes = 11; calAno--; }
+  if(calMes > 11){ calMes = 0; calAno++; }
+  calRender();
+}
+
+function calRender(){
+  document.getElementById('calMesRotulo').textContent = CAL_MESES[calMes] + ' de ' + calAno;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  CAL_DOW.forEach(d=>{
+    const h = document.createElement('div'); h.className = 'cal-dow'; h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  const porDia = {};
+  funilCards.forEach(c=>{ (porDia[c.data] = porDia[c.data] || []).push(c); });
+
+  const primeiro = new Date(calAno, calMes, 1);
+  const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
+  const hojeStr = new Date().toISOString().slice(0,10);
+
+  for(let i=0;i<primeiro.getDay();i++){
+    const cel = document.createElement('div'); cel.className = 'cal-dia fora';
+    grid.appendChild(cel);
+  }
+  for(let dia=1; dia<=diasNoMes; dia++){
+    const key = calAno + '-' + String(calMes+1).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
+    const itens = porDia[key] || [];
+    const cel = document.createElement('div');
+    cel.className = 'cal-dia' + (key === hojeStr ? ' hoje' : '') + (itens.length ? ' com-item' : '');
+    let html = '<div class="n">' + dia + '</div>';
+    if(itens.length){
+      html += '<div class="pontos">' + itens.map(c=>'<span class="cal-ponto ' + c.etapa + '"></span>').join('') + '</div>';
+    }
+    cel.innerHTML = html;
+    if(itens.length) cel.onclick = ()=>calMostrarDia(key, itens);
+    grid.appendChild(cel);
+  }
+
+  document.getElementById('calDiaDetalhe').innerHTML = '';
+}
+
+function calMostrarDia(key, itens){
+  const box = document.getElementById('calDiaDetalhe');
+  let html = '<div class="card"><div class="card-titulo"><span class="ct-esq">' + dataBR(key) + '</span></div><div class="card-corpo">';
+  itens.forEach(c=>{
+    const et = ETAPAS_FUNIL.find(e=>e.slug===c.etapa);
+    html += '<div class="funil-card" style="margin-bottom:7px">' +
+      '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
+      '<div class="num">' + esc(et ? et.titulo : c.etapa) + (c.numero ? ' · nº ' + String(c.numero).padStart(4,'0') : '') + '</div>' +
+    '</div>';
+  });
+  html += '</div></div>';
+  box.innerHTML = html;
+}
+
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
 async function iniciar(){
   document.getElementById('dataReuniao').value = new Date().toISOString().slice(0,10);
@@ -2304,12 +2743,21 @@ async function iniciar(){
 window.addEventListener('load', iniciar);
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
-    if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
+    if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
+    else if(document.getElementById('modalConfigFunil').classList.contains('aberto')) fecharConfigFunil();
+    else if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
+    else if(document.getElementById('funilPainel').classList.contains('aberto')) fecharFunil();
     else if(document.getElementById('admPainel').classList.contains('aberto')) fecharADM();
   }
 });
 document.getElementById('modalAta').addEventListener('click', function(e){
   if(e.target === this) fecharModal();
+});
+document.getElementById('modalAgenda').addEventListener('click', function(e){
+  if(e.target === this) fecharModalAgenda();
+});
+document.getElementById('modalConfigFunil').addEventListener('click', function(e){
+  if(e.target === this) fecharConfigFunil();
 });
 </script>
 </body>
