@@ -146,10 +146,16 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--vermelho
 /* Card com plano de ação ligado: fica marcado em outra cor (azul), pra
    diferenciar de relance dos demais registros da reunião. */
 .registro.tem-plano{border-left-color:var(--azul);background:var(--azul-suave);}
+.registro.plano-executado{border-left-color:var(--verde);background:var(--verde-suave);}
 .plano-toggle{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--cinza-borda);}
 .plano-toggle span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--azul);}
 .plano-bloco{margin-top:9px;padding:9px 10px;border:1px solid rgba(30,90,158,.25);border-left:3px solid var(--azul);border-radius:0 6px 6px 0;background:var(--branco);}
 .plano-bloco label{color:var(--azul);}
+/* Plano encerrado como executado: vira verde, igual ao resto do "concluído" no app */
+.plano-bloco.executado{border-left-color:var(--verde);}
+.plano-bloco.executado label{color:var(--verde);}
+.plano-executado-linha{margin-top:10px;padding-top:9px;border-top:1px dashed rgba(30,90,158,.25);}
+.plano-executado-selo{display:inline-block;font-size:11px;font-weight:800;color:var(--verde);}
 
 /* ───── ARQUIVOS ───── */
 .docs-area{margin-top:8px;}
@@ -272,10 +278,10 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .sw input:checked + i:before{transform:translateX(21px);}
 .vis-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
 
-/* ═════════ FUNIL & AGENDA ═════════ */
-.funil-painel{display:none;position:fixed;inset:0;background:var(--branco);z-index:100000;overflow-y:auto;}
-.funil-painel.aberto{display:block;}
-.funil-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;background:var(--branco);z-index:5;}
+/* ═════════ FUNIL & AGENDA — agora é a página inicial, não mais um
+   overlay: o formulário virou a 3ª guia (ver #funilAbaForm) ═════════ */
+.funil-painel{background:var(--branco);}
+.funil-topo{border-bottom:3px solid var(--vermelho);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--branco);}
 .funil-topo h2{font-size:16px;letter-spacing:2px;font-weight:800;}
 .funil-topo h2 span{color:var(--vermelho);}
 .funil-topo .sub{font-size:10px;letter-spacing:1.5px;color:var(--cinza-texto);text-transform:uppercase;margin-top:2px;}
@@ -380,7 +386,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
       </div>
     </div>
     <div class="header-dir">
-      <button type="button" class="btn-adm" id="btnFunil" onclick="abrirFunil()">FUNIL &amp; AGENDA</button>
       <button type="button" class="btn-adm" id="btnAreaADM" onclick="abrirADM()" style="display:none">ÁREA ADM</button>
       <div class="relogio">
         <div class="hora" id="relogioHora">--:--:--</div>
@@ -390,6 +395,40 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
   </div>
 </div>
 
+<div class="funil-painel" id="funilPainel">
+  <div class="funil-topo">
+    <div>
+      <h2>FIORELLA BRASIL FUNIL</h2>
+      <div class="sub">Reuniões, atas e planos de ação do hub</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span id="funilRegra" style="display:none;font-size:11px;color:var(--cinza-texto)"></span>
+      <button type="button" class="btn btn-claro btn-mini" id="btnConfigFunil" onclick="abrirConfigFunil()" style="display:none">Regra de arquivamento</button>
+      <button type="button" class="btn btn-vermelho btn-mini" id="btnAgendarReuniao" onclick="abrirModalAgenda()" style="display:none">+ Agendar reunião</button>
+    </div>
+  </div>
+  <div class="funil-corpo">
+    <div class="funil-abas">
+      <button type="button" class="aba ativa" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
+      <button type="button" class="aba" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
+      <button type="button" class="aba" id="funilAbaBtnForm" onclick="funilAba('form')">Formulário</button>
+    </div>
+
+    <div id="funilAbaCalendario">
+      <div class="cal-topo">
+        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(-1)">◂ Anterior</button>
+        <div class="mes" id="calMesRotulo">—</div>
+        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="calDiaDetalhe" style="margin-top:16px"></div>
+    </div>
+
+    <div id="funilAbaBoard" style="display:none">
+      <div class="funil-board" id="funilBoard"></div>
+    </div>
+
+    <div id="funilAbaForm" style="display:none">
 <div class="container">
 
 <!-- ═══════════ MODO EDIÇÃO ═══════════ -->
@@ -785,6 +824,9 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 </div>
 
 </div><!-- /container -->
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════
      ÁREA ADM
@@ -878,40 +920,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 <!-- ═══════════════════════════════════════════════════════════
      FUNIL & AGENDA
 ═══════════════════════════════════════════════════════════ -->
-<div class="funil-painel" id="funilPainel">
-  <div class="funil-topo">
-    <div>
-      <h2>FIORELLA BRASIL FUNIL</h2>
-      <div class="sub">Reuniões, atas e planos de ação do hub</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span id="funilRegra" style="display:none;font-size:11px;color:var(--cinza-texto)"></span>
-      <button type="button" class="btn btn-claro btn-mini" id="btnConfigFunil" onclick="abrirConfigFunil()" style="display:none">Regra de arquivamento</button>
-      <button type="button" class="btn btn-vermelho btn-mini" id="btnAgendarReuniao" onclick="abrirModalAgenda()" style="display:none">+ Agendar reunião</button>
-      <button type="button" class="btn btn-preto btn-mini" onclick="fecharFunil()">Voltar ao formulário</button>
-    </div>
-  </div>
-  <div class="funil-corpo">
-    <div class="funil-abas">
-      <button type="button" class="aba ativa" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
-      <button type="button" class="aba" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
-    </div>
-
-    <div id="funilAbaCalendario">
-      <div class="cal-topo">
-        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(-1)">◂ Anterior</button>
-        <div class="mes" id="calMesRotulo">—</div>
-        <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
-      </div>
-      <div class="cal-grid" id="calGrid"></div>
-      <div id="calDiaDetalhe" style="margin-top:16px"></div>
-    </div>
-
-    <div id="funilAbaBoard" style="display:none">
-      <div class="funil-board" id="funilBoard"></div>
-    </div>
-  </div>
-</div>
 
 <!-- MODAL AGENDAR REUNIÃO (Área ADM) -->
 <div class="modal" id="modalAgenda">
@@ -1237,12 +1245,13 @@ function htmlRef(ref){
 function blocoPlanoAcao(dados){
   dados = dados || {};
   const ligado = !!dados.planoAtivo;
+  const executado = !!dados.planoExecutado;
   return `
     <div class="plano-toggle">
       <label class="sw"><input type="checkbox" class="campo-plano-ativo"${ligado?' checked':''} onchange="togglePlanoCard(this)"><i></i></label>
       <span>Gerar Plano de Ação</span>
     </div>
-    <div class="plano-bloco" style="display:${ligado?'':'none'}">
+    <div class="plano-bloco${executado?' executado':''}" style="display:${ligado?'':'none'}">
       <label>REGISTRO DE PLANO DE AÇÃO</label>
       <textarea class="campo-plano-texto" placeholder="Descreva o plano de ação combinado...">${esc(dados.planoTexto||'')}</textarea>
       <div class="linha" style="margin-top:8px">
@@ -1261,6 +1270,11 @@ function blocoPlanoAcao(dados){
           <input type="date" class="campo-plano-data-final" value="${esc(dados.planoDataFinal||'')}" onclick="this.showPicker && this.showPicker()">
         </div>
       </div>
+      <input type="hidden" class="campo-plano-executado" value="${executado?'1':''}">
+      <div class="plano-executado-linha">
+        <button type="button" class="btn btn-verde btn-mini campo-plano-btn-executar" style="${executado?'display:none':''}" onclick="encerrarPlanoCard(this)">Encerrar plano de ação como executado</button>
+        <span class="plano-executado-selo" style="${executado?'':'display:none'}">✓ Executado — ata movida para Arquivo no funil</span>
+      </div>
     </div>`;
 }
 function togglePlanoCard(chk){
@@ -1270,6 +1284,34 @@ function togglePlanoCard(chk){
   if(bloco) bloco.style.display = chk.checked ? '' : 'none';
   registro.classList.toggle('tem-plano', chk.checked);
 }
+async function encerrarPlanoCard(btn){
+  const bloco = btn.closest('.plano-bloco');
+  if(!bloco) return;
+  if(!confirm('Encerrar este plano de ação como executado?' + (admLiberado ? ' A ata vai para "Arquivo" no funil.' : ''))) return;
+  bloco.classList.add('executado');
+  const registro = btn.closest('.registro');
+  if(registro) registro.classList.add('plano-executado');
+  bloco.querySelector('.campo-plano-executado').value = '1';
+  btn.style.display = 'none';
+  const selo = bloco.querySelector('.plano-executado-selo');
+  if(!admLiberado) selo.textContent = '✓ Executado — salve a ata para confirmar';
+  selo.style.display = '';
+
+  if(admLiberado && editandoId){
+    try{
+      const { error } = await sb.rpc('ata_funil_definir_etapa',
+        { p_senha: admSenhaAtual, p_tipo: 'ata', p_id: editandoId, p_etapa: 'arquivo' });
+      if(error) throw new Error(error.message);
+      toast('Plano encerrado. Ata movida para "Arquivo" no funil.');
+    }catch(err){
+      toast('Plano marcado como executado, mas não consegui mover a ata no funil: ' + err.message, true);
+    }
+  } else if(!editandoId){
+    toast('Plano marcado como executado — salve a ata para registrar.');
+  } else {
+    toast('Plano marcado como executado.');
+  }
+}
 
 function addRegistroEmpresa(containerId, tipo, dados){
   dados = dados || {};
@@ -1277,7 +1319,7 @@ function addRegistroEmpresa(containerId, tipo, dados){
   const id = 'reg_' + contador;
   const docsId = 'docs_' + id;
   const div = document.createElement('div');
-  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '');
+  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '') + (dados.planoExecutado ? ' plano-executado' : '');
   div.id = id;
   div.dataset.tipo = tipo;
   if(dados.ref) div.dataset.ref = JSON.stringify(dados.ref);
@@ -1330,7 +1372,7 @@ function addChamado(dados){
   contador++;
   const id = 'cham_' + contador;
   const div = document.createElement('div');
-  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '');
+  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '') + (dados.planoExecutado ? ' plano-executado' : '');
   div.id = id;
   div.innerHTML = `
     <div class="registro-topo">
@@ -1611,7 +1653,8 @@ function coletarRegistros(containerId){
       planoTexto: (div.querySelector('.campo-plano-texto')||{}).value || '',
       planoEnvolvidos: (div.querySelector('.campo-plano-envolvidos')||{}).value || '',
       planoDataInicial: (div.querySelector('.campo-plano-data-inicial')||{}).value || '',
-      planoDataFinal: (div.querySelector('.campo-plano-data-final')||{}).value || ''
+      planoDataFinal: (div.querySelector('.campo-plano-data-final')||{}).value || '',
+      planoExecutado: (div.querySelector('.campo-plano-executado')||{}).value === '1'
     };
   });
 }
@@ -1652,6 +1695,7 @@ function coletarTudo(){
 
 function limparTudo(){
   if(!confirm('Limpar tudo e abrir um formulário novo?\n\nO que estiver na tela e não tiver sido salvo será perdido. Atas já arquivadas não são afetadas.')) return;
+  location.hash = 'form';
   location.reload();
 }
 
@@ -1780,7 +1824,7 @@ function carregarAtaNoFormulario(a){
   .forEach(([chave, lista, tipo])=>{
     (d[chave]||[]).forEach(r=>{
       const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref,
-        planoAtivo:r.planoAtivo, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos, planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal});
+        planoAtivo:r.planoAtivo, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos, planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal, planoExecutado:r.planoExecutado});
       const docs = (r.docs||[]).filter(x => x && x.caminho);
       if(docs.length){
         const k = 'docs_' + div.id;
@@ -1791,7 +1835,7 @@ function carregarAtaNoFormulario(a){
   });
 
   (d.chamados||[]).forEach(c=>addChamado({codigo:c.codigo, empresa:c.empresa, tipoApoio:c.tipoApoio, texto:c.texto,
-    planoAtivo:c.planoAtivo, planoTexto:c.planoTexto, planoEnvolvidos:c.planoEnvolvidos, planoDataInicial:c.planoDataInicial, planoDataFinal:c.planoDataFinal}));
+    planoAtivo:c.planoAtivo, planoTexto:c.planoTexto, planoEnvolvidos:c.planoEnvolvidos, planoDataInicial:c.planoDataInicial, planoDataFinal:c.planoDataFinal, planoExecutado:c.planoExecutado}));
 
   const docsG = (d.docsGerais||[]).filter(x => x && x.caminho);
   if(docsG.length){
@@ -2320,6 +2364,7 @@ async function admEditar(id){
     const a = await admObter(id);
     carregarAtaNoFormulario(a);
     fecharADM();
+    funilAba('form');
     window.scrollTo({top:0, behavior:'smooth'});
     toast('Ata nº ' + String(a.numero).padStart(4,'0') + ' aberta para edição.');
   }catch(err){ alert('Erro ao abrir a ata para edição: ' + err.message); }
@@ -2533,8 +2578,6 @@ let agendaOrigemId = null;   // id do agendamento em curso, ligado à próxima a
 let calAno, calMes;          // mês em exibição no calendário (0-based)
 
 async function abrirFunil(){
-  document.getElementById('funilPainel').classList.add('aberto');
-  document.body.style.overflow = 'hidden';
   document.getElementById('btnAgendarReuniao').style.display = admLiberado ? '' : 'none';
   document.getElementById('btnConfigFunil').style.display = admLiberado ? '' : 'none';
   const hoje = new Date();
@@ -2542,17 +2585,14 @@ async function abrirFunil(){
   funilAba('calendario');
   await funilCarregar();
 }
-function fecharFunil(){
-  document.getElementById('funilPainel').classList.remove('aberto');
-  document.body.style.overflow = '';
-}
 function funilAba(qual){
-  const board = qual === 'board';
-  document.getElementById('funilAbaBoard').style.display = board ? '' : 'none';
-  document.getElementById('funilAbaCalendario').style.display = board ? 'none' : '';
-  document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', board);
-  document.getElementById('funilAbaBtnCal').classList.toggle('ativa', !board);
-  if(!board) calRender();
+  document.getElementById('funilAbaBoard').style.display = qual === 'board' ? '' : 'none';
+  document.getElementById('funilAbaCalendario').style.display = qual === 'calendario' ? '' : 'none';
+  document.getElementById('funilAbaForm').style.display = qual === 'form' ? '' : 'none';
+  document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', qual === 'board');
+  document.getElementById('funilAbaBtnCal').classList.toggle('ativa', qual === 'calendario');
+  document.getElementById('funilAbaBtnForm').classList.toggle('ativa', qual === 'form');
+  if(qual === 'calendario') calRender();
 }
 
 async function funilCarregar(){
@@ -2714,7 +2754,7 @@ function iniciarAtaDeAgenda(c){
   document.getElementById('dataReuniao').value = c.data;
   document.getElementById('vendedorNome').value = c.vendedor_nome || '';
   document.getElementById('vendedorCodigo').value = c.vendedor_codigo || '';
-  fecharFunil();
+  funilAba('form');
   document.getElementById('sec0').classList.add('aberto');
   window.scrollTo({top:0, behavior:'smooth'});
   toast('Reunião de ' + dataBR(c.data) + ' carregada — preencha e salve a ata normalmente.');
@@ -2772,11 +2812,17 @@ function calMostrarDia(key, itens){
   const box = document.getElementById('calDiaDetalhe');
   let html = '<div class="card"><div class="card-titulo"><span class="ct-esq">' + dataBR(key) + '</span></div><div class="card-corpo">';
   itens.forEach(c=>{
+    // Só dá pra ir para a ata quando o card realmente tem uma (tipo "ata" ou
+    // "plano" — este carrega ata_id); "agenda" ainda não virou ata nenhuma.
+    const ataId = c.tipo === 'plano' ? c.ata_id : (c.tipo === 'ata' ? c.id : null);
+    const podeAbrir = !!(ataId && admLiberado);
+    const clsCard = 'funil-card' + (podeAbrir ? ' clicavel' : '');
+    const attrVer = podeAbrir ? ' data-ver="' + esc(ataId) + '"' : '';
     if(c.tipo === 'plano'){
       const periodo = c.data_inicial && c.data_final && c.data_inicial !== c.data_final
         ? dataBR(c.data_inicial) + ' – ' + dataBR(c.data_final)
         : dataBR(c.data_final || c.data_inicial);
-      html += '<div class="funil-card" style="margin-bottom:7px">' +
+      html += '<div class="' + clsCard + '"' + attrVer + ' style="margin-bottom:7px">' +
         '<div class="vend">Plano de ação · ' + esc(c.vendedor_nome) +
         (c.empresa ? ' · ' + esc(c.empresa) : '') +
         (c.numero ? ' (ata nº ' + String(c.numero).padStart(4,'0') + ')' : '') + '</div>' +
@@ -2788,13 +2834,16 @@ function calMostrarDia(key, itens){
       return;
     }
     const et = ETAPAS_FUNIL.find(e=>e.slug===c.etapa);
-    html += '<div class="funil-card" style="margin-bottom:7px">' +
+    html += '<div class="' + clsCard + '"' + attrVer + ' style="margin-bottom:7px">' +
       '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
       '<div class="num">' + esc(et ? et.titulo : c.etapa) + (c.numero ? ' · nº ' + String(c.numero).padStart(4,'0') : '') + '</div>' +
     '</div>';
   });
   html += '</div></div>';
   box.innerHTML = html;
+  box.querySelectorAll('.funil-card.clicavel').forEach(el=>{
+    el.addEventListener('click', ()=>admVer(el.dataset.ver));
+  });
 }
 
 /* ═══════════════════ INICIALIZAÇÃO ═══════════════════ */
@@ -2829,6 +2878,8 @@ async function iniciar(){
   if(btn) btn.style.display = (admLiberado || !temPortal) ? '' : 'none';
 
   await carregarVisibilidade();
+  await abrirFunil();
+  if(location.hash === '#form') funilAba('form');
   if(location.hash === '#adm' && admLiberado) abrirADM();
 }
 
@@ -2838,7 +2889,6 @@ document.addEventListener('keydown', function(e){
     if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
     else if(document.getElementById('modalConfigFunil').classList.contains('aberto')) fecharConfigFunil();
     else if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
-    else if(document.getElementById('funilPainel').classList.contains('aberto')) fecharFunil();
     else if(document.getElementById('admPainel').classList.contains('aberto')) fecharADM();
   }
 });
