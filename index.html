@@ -485,7 +485,48 @@ input[type=text],input[type=date],input[type=password],textarea,select{font-size
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important;}}
 
+:root{--page:#e9edef;--surface:#fff;--soft:#f3f5f6;--meeting:#2563eb;--action:#b45309;--meeting-bg:#eaf1ff;--action-bg:#fff3df;}
+body,.adm{background:var(--page);}
+.card,.adm-card,.funil-card,#funilAbaCalendario{box-shadow:0 3px 12px rgba(20,35,45,.06);border-color:#cbd2d7;}
+.funil-col{background:#dde3e6;}
+.cal-legenda{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cinza-borda);font-size:12px;color:var(--cinza-texto);}
+.cal-legenda span{display:inline-flex;align-items:center;gap:8px;}
+.cal-legenda i{width:12px;height:12px;border-radius:4px;background:var(--meeting);}
+.cal-legenda .leg-plano{background:var(--action);}
+.cal-legenda .leg-ata{background:#64748b;}
+.cal-eventos{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.cal-evento{display:block;padding:3px 5px;border-radius:4px;font-size:10px;font-weight:600;line-height:1.4;background:var(--meeting-bg);color:var(--meeting);border-left:3px solid var(--meeting);overflow-wrap:anywhere;}
+.cal-evento.plano{background:var(--action-bg);color:var(--action);border-color:var(--action);}
+.cal-evento.ata{background:var(--soft);color:var(--cinza-texto);border-color:#64748b;}
+.cal-dia.com-item:focus-visible{outline:2px solid var(--meeting);outline-offset:2px;}
+#btnTema{white-space:nowrap;}
+html[data-theme=dark]{color-scheme:dark;--page:#14191e;--surface:#222a32;--soft:#2a343e;--preto:#edf1f4;--branco:#222a32;--cinza-borda:#46535f;--cinza-texto:#bbc5ce;--vermelho:#c3cdd6;--vermelho-escuro:#edf1f4;--vermelho-suave:#2a343e;--verde:#99cdb1;--verde-suave:#253b31;--azul:#a3c6ef;--azul-suave:#28384c;--meeting:#95baff;--action:#f4c16d;--meeting-bg:#263c5d;--action-bg:#463822;}
+html[data-theme=dark] .header,html[data-theme=dark] .card,html[data-theme=dark] .card-titulo,html[data-theme=dark] .card.completo .card-titulo,html[data-theme=dark] #funilAbaCalendario,html[data-theme=dark] .registro,html[data-theme=dark] .funil-card,html[data-theme=dark] .adm-card,html[data-theme=dark] .login-box,html[data-theme=dark] .tabela-wrap,html[data-theme=dark] .progresso{background:var(--surface);border-color:var(--cinza-borda);color:var(--preto);}
+html[data-theme=dark] .funil-col{background:#1b2229;}
+html[data-theme=dark] .logo-badge,html[data-theme=dark] .guia,html[data-theme=dark] .card.completo .guia,html[data-theme=dark] .zona-import,html[data-theme=dark] .edicao,html[data-theme=dark] .plano-bloco,html[data-theme=dark] .registro .sup textarea,html[data-theme=dark] .ref span,html[data-theme=dark] .zona-import code,html[data-theme=dark] .vis-item.off,html[data-theme=dark] table.tabela thead th,html[data-theme=dark] .mini-tab th{background:var(--soft);border-color:var(--cinza-borda);color:var(--preto);}
+html[data-theme=dark] .btn-claro,html[data-theme=dark] .btn-preto,html[data-theme=dark] .btn-remover,html[data-theme=dark] .btn-toggle,html[data-theme=dark] .btn-adm{background:var(--surface);color:var(--preto);border-color:var(--cinza-borda);}
+html[data-theme=dark] .btn-vermelho{background:#dae2e8;color:#18212a;}
+html[data-theme=dark] .btn-vermelho:hover{background:#fff;color:#18212a;}
+html[data-theme=dark] .btn-verde,html[data-theme=dark] .badge-ok{background:#99cdb1;color:#172b21;}
+html[data-theme=dark] .btn-claro:hover,html[data-theme=dark] .btn-preto:hover,html[data-theme=dark] .btn-remover:hover,html[data-theme=dark] .btn-toggle:hover,html[data-theme=dark] .btn-adm:hover{background:#34414c;color:#fff;}
+html[data-theme=dark] .cal-dia{background:#222a32;border-color:#45515c;}
+html[data-theme=dark] .cal-dia.fora{background:#1c232a;color:#a8b3bd;}
+html[data-theme=dark] .cal-dia.hoje{background:#303e4b;border-color:#acc0d3;}
+html[data-theme=dark] .cal-dia.com-item:hover{background:#303e4b;}
+html[data-theme=dark] .status{background:var(--soft);color:var(--cinza-texto);}
+html[data-theme=dark] .card.completo .status{background:var(--verde-suave);color:var(--verde);border-color:#4a6c59;}
+html[data-theme=dark] table.tabela tbody tr:nth-child(even){background:#26303a;}
+html[data-theme=dark] table.tabela tbody tr:hover{background:#303e4b;}
+html[data-theme=dark] .texto-orientativo,html[data-theme=dark] .bloco-sec .obs{color:var(--preto);}
+html[data-theme=dark] .card,html[data-theme=dark] .adm-card,html[data-theme=dark] .funil-card,html[data-theme=dark] #funilAbaCalendario{box-shadow:0 4px 18px rgba(0,0,0,.18);}
+@media(max-width:640px){.cal-evento{font-size:9px;padding:3px 2px;border-left-width:2px;}.cal-dia{padding:4px 2px;min-height:66px;}.cal-legenda{gap:10px;font-size:11px;}.cal-evento .evento-label{display:none;}.cal-evento::after{content:attr(data-short);}}
+
 </style>
+<script>
+function aplicarTema(escuro){document.documentElement.dataset.theme=escuro?'dark':'light'; const b=document.getElementById('btnTema'); if(b){b.textContent=escuro?'Modo claro':'Modo escuro';b.setAttribute('aria-pressed',String(escuro));}}
+function alternarTema(){const escuro=document.documentElement.dataset.theme!=='dark';aplicarTema(escuro);try{localStorage.setItem('fiorella-tema',escuro?'dark':'light');}catch(e){}}
+(function(){let tema;try{tema=localStorage.getItem('fiorella-tema');}catch(e){}aplicarTema(tema?tema==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches);document.addEventListener('DOMContentLoaded',()=>aplicarTema(document.documentElement.dataset.theme==='dark'));})();
+</script>
 </head>
 <body>
 
@@ -500,6 +541,7 @@ input[type=text],input[type=date],input[type=password],textarea,select{font-size
       </div>
     </div>
     <div class="header-dir">
+      <button type="button" class="btn btn-claro" id="btnTema" onclick="alternarTema()" aria-pressed="false">Modo escuro</button>
       <button type="button" class="btn-adm" id="btnAreaADM" onclick="abrirADM()" style="display:none">ÁREA ADM</button>
       <div class="relogio">
         <div class="hora" id="relogioHora">--:--:--</div>
@@ -535,6 +577,7 @@ input[type=text],input[type=date],input[type=password],textarea,select{font-size
         <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legenda" aria-label="Legenda do calendário"><span><i aria-hidden="true"></i>Agendamento de reunião</span><span><i class="leg-plano" aria-hidden="true"></i>Plano de ação</span><span><i class="leg-ata" aria-hidden="true"></i>Ata de reunião</span></div>
       <div id="calDiaDetalhe" style="margin-top:16px"></div>
     </div>
 
@@ -2797,10 +2840,10 @@ function calRender(){
     cel.className = 'cal-dia' + (key === hojeStr ? ' hoje' : '') + (itens.length ? ' com-item' : '');
     let html = '<div class="n">' + dia + '</div>';
     if(itens.length){
-      html += '<div class="pontos">' + itens.map(c=>'<span class="cal-ponto ' + c.etapa + '"></span>').join('') + '</div>';
+      html += '<div class="cal-eventos">' + ['agenda','plano','ata'].map(tipo=>{ const n=itens.filter(c=>c.tipo===tipo).length; if(!n) return ''; const nome=tipo==='agenda'?'Reunião':tipo==='plano'?'Plano de ação':'Ata'; const curto=tipo==='agenda'?'Reun.':tipo==='plano'?'Plano':'Ata'; return '<span class="cal-evento '+tipo+'" data-short="'+n+' '+curto+'" title="'+n+' · '+nome+'"><span class="evento-label">'+n+' · '+nome+'</span></span>'; }).join('') + '</div>';
     }
     cel.innerHTML = html;
-    if(itens.length) cel.onclick = ()=>calMostrarDia(key, itens);
+    if(itens.length){ cel.onclick = ()=>calMostrarDia(key, itens); cel.tabIndex=0; cel.setAttribute('role','button'); cel.setAttribute('aria-label',dia+' de '+CAL_MESES[calMes]+': '+itens.map(c=>c.tipo==='plano'?'Plano de ação':c.tipo==='agenda'?'Agendamento de reunião':'Ata de reunião').join(', ')); cel.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();calMostrarDia(key,itens);}}; }
     grid.appendChild(cel);
   }
 
