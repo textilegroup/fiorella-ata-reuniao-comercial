@@ -521,6 +521,9 @@ html[data-theme=dark] .texto-orientativo,html[data-theme=dark] .bloco-sec .obs{c
 html[data-theme=dark] .card,html[data-theme=dark] .adm-card,html[data-theme=dark] .funil-card,html[data-theme=dark] #funilAbaCalendario{box-shadow:0 4px 18px rgba(0,0,0,.18);}
 @media(max-width:640px){.cal-evento{font-size:9px;padding:3px 2px;border-left-width:2px;}.cal-dia{padding:4px 2px;min-height:66px;}.cal-legenda{gap:10px;font-size:11px;}.cal-evento .evento-label{display:none;}.cal-evento::after{content:attr(data-short);}}
 
+.funil-topo{justify-content:flex-end;padding-top:18px;padding-bottom:14px;}
+.funil-topo:not(:has(button:not([style*="display:none"]):not([style*="display: none"]))){display:none;}
+.funil-corpo{padding-top:18px;}
 </style>
 <script>
 function aplicarTema(escuro){document.documentElement.dataset.theme=escuro?'dark':'light'; const b=document.getElementById('btnTema'); if(b){b.textContent=escuro?'Modo claro':'Modo escuro';b.setAttribute('aria-pressed',String(escuro));}}
@@ -553,10 +556,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
 
 <div class="funil-painel" id="funilPainel">
   <div class="funil-topo">
-    <div>
-      <h2>FIORELLA BRASIL FUNIL</h2>
-      <div class="sub">Reuniões, atas e planos de ação do hub</div>
-    </div>
+    
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <span id="funilRegra" style="display:none;font-size:11px;color:var(--cinza-texto)"></span>
       <button type="button" class="btn btn-claro btn-mini" id="btnConfigFunil" onclick="abrirConfigFunil()" style="display:none">Regra de arquivamento</button>
