@@ -68,11 +68,14 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 .progresso b{color:var(--preto);font-variant-numeric:tabular-nums;}
 
 /* ───── CARTÕES ───── */
-.card{background:var(--branco);border:1px solid var(--cinza-borda);border-radius:6px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+/* Cada sessão é um bloco bem delineado: borda de destaque à esquerda,
+   cabeçalho com fundo tintado e espaço maior entre uma sessão e outra —
+   pra ficar óbvio onde uma fase termina e a próxima começa. */
+.card{background:var(--branco);border:1px solid var(--cinza-borda);border-left:4px solid var(--vermelho);border-radius:8px;margin-bottom:22px;overflow:hidden;box-shadow:0 2px 7px rgba(0,0,0,.07);}
 .card-titulo{
-  background:var(--branco);color:var(--preto);padding:9px 12px;font-size:12px;font-weight:800;
+  background:var(--vermelho-suave);color:var(--preto);padding:11px 14px;font-size:12px;font-weight:800;
   letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;
-  gap:10px;border-bottom:2px solid var(--vermelho);flex-wrap:wrap;
+  gap:10px;border-bottom:3px solid var(--vermelho);flex-wrap:wrap;
 }
 .ct-esq{display:flex;align-items:center;gap:9px;min-width:0;}
 .ct-dir{display:flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap;}
@@ -91,7 +94,7 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 .registro .sup label{color:var(--vermelho);}
 .registro .sup textarea{background:#FFFCFC;border-color:rgba(200,16,46,.28);min-height:42px;}
 
-.card.completo{border-color:rgba(30,122,60,.45);}
+.card.completo{border-color:rgba(30,122,60,.45);border-left-color:var(--verde);}
 .card.completo .card-titulo{border-bottom-color:var(--verde);background:var(--verde-suave);}
 .card.completo .dot{background:var(--verde);}
 .card.completo .status{background:var(--verde);color:#fff;border-color:var(--verde);}
@@ -674,56 +677,6 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 ═══════════════════════════════════════════════════════════ -->
 <div class="separador" id="sepOrientacoes"><span>Orientações</span></div>
 
-<!-- ═══════════ UTILIZAÇÃO DO CRM ═══════════ -->
-<div class="card recolhivel" id="sec6" data-slug="crm">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>UTILIZAÇÃO DO CRM</span>
-    <span class="ct-dir">
-      <span class="status">PENDENTE</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec6',this)">EXIBIR</button>
-    </span>
-  </div>
-  <div class="card-corpo">
-    <div class="guia"><strong>Verificar:</strong>
-      <ul>
-        <li>Negócios sem atualização</li>
-        <li>Atividades vencidas</li>
-        <li>Contatos não registrados</li>
-        <li>Oportunidades abandonadas</li>
-      </ul>
-    </div>
-    <div style="margin-top:8px">
-      <label>Observações sobre o CRM</label>
-      <textarea id="obsCRM" placeholder="Pendências e correções acordadas no CRM..."></textarea>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════ NECESSIDADES DE APOIO ═══════════ -->
-<div class="card recolhivel" id="sec7" data-slug="apoio">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>NECESSIDADES DE APOIO</span>
-    <span class="ct-dir">
-      <span class="status">PENDENTE</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec7',this)">EXIBIR</button>
-    </span>
-  </div>
-  <div class="card-corpo">
-    <div class="guia">
-      <strong>Quando realmente houver necessidade.</strong> Exemplos:
-      <ul>
-        <li>Visita conjunta</li>
-        <li>Aprovação comercial</li>
-        <li>Questão estratégica</li>
-        <li>Recuperação de cliente</li>
-      </ul>
-      <em>Integração com chamados no Bitrix24 a ser definida — por enquanto, os chamados ficam registrados na ata.</em>
-    </div>
-    <div id="listaChamados"></div>
-    <button type="button" class="btn btn-preto" onclick="addChamado()">+ ADICIONAR CHAMADO</button>
-  </div>
-</div>
-
 <!-- ═══════════ TEMAS QUE DEVEM SER EVITADOS ═══════════ -->
 <div class="card recolhivel" id="secEvitados" data-slug="evitados">
   <div class="card-titulo">
@@ -811,11 +764,11 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 
 <!-- ═══════════ AÇÕES FINAIS ═══════════ -->
 <div class="acoes-finais">
-  <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">SALVAR E GERAR ATA SUPERVISÃO</button>
-  <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">SALVAR E GERAR ATA VENDEDOR</button>
+  <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR</button>
+  <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">GERAR ATA SUPERVISÃO</button>
+  <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">GERAR ATA VENDEDOR</button>
 </div>
 <div class="acoes-finais">
-  <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR PREPARAÇÃO (SEM PDF)</button>
   <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR E GERAR NOVO FORMULÁRIO</button>
 </div>
 <div class="nota-banco">
@@ -1022,13 +975,11 @@ const TOPICOS = [
   {slug:'semcontato',    card:'sec3',         titulo:'CLIENTES SEM CONTATO',         chave:'semContato',    preenchivel:true,  controlavel:true,  lista:'listaSemContato'},
   {slug:'oportunidades', card:'sec4',         titulo:'OPORTUNIDADES RELEVANTES',     chave:'oportunidades', preenchivel:true,  controlavel:true,  lista:'listaOportunidades'},
   {slug:'acoes',         card:'sec5',         titulo:'AÇÕES DA SEMANA ANTERIOR',     chave:null,            preenchivel:true,  controlavel:true},
-  {slug:'crm',           card:'sec6',         titulo:'UTILIZAÇÃO DO CRM',            chave:null,            preenchivel:true,  controlavel:false},
-  {slug:'apoio',         card:'sec7',         titulo:'NECESSIDADES DE APOIO',        chave:'chamados',      preenchivel:true,  controlavel:false, lista:'listaChamados'},
   {slug:'evitados',      card:'secEvitados',  titulo:'TEMAS QUE DEVEM SER EVITADOS', chave:null,            preenchivel:false, controlavel:false},
   {slug:'regra',         card:'secRegra',     titulo:'REGRA PRÁTICA',                chave:null,            preenchivel:false, controlavel:false}
 ];
 const TOP = {}; TOPICOS.forEach(t => TOP[t.slug] = t);
-const GRUPO_ORIENTACOES = ['crm','apoio','evitados','regra'];
+const GRUPO_ORIENTACOES = ['evitados','regra'];
 
 let visibilidade = {};   // {slug: true/false}
 let semRegistro  = {};   // {slug: true/false}
@@ -1255,6 +1206,15 @@ function blocoPlanoAcao(dados){
       <label>REGISTRO DE PLANO DE AÇÃO</label>
       <textarea class="campo-plano-texto" placeholder="Descreva o plano de ação combinado...">${esc(dados.planoTexto||'')}</textarea>
       <div class="linha" style="margin-top:8px">
+        <div class="col-fixa">
+          <label>Tipo de apoio</label>
+          <select class="campo-plano-tipo-apoio">
+            <option value="">Selecione...</option>
+            ${['Visita comercial','Visita técnica','Aprovação comercial',
+               'Contato telefônico (Supervisão Operacional)','Contato telefônico (Supervisão Administrativa)',
+               'Outro'].map(op=>'<option'+(dados.planoTipoApoio===op?' selected':'')+'>'+op+'</option>').join('')}
+          </select>
+        </div>
         <div class="col">
           <label>Envolvidos</label>
           <input type="text" class="campo-plano-envolvidos" placeholder="Nomes separados por vírgula" value="${esc(dados.planoEnvolvidos||'')}">
@@ -1365,46 +1325,6 @@ function removerRegistro(id){
     if(card) atualizarStatus(card.dataset.slug);
     atualizarBotoesLimpar();
   }
-}
-
-function addChamado(dados){
-  dados = dados || {};
-  contador++;
-  const id = 'cham_' + contador;
-  const div = document.createElement('div');
-  div.className = 'registro' + (dados.planoAtivo ? ' tem-plano' : '') + (dados.planoExecutado ? ' plano-executado' : '');
-  div.id = id;
-  div.innerHTML = `
-    <div class="registro-topo">
-      <span class="rotulo">Chamado</span>
-      <button type="button" class="btn btn-remover" onclick="removerRegistro('${id}')">Remover</button>
-    </div>
-    <div class="linha">
-      <div class="col-fixa">
-        <label>Código da empresa</label>
-        <input type="text" class="campo-codigo" placeholder="Ex.: 10245" value="${esc(dados.codigo||'')}">
-      </div>
-      <div class="col">
-        <label>Nome da empresa</label>
-        <input type="text" class="campo-empresa" placeholder="Nome da empresa no sistema" value="${esc(dados.empresa||'')}">
-      </div>
-      <div class="col-fixa">
-        <label>Tipo de apoio</label>
-        <select class="campo-tipo">
-          <option value="">Selecione...</option>
-          <option ${dados.tipoApoio==='Visita comercial'?'selected':''}>Visita comercial</option>
-          <option ${dados.tipoApoio==='Visita técnica'?'selected':''}>Visita técnica</option>
-          <option ${dados.tipoApoio==='Aprovação comercial'?'selected':''}>Aprovação comercial</option>
-          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Operacional)'?'selected':''}>Contato telefônico (Supervisão Operacional)</option>
-          <option ${dados.tipoApoio==='Contato telefônico (Supervisão Administrativa)'?'selected':''}>Contato telefônico (Supervisão Administrativa)</option>
-        </select>
-      </div>
-    </div>
-    <label>Descrição do chamado</label>
-    <textarea class="campo-texto" placeholder="Descreva a necessidade de apoio...">${esc(dados.texto||'')}</textarea>
-    ${blocoPlanoAcao(dados)}`;
-  document.getElementById('listaChamados').appendChild(div);
-  statusDoContainer('listaChamados');
 }
 
 function esc(s){
@@ -1643,13 +1563,13 @@ function coletarRegistros(containerId){
     return {
       codigo: (div.querySelector('.campo-codigo')||{}).value || '',
       empresa: (div.querySelector('.campo-empresa')||{}).value || '',
-      tipoApoio: (div.querySelector('.campo-tipo')||{}).value || '',
       texto: (div.querySelector('.campo-texto')||{}).value || '',
       supervisao: (div.querySelector('.campo-supervisao')||{}).value || '',
       ref: ref,
       _docsKey: 'docs_' + div.id,
       docs: (arquivos['docs_' + div.id]||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||''})),
       planoAtivo: (div.querySelector('.campo-plano-ativo')||{}).checked || false,
+      planoTipoApoio: (div.querySelector('.campo-plano-tipo-apoio')||{}).value || '',
       planoTexto: (div.querySelector('.campo-plano-texto')||{}).value || '',
       planoEnvolvidos: (div.querySelector('.campo-plano-envolvidos')||{}).value || '',
       planoDataInicial: (div.querySelector('.campo-plano-data-inicial')||{}).value || '',
@@ -1684,9 +1604,7 @@ function coletarTudo(){
     semContato: regs('listaSemContato','semcontato'),
     obsSemContato: txt('obsSemContato','semcontato'),
     obsAcoes: txt('obsAcoes','acoes'),
-    obsCRM: txt('obsCRM','crm'),
     oportunidades: regs('listaOportunidades','oportunidades'),
-    chamados: regs('listaChamados','apoio'),
     docsGerais: ativo('perdidos')
       ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||'', contexto:'perdidos'}))
       : []
@@ -1784,8 +1702,6 @@ function entrarModoEdicao(id, numero, finalizada, criadoEm){
     (finalizada ? 'Ata já finalizada — salvar substitui a versão arquivada.'
                 : 'Ata preparada, ainda sem PDF final.') +
     (criadoEm ? ' Criada em ' + dataHoraBR(criadoEm) + '.' : '');
-  document.getElementById('btnGerar').textContent = 'SALVAR E GERAR ATA FINAL (PDF)';
-  document.getElementById('btnPreparar').textContent = 'SALVAR ALTERAÇÕES (SEM PDF)';
 }
 
 function cancelarEdicao(){
@@ -1802,7 +1718,7 @@ function carregarAtaNoFormulario(a){
     visibilidade[t.slug] = !!visibilidade[t.slug] || naAta;
   });
 
-  ['listaRisco','listaPerdidos','listaSemContato','listaOportunidades','listaChamados'].forEach(id=>{
+  ['listaRisco','listaPerdidos','listaSemContato','listaOportunidades'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.innerHTML = '';
   });
   ['statusImportRisco','statusImport','statusImportSC'].forEach(id=>{
@@ -1817,14 +1733,14 @@ function carregarAtaNoFormulario(a){
   document.getElementById('obsPerdidos').value   = d.obsPerdidos || '';
   document.getElementById('obsSemContato').value = d.obsSemContato || '';
   document.getElementById('obsAcoes').value      = d.obsAcoes || '';
-  document.getElementById('obsCRM').value        = d.obsCRM || '';
 
   [['risco','listaRisco','risco'], ['perdidos','listaPerdidos','perdido'],
    ['semContato','listaSemContato','semcontato'], ['oportunidades','listaOportunidades','oportunidade']]
   .forEach(([chave, lista, tipo])=>{
     (d[chave]||[]).forEach(r=>{
       const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref,
-        planoAtivo:r.planoAtivo, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos, planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal, planoExecutado:r.planoExecutado});
+        planoAtivo:r.planoAtivo, planoTipoApoio:r.planoTipoApoio, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos,
+        planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal, planoExecutado:r.planoExecutado});
       const docs = (r.docs||[]).filter(x => x && x.caminho);
       if(docs.length){
         const k = 'docs_' + div.id;
@@ -1833,9 +1749,6 @@ function carregarAtaNoFormulario(a){
       }
     });
   });
-
-  (d.chamados||[]).forEach(c=>addChamado({codigo:c.codigo, empresa:c.empresa, tipoApoio:c.tipoApoio, texto:c.texto,
-    planoAtivo:c.planoAtivo, planoTexto:c.planoTexto, planoEnvolvidos:c.planoEnvolvidos, planoDataInicial:c.planoDataInicial, planoDataFinal:c.planoDataFinal, planoExecutado:c.planoExecutado}));
 
   const docsG = (d.docsGerais||[]).filter(x => x && x.caminho);
   if(docsG.length){
@@ -2014,14 +1927,6 @@ function construirPDF(d, numero, comSupervisao){
     titulo('AÇÕES DA SEMANA ANTERIOR');
     if(nada.acoes) semRegistroTexto(); else blocoTexto('', d.obsAcoes);
   }
-  if(mostrar('crm')){
-    titulo('UTILIZAÇÃO DO CRM');
-    if(nada.crm) semRegistroTexto(); else blocoTexto('', d.obsCRM);
-  }
-  if(mostrar('apoio')){
-    titulo('NECESSIDADES DE APOIO — CHAMADOS');
-    if(nada.apoio) semRegistroTexto(); else tabelaRegistros(d.chamados, true);
-  }
 
   if(mostrar('regra')){
     if(y > 235){ doc.addPage(); y = 20; }
@@ -2185,8 +2090,6 @@ function montarResumoAta(d, dataFmt, numero){
   if(ver('semcontato') && !nada.semcontato && (d.obsSemContato||'').trim()){ L.push('Obs. gerais (sem contato): ' + d.obsSemContato); L.push(''); }
   bloco('oportunidades','OPORTUNIDADES RELEVANTES', d.oportunidades);
   blocoObs('acoes','AÇÕES DA SEMANA ANTERIOR', d.obsAcoes);
-  blocoObs('crm','UTILIZAÇÃO DO CRM', d.obsCRM);
-  bloco('apoio','CHAMADOS / NECESSIDADES DE APOIO', d.chamados);
   return L.join('\n');
 }
 
@@ -2201,18 +2104,6 @@ async function registrarBitrix(d, pdfBase64, nomeArquivo, dataFmt, numero){
   if(BITRIX.stageId) fields.STAGE_ID = BITRIX.stageId;
   if(BITRIX.campoArquivo) fields[BITRIX.campoArquivo] = { fileData: [nomeArquivo, pdfBase64] };
   await chamarBitrix('crm.deal.add', { fields: fields });
-
-  if(BITRIX.criarTarefas && d.chamados.length){
-    for(const ch of d.chamados){
-      await chamarBitrix('tasks.task.add', { fields: {
-        TITLE: 'CHAMADO — ' + (ch.tipoApoio||'Apoio comercial') + ' — ' + (ch.empresa||ch.codigo||'empresa'),
-        DESCRIPTION: 'Origem: Ata de reunião semanal ' + dataFmt + ' — Vendedor: ' + d.vendedorNome +
-                     '\nCódigo da empresa: ' + (ch.codigo||'—') + '\nEmpresa: ' + (ch.empresa||'—') +
-                     '\nTipo de apoio: ' + (ch.tipoApoio||'—') + '\n\n' + (ch.texto||''),
-        RESPONSIBLE_ID: BITRIX.responsavelTarefas
-      }});
-    }
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2396,8 +2287,7 @@ const SECOES_DET = [
   ['risco',        'risco',        'Clientes em risco de perda'],
   ['perdido',      'perdidos',     'Clientes perdidos'],
   ['semcontato',   'semcontato',   'Clientes sem contato'],
-  ['oportunidade', 'oportunidades','Oportunidades relevantes'],
-  ['chamado',      'apoio',        'Necessidades de apoio / chamados']
+  ['oportunidade', 'oportunidades','Oportunidades relevantes']
 ];
 
 async function admVer(id){
@@ -2427,13 +2317,12 @@ async function admVer(id){
       const itens = (a.itens||[]).filter(i=>i.secao===sec);
       if(!itens.length){ html += '<div class="sem">Sem registros.</div>'; }
       else{
-        const temSup = sec !== 'chamado' && itens.some(i => (i.supervisao||'').trim());
+        const temSup = itens.some(i => (i.supervisao||'').trim());
         html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:180px">Empresa</th>'+
-                (sec==='chamado'?'<th style="width:150px">Tipo de apoio</th>':'')+'<th>Registro em ata (informação pública)</th>'+
+                '<th>Registro em ata (informação pública)</th>'+
                 (temSup?'<th>Registro supervisão (informação apenas p/ supervisão)</th>':'')+'</tr></thead><tbody>';
         itens.forEach(i=>{
           html += '<tr><td>'+esc(i.codigo||'—')+'</td><td>'+esc(i.empresa||'—')+'</td>'+
-                  (sec==='chamado'?'<td>'+esc(i.tipoApoio||'—')+'</td>':'')+
                   '<td>'+esc(i.texto||'—')+'</td>'+
                   (temSup?'<td style="background:#FFFCFC">'+esc(i.supervisao||'—')+'</td>':'')+'</tr>';
         });
@@ -2444,8 +2333,7 @@ async function admVer(id){
 
     [['perdidos','Observações — clientes perdidos', d.obsPerdidos],
      ['semcontato','Observações — clientes sem contato', d.obsSemContato],
-     ['acoes','Ações da semana anterior', d.obsAcoes],
-     ['crm','Utilização do CRM', d.obsCRM]].forEach(([slug, rot, texto])=>{
+     ['acoes','Ações da semana anterior', d.obsAcoes]].forEach(([slug, rot, texto])=>{
       html += '<div class="bloco-sec"><h4>'+rot+'</h4>';
       if(!ver(slug)) html += '<div class="marca-oculta">Tópico desativado no formulário nesta ata.</div>';
       else if(nada[slug]) html += '<div class="marca-nada">✓ Nada a registrar — confirmado pelo vendedor.</div>';
