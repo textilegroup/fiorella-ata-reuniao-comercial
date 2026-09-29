@@ -299,6 +299,21 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .funil-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;}
 .funil-col{background:#FAFAFB;border:1px solid var(--cinza-borda);border-radius:8px;overflow:hidden;min-width:0;}
 .funil-col-head{padding:10px 12px;border-bottom:2px solid var(--vermelho);background:var(--branco);}
+/* ── Avisos de exceção / grupo empresarial no card da empresa ── */
+.alerta{display:flex;align-items:flex-start;gap:8px;margin:0 0 9px;padding:8px 10px;border-radius:0 6px 6px 0;font-size:11.5px;line-height:1.45;}
+.alerta .ico{margin-top:1px;}
+.alerta b{font-weight:800;}
+.alerta .acoes-alerta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.alerta button{font-size:10.5px;padding:3px 9px;border-radius:4px;cursor:pointer;border:1px solid currentColor;background:transparent;color:inherit;font-weight:700;}
+.alerta button:hover{background:rgba(0,0,0,.06);}
+.alerta-excecao{background:#FFF6E6;border-left:3px solid #B4690E;color:#7A4708;}
+.alerta-grupo{background:var(--azul-suave,#EEF4FB);border-left:3px solid var(--azul,#1E5A9E);color:#14406F;}
+.registro.eliminado{border-left-color:#B4690E;background:#FFFBF4;}
+.registro.eliminado .campo-codigo,.registro.eliminado .campo-empresa{opacity:.65;}
+.registro.subsidiaria{border-left-color:var(--azul,#1E5A9E);}
+.selo-sub{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--azul,#1E5A9E);background:var(--azul-suave,#EEF4FB);border:1px solid rgba(30,90,158,.3);border-radius:10px;padding:1px 7px;margin-left:6px;}
+.elim-toggle{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--cinza-borda);}
+.elim-toggle span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#B4690E;}
 .ico{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:7px;}
 .ico svg{width:100%;height:100%;display:block;}
 .funil-col-head .tit{display:flex;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--vermelho);}
@@ -1138,6 +1153,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
     <div class="abas">
       <button type="button" class="aba ativa" id="abaBtnAtas" onclick="admAba('atas')">Atas arquivadas</button>
       <button type="button" class="aba" id="abaBtnSecoes" onclick="admAba('secoes')">Visibilidade dos tópicos</button>
+      <button type="button" class="aba" id="abaBtnCarteira" onclick="admAba('carteira')">Exceções e grupos</button>
     </div>
 
     <!-- ─── ABA ATAS ─── -->
@@ -1191,6 +1207,70 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       </div>
     </div>
 
+    <!-- ─── EXCEÇÕES DE ANÁLISE E GRUPOS EMPRESARIAIS ─── -->
+    <div id="abaCarteira" style="display:none">
+      <div class="vis-aviso">
+        <strong>Quem sai da análise e quem compra junto.</strong>
+        Cliente <b>eliminado da análise</b> deixa de ocupar a reunião seguinte — ao ser lançado de novo, o formulário avisa
+        quem eliminou, quando e por quê. <b>Grupo empresarial</b> reúne empresas que compram por códigos diferentes:
+        ao lançar uma subsidiária, o formulário mostra a principal e oferece eliminar da análise ou manter atrelado.
+      </div>
+
+      <div class="vis-grupo">Clientes eliminados da análise</div>
+      <div id="listaExcecoes"></div>
+
+      <div class="vis-grupo" style="margin-top:22px">Grupos empresariais</div>
+      <div id="listaGrupos"></div>
+      <div class="vis-acoes">
+        <button type="button" class="btn btn-vermelho" onclick="abrirModalGrupo()">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9.5" width="7" height="11" rx="1.4"/><rect x="14" y="3.5" width="7" height="17" rx="1.4"/><path d="M6 13h1M6 16.5h1M17 7h1M17 10.5h1M17 14h1"/></svg></span>Atrelar a Grupo Empresarial</button>
+        <button type="button" class="btn btn-claro" onclick="admCarregarCarteira()">Atualizar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL GRUPO EMPRESARIAL -->
+<div class="modal" id="modalGrupo">
+  <div class="modal-caixa" style="max-width:720px">
+    <div class="modal-topo">
+      <h3 id="modalGrupoTitulo">Atrelar a grupo empresarial
+        <small>Uma empresa principal concentra as compras; as subsidiárias ficam ligadas a ela.</small></h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharModalGrupo()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <input type="hidden" id="grupoId">
+      <div class="linha">
+        <div class="col">
+          <label>Nome do grupo</label>
+          <input type="text" id="grupoNome" placeholder="Ex.: Grupo Malwee">
+        </div>
+      </div>
+      <div class="vis-grupo" style="margin-top:6px">Empresa principal</div>
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Código</label>
+          <input type="text" id="grupoPrincCod" placeholder="Ex.: 20414/01">
+        </div>
+        <div class="col">
+          <label>Nome da empresa</label>
+          <input type="text" id="grupoPrincNome" placeholder="Razão social da principal">
+        </div>
+      </div>
+      <div class="vis-grupo" style="margin-top:12px">Subsidiárias</div>
+      <div id="grupoMembros"></div>
+      <button type="button" class="btn btn-claro btn-mini" onclick="addLinhaMembro()">+ Adicionar subsidiária</button>
+      <div style="margin-top:12px">
+        <label>Observação</label>
+        <textarea id="grupoObs" placeholder="Ex.: mudou de razão social em 2025; compra pelo CNPJ da matriz..."></textarea>
+      </div>
+      <div id="grupoErro" class="erro" style="display:none"></div>
+      <div class="vis-acoes">
+        <button type="button" class="btn btn-verde" onclick="salvarGrupo()">Salvar grupo</button>
+        <button type="button" class="btn btn-claro" onclick="fecharModalGrupo()">Cancelar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1587,6 +1667,208 @@ async function encerrarPlanoCard(btn){
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   EXCEÇÕES DE ANÁLISE E GRUPOS EMPRESARIAIS
+   • Exceção: cliente já avaliado e descartado não deve voltar a ocupar
+     a reunião seguinte. Ao ser lançado de novo, o card avisa.
+   • Grupo: empresa que mudou de nome ou compra por outro CNPJ. Ao lançar
+     uma subsidiária, o card avisa quem é o principal e oferece as duas
+     saídas — eliminar da análise ou manter atrelado.
+   As duas listas são lidas uma vez no carregamento e ficam em memória.
+═══════════════════════════════════════════════════════════ */
+let excecoes = [];      // [{codigo, empresa, motivo, autor, criado_em, reavaliar_em, ata_numero}]
+let gruposEmp = [];     // [{id, nome, principal_codigo, principal_nome, membros:[...]}]
+
+function chaveEmpresa(c){ return String(c==null?'':c).trim().toUpperCase(); }
+
+async function carregarExcecoesEGrupos(){
+  try{
+    const [ex, gr] = await Promise.all([sb.rpc('ata_excecoes_listar'), sb.rpc('ata_grupos_listar')]);
+    if(!ex.error) excecoes  = ex.data || [];
+    if(!gr.error) gruposEmp = gr.data || [];
+  }catch(e){ /* sem lista, o formulário segue funcionando normalmente */ }
+}
+
+function acharExcecao(codigo){
+  const k = chaveEmpresa(codigo);
+  if(!k) return null;
+  return excecoes.find(e => chaveEmpresa(e.codigo) === k) || null;
+}
+
+/* Devolve {grupo, membro} quando a empresa pertence a algum grupo. */
+function acharGrupo(codigo){
+  const k = chaveEmpresa(codigo);
+  if(!k) return null;
+  for(const g of gruposEmp){
+    const m = (g.membros||[]).find(x => chaveEmpresa(x.codigo) === k);
+    if(m) return { grupo: g, membro: m };
+  }
+  return null;
+}
+
+/* Lê o card, decide os avisos e desenha. Chamado ao criar o card e a cada
+   vez que o código da empresa muda. */
+function verificarEmpresaDoCard(div){
+  if(!div) return;
+  const slot = div.querySelector('.slot-alerta');
+  if(!slot) return;
+  const codigo = (div.querySelector('.campo-codigo')||{}).value || '';
+  const nome   = (div.querySelector('.campo-empresa')||{}).value || '';
+  slot.innerHTML = '';
+  div.classList.remove('subsidiaria');
+
+  const ex = acharExcecao(codigo);
+  if(ex){
+    const quando = ex.criado_em ? dataHoraBR(ex.criado_em) : '';
+    const prazo  = ex.reavaliar_em ? ' · volta à análise em ' + dataBR(ex.reavaliar_em) : '';
+    slot.innerHTML += '<div class="alerta alerta-excecao"><span class="ico">' + ICONES.alerta + '</span>' +
+      '<div><b>Cliente já eliminado da análise.</b>' +
+      (ex.motivo ? ' ' + esc(ex.motivo) : '') +
+      '<br><small>' + esc(ex.autor||'') + (quando ? ' · ' + quando : '') +
+      (ex.ata_numero ? ' · ata nº ' + String(ex.ata_numero).padStart(4,'0') : '') + esc(prazo) + '</small>' +
+      '<div class="acoes-alerta">' +
+        '<button type="button" onclick="devolverAExcecao(this)">Devolver à análise</button>' +
+        '<button type="button" onclick="removerRegistro(\'' + div.id + '\')">Retirar da ata</button>' +
+      '</div></div></div>';
+  }
+
+  const g = acharGrupo(codigo);
+  if(g && g.membro.papel === 'subsidiaria'){
+    div.classList.add('subsidiaria');
+    div.dataset.grupo = JSON.stringify({ nome:g.grupo.nome, principal_codigo:g.grupo.principal_codigo, principal_nome:g.grupo.principal_nome });
+    slot.innerHTML += '<div class="alerta alerta-grupo"><span class="ico">' + ICONES.grupo + '</span>' +
+      '<div><b>Subsidiária do grupo ' + esc(g.grupo.nome) + '.</b> ' +
+      'A compra costuma ser atribuída a <b>' + esc(g.grupo.principal_nome || g.grupo.principal_codigo) + '</b>' +
+      (g.grupo.principal_codigo ? ' (cód. ' + esc(g.grupo.principal_codigo) + ')' : '') + '.' +
+      '<div class="acoes-alerta">' +
+        '<button type="button" onclick="eliminarPeloGrupo(this)">Eliminar da análise</button>' +
+        '<button type="button" onclick="manterAtrelado(this)">Manter atrelado</button>' +
+      '</div></div></div>';
+  } else if(g && g.membro.papel === 'principal'){
+    const subs = (g.grupo.membros||[]).filter(m=>m.papel==='subsidiaria').length;
+    slot.innerHTML += '<div class="alerta alerta-grupo"><span class="ico">' + ICONES.grupo + '</span>' +
+      '<div><b>Empresa principal do grupo ' + esc(g.grupo.nome) + '.</b> ' +
+      subs + ' subsidiária(s) somam compras aqui.</div></div>';
+  } else {
+    delete div.dataset.grupo;
+  }
+}
+
+function manterAtrelado(btn){
+  const div = btn.closest('.registro');
+  const alerta = btn.closest('.alerta');
+  if(!div || !alerta) return;
+  let g = {}; try{ g = JSON.parse(div.dataset.grupo||'{}'); }catch(e){}
+  alerta.innerHTML = '<span class="ico">' + ICONES.grupo + '</span><div>Mantido atrelado ao grupo <b>' +
+    esc(g.nome||'') + '</b> — a ata registra a ligação com ' + esc(g.principal_nome || g.principal_codigo || 'a principal') + '.</div>';
+  div.dataset.atrelado = '1';
+}
+
+async function eliminarPeloGrupo(btn){
+  const div = btn.closest('.registro');
+  if(div) await eliminarDaAnalise(div);
+}
+
+/* Chave "Eliminar da análise" — só aparece em edição de ata na fase
+   "aguardando avaliação", que é quando a gestão revisa o que foi lançado. */
+function blocoEliminar(dados){
+  dados = dados || {};
+  return `
+    <div class="elim-toggle" style="display:none">
+      <label class="sw"><input type="checkbox" class="campo-eliminar"${dados.eliminado?' checked':''} onchange="toggleEliminar(this)"><i></i></label>
+      <span>Eliminar da análise</span>
+    </div>`;
+}
+
+function podeEliminarDaAnalise(){
+  if(!admLiberado || !editandoId) return false;
+  const c = (typeof funilCards !== 'undefined' ? funilCards : []).find(x => x.tipo === 'ata' && x.id === editandoId);
+  return !!c && c.etapa === 'realizada';
+}
+
+/* Mostra/esconde a chave em todos os cards conforme a fase da ata. */
+function atualizarChavesEliminar(){
+  const mostrar = podeEliminarDaAnalise();
+  document.querySelectorAll('.elim-toggle').forEach(el => { el.style.display = mostrar ? '' : 'none'; });
+}
+
+async function toggleEliminar(chk){
+  const div = chk.closest('.registro');
+  if(!div) return;
+  if(chk.checked){ await eliminarDaAnalise(div, chk); }
+  else{ await devolverAAnalise(div, chk); }
+}
+
+async function eliminarDaAnalise(div, chk){
+  const codigo = (div.querySelector('.campo-codigo')||{}).value.trim();
+  const nome   = (div.querySelector('.campo-empresa')||{}).value.trim();
+  if(!codigo){ alert('Informe o código da empresa antes de eliminá-la da análise.'); if(chk) chk.checked = false; return; }
+
+  const motivo = prompt('Por que este cliente sai da análise?\n\nO motivo aparece para quem lançar esta empresa numa próxima reunião.', '');
+  if(motivo === null){ if(chk) chk.checked = false; return; }
+
+  const meses = prompt('Voltar a analisar depois de quantos meses?\n\nDeixe em branco para manter fora da análise por tempo indeterminado.', '6');
+  if(meses === null){ if(chk) chk.checked = false; return; }
+  let reavaliar = null;
+  const n = parseInt(String(meses).replace(/\D/g,''), 10);
+  if(isFinite(n) && n > 0){
+    const d = new Date(); d.setMonth(d.getMonth() + n);
+    reavaliar = d.toISOString().slice(0,10);
+  }
+
+  try{
+    const { error } = await sb.rpc('ata_excecao_registrar', {
+      p_senha: admSenhaAtual, p_codigo: codigo, p_empresa: nome,
+      p_motivo: motivo || null, p_ata_id: editandoId || null,
+      p_reavaliar_em: reavaliar, p_autor: (window.APP && APP.usuario && APP.usuario.nome) || null
+    });
+    if(error) throw new Error(error.message);
+    div.classList.add('eliminado');
+    if(chk) chk.checked = true;
+    const c = div.querySelector('.campo-eliminar'); if(c) c.checked = true;
+    await carregarExcecoesEGrupos();
+    verificarEmpresaDoCard(div);
+    toast('“' + (nome || codigo) + '” eliminado da análise.');
+  }catch(err){
+    if(chk) chk.checked = false;
+    alert('Não foi possível eliminar da análise: ' + err.message);
+  }
+}
+
+async function devolverAAnalise(div, chk){
+  const codigo = (div.querySelector('.campo-codigo')||{}).value.trim();
+  if(!codigo) return;
+  if(!confirm('Devolver este cliente à análise?')){ if(chk) chk.checked = true; return; }
+  try{
+    const { error } = await sb.rpc('ata_excecao_remover', {
+      p_senha: admSenhaAtual, p_codigo: codigo,
+      p_autor: (window.APP && APP.usuario && APP.usuario.nome) || null });
+    if(error) throw new Error(error.message);
+    div.classList.remove('eliminado');
+    await carregarExcecoesEGrupos();
+    verificarEmpresaDoCard(div);
+    toast('Cliente devolvido à análise.');
+  }catch(err){
+    if(chk) chk.checked = true;
+    alert('Não foi possível devolver à análise: ' + err.message);
+  }
+}
+
+/* Botão do próprio aviso de exceção. */
+async function devolverAExcecao(btn){
+  const div = btn.closest('.registro');
+  if(div) await devolverAAnalise(div, div.querySelector('.campo-eliminar'));
+}
+
+/* O código da empresa mudou: revisa os avisos daquele card. */
+document.addEventListener('input', function(e){
+  if(e.target.classList && e.target.classList.contains('campo-codigo')){
+    const div = e.target.closest('.registro');
+    clearTimeout(div._tv);
+    div._tv = setTimeout(()=>verificarEmpresaDoCard(div), 350);
+  }
+});
+
 function addRegistroEmpresa(containerId, tipo, dados){
   dados = dados || {};
   contador++;
@@ -1602,6 +1884,7 @@ function addRegistroEmpresa(containerId, tipo, dados){
       <span class="rotulo">${ROTULOS[tipo]}</span>
       <button type="button" class="btn btn-remover" onclick="removerRegistro('${id}')">Remover</button>
     </div>
+    <div class="slot-alerta"></div>
     ${htmlRef(dados.ref)}
     <div class="linha">
       <div class="col-fixa">
@@ -1624,8 +1907,12 @@ function addRegistroEmpresa(containerId, tipo, dados){
       <input type="file" multiple onchange="anexar(this,'${docsId}')">
       <ul class="lista-arquivos" id="${docsId}"></ul>
     </div>` : ''}
-    ${blocoPlanoAcao(dados)}`;
+    ${blocoPlanoAcao(dados)}
+    ${blocoEliminar(dados)}`;
   document.getElementById(containerId).appendChild(div);
+  if(dados.grupo) div.dataset.grupo = JSON.stringify(dados.grupo);
+  if(dados.eliminado) div.classList.add('eliminado');
+  verificarEmpresaDoCard(div);
   statusDoContainer(containerId);
   return div;
 }
@@ -1816,10 +2103,21 @@ function importarExcel(input, containerId, tipo, statusId){
         importados++;
       }
 
+      // Quem já foi descartado antes e quem é subsidiária aparece no resumo,
+      // para o condutor ver de imediato o que não precisa reavaliar.
+      let jaEliminadas = 0, subsidiarias = 0;
+      document.getElementById(containerId).querySelectorAll('.registro').forEach(d=>{
+        const cod = (d.querySelector('.campo-codigo')||{}).value || '';
+        if(acharExcecao(cod)) jaEliminadas++;
+        const g = acharGrupo(cod);
+        if(g && g.membro.papel === 'subsidiaria') subsidiarias++;
+      });
       const achadas = ['nome','codigo','vendedor','regiao','trienio','atual','registro','supervisao'].filter(k => m[k] >= 0).length;
       document.getElementById(statusId).innerHTML =
         importados>0
-          ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — ' + achadas + ' coluna(s) do modelo reconhecida(s)</span>'
+          ? '<span class="badge-ok">✓ ' + importados + ' empresa(s) importada(s) — ' + achadas + ' coluna(s) reconhecida(s)</span>' +
+            (jaEliminadas ? '<div style="margin-top:6px;font-size:11.5px;color:#7A4708"><b>' + jaEliminadas + '</b> já eliminada(s) da análise em reunião anterior.</div>' : '') +
+            (subsidiarias ? '<div style="margin-top:4px;font-size:11.5px;color:#14406F"><b>' + subsidiarias + '</b> subsidiária(s) de grupo empresarial.</div>' : '')
           : '<span style="color:var(--vermelho);font-size:12px">Nenhuma empresa identificada. Confira o cabeçalho — use o botão <strong>Gerar modelo</strong> como referência.</span>';
       statusDoContainer(containerId);
     }catch(err){
@@ -1888,7 +2186,10 @@ function coletarRegistros(containerId){
       planoEnvolvidos: (div.querySelector('.campo-plano-envolvidos')||{}).value || '',
       planoDataInicial: (div.querySelector('.campo-plano-data-inicial')||{}).value || '',
       planoDataFinal: (div.querySelector('.campo-plano-data-final')||{}).value || '',
-      planoExecutado: (div.querySelector('.campo-plano-executado')||{}).value === '1'
+      planoExecutado: (div.querySelector('.campo-plano-executado')||{}).value === '1',
+      eliminado: (div.querySelector('.campo-eliminar')||{}).checked || false,
+      atrelado: div.dataset.atrelado === '1',
+      grupo: (function(){ try{ return div.dataset.grupo ? JSON.parse(div.dataset.grupo) : null; }catch(e){ return null; } })()
     };
   });
 }
@@ -2008,6 +2309,7 @@ async function salvarAta(finalizar){
 
 /* ═══════════════════ MODO EDIÇÃO ═══════════════════ */
 function entrarModoEdicao(id, numero, finalizada, criadoEm){
+  setTimeout(atualizarChavesEliminar, 0);
   editandoId = id;
   editandoNumero = numero;
   document.getElementById('barraEdicao').style.display = '';
@@ -2630,14 +2932,160 @@ function admSair(){
   document.getElementById('btnExportar').style.display = 'none';
 }
 
+/* ═══════════════════════════════════════════════════════════
+   ÁREA ADM — EXCEÇÕES E GRUPOS
+═══════════════════════════════════════════════════════════ */
+async function admCarregarCarteira(){
+  await carregarExcecoesEGrupos();
+  admRenderExcecoes();
+  admRenderGrupos();
+}
+
+function admRenderExcecoes(){
+  const el = document.getElementById('listaExcecoes');
+  if(!el) return;
+  if(!excecoes.length){
+    el.innerHTML = '<div class="vazio">Nenhum cliente eliminado da análise.</div>';
+    return;
+  }
+  let html = '<div class="tabela-wrap"><table class="tabela"><thead><tr>' +
+    '<th>Código</th><th>Empresa</th><th>Motivo</th><th>Quem eliminou</th><th>Quando</th><th>Volta em</th><th>Ações</th>' +
+    '</tr></thead><tbody>';
+  excecoes.forEach(e=>{
+    html += '<tr>' +
+      '<td><strong>' + esc(e.codigo) + '</strong></td>' +
+      '<td>' + esc(e.empresa || '—') + '</td>' +
+      '<td>' + esc(e.motivo || '—') + (e.ata_numero ? '<br><small style="color:#6A6A73">ata nº ' + String(e.ata_numero).padStart(4,'0') + '</small>' : '') + '</td>' +
+      '<td>' + esc(e.autor || '—') + '</td>' +
+      '<td style="white-space:nowrap">' + dataHoraBR(e.criado_em) + '</td>' +
+      '<td style="white-space:nowrap">' + (e.reavaliar_em ? dataBR(e.reavaliar_em) : '<span style="color:#6A6A73">sem prazo</span>') + '</td>' +
+      '<td><button type="button" class="btn btn-claro btn-mini" onclick="admDevolverExcecao(\'' + esc(e.codigo).replace(/'/g,"\\'") + '\')">Devolver à análise</button></td>' +
+      '</tr>';
+  });
+  el.innerHTML = html + '</tbody></table></div>';
+}
+
+async function admDevolverExcecao(codigo){
+  if(!confirm('Devolver "' + codigo + '" à análise?\n\nEle volta a ser avaliado normalmente nas próximas reuniões.')) return;
+  try{
+    const { error } = await sb.rpc('ata_excecao_remover', { p_senha: admSenhaAtual, p_codigo: codigo,
+      p_autor: (window.APP && APP.usuario && APP.usuario.nome) || null });
+    if(error) throw new Error(error.message);
+    await admCarregarCarteira();
+    toast('Cliente devolvido à análise.');
+  }catch(err){ alert('Não foi possível devolver à análise: ' + err.message); }
+}
+
+function admRenderGrupos(){
+  const el = document.getElementById('listaGrupos');
+  if(!el) return;
+  if(!gruposEmp.length){
+    el.innerHTML = '<div class="vazio">Nenhum grupo cadastrado.</div>';
+    return;
+  }
+  let html = '';
+  gruposEmp.forEach(g=>{
+    const subs = (g.membros||[]).filter(m=>m.papel==='subsidiaria');
+    html += '<div class="vis-item" style="align-items:flex-start">' +
+      '<span class="ico" style="margin-top:3px;color:var(--azul,#1E5A9E)">' + ICONES.grupo + '</span>' +
+      '<div class="nome">' + esc(g.nome) +
+      '<small><b>Principal:</b> ' + esc(g.principal_nome || '—') + ' (cód. ' + esc(g.principal_codigo) + ')</small>' +
+      (subs.length ? '<small><b>Subsidiárias:</b> ' + subs.map(m=>esc(m.empresa || m.codigo) + ' (' + esc(m.codigo) + ')').join(' · ') + '</small>'
+                   : '<small>Sem subsidiárias cadastradas.</small>') +
+      (g.observacao ? '<small>' + esc(g.observacao) + '</small>' : '') +
+      '</div>' +
+      '<div style="display:flex;gap:6px;flex:none">' +
+      '<button type="button" class="btn btn-claro btn-mini" onclick="abrirModalGrupo(\'' + g.id + '\')">Editar</button>' +
+      '<button type="button" class="btn btn-vermelho btn-mini" onclick="admRemoverGrupo(\'' + g.id + '\',\'' + esc(g.nome).replace(/'/g,"\\'") + '\')">Remover</button>' +
+      '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+async function admRemoverGrupo(id, nome){
+  if(!confirm('Remover o grupo "' + nome + '"?\n\nAs empresas voltam a ser tratadas isoladamente.')) return;
+  try{
+    const { error } = await sb.rpc('ata_grupo_remover', { p_senha: admSenhaAtual, p_id: id });
+    if(error) throw new Error(error.message);
+    await admCarregarCarteira();
+    toast('Grupo removido.');
+  }catch(err){ alert('Não foi possível remover o grupo: ' + err.message); }
+}
+
+/* ── Modal do grupo ── */
+function addLinhaMembro(codigo, empresa){
+  const box = document.getElementById('grupoMembros');
+  const div = document.createElement('div');
+  div.className = 'linha membro-grupo';
+  div.innerHTML =
+    '<div class="col-fixa"><input type="text" class="m-cod" placeholder="Código" value="' + esc(codigo||'') + '"></div>' +
+    '<div class="col"><input type="text" class="m-nome" placeholder="Nome da empresa" value="' + esc(empresa||'') + '"></div>' +
+    '<button type="button" class="btn btn-remover btn-mini" onclick="this.parentNode.remove()">Remover</button>';
+  box.appendChild(div);
+}
+
+function abrirModalGrupo(id){
+  const g = id ? gruposEmp.find(x=>x.id===id) : null;
+  document.getElementById('grupoId').value        = g ? g.id : '';
+  document.getElementById('grupoNome').value      = g ? g.nome : '';
+  document.getElementById('grupoPrincCod').value  = g ? g.principal_codigo : '';
+  document.getElementById('grupoPrincNome').value = g ? (g.principal_nome||'') : '';
+  document.getElementById('grupoObs').value       = g ? (g.observacao||'') : '';
+  document.getElementById('grupoMembros').innerHTML = '';
+  document.getElementById('grupoErro').style.display = 'none';
+  document.getElementById('modalGrupoTitulo').firstChild.textContent =
+    g ? 'Editar grupo empresarial ' : 'Atrelar a grupo empresarial ';
+  if(g) (g.membros||[]).filter(m=>m.papel==='subsidiaria').forEach(m=>addLinhaMembro(m.codigo, m.empresa));
+  else addLinhaMembro();
+  document.getElementById('modalGrupo').classList.add('aberto');
+}
+
+function fecharModalGrupo(){ document.getElementById('modalGrupo').classList.remove('aberto'); }
+
+async function salvarGrupo(){
+  const erro = document.getElementById('grupoErro');
+  erro.style.display = 'none';
+  const nome = document.getElementById('grupoNome').value.trim();
+  const pc   = document.getElementById('grupoPrincCod').value.trim();
+  const pn   = document.getElementById('grupoPrincNome').value.trim();
+  if(!nome || !pc){
+    erro.textContent = 'Informe o nome do grupo e o código da empresa principal.';
+    erro.style.display = 'block'; return;
+  }
+  const membros = Array.from(document.querySelectorAll('#grupoMembros .membro-grupo')).map(l=>({
+    codigo: (l.querySelector('.m-cod')||{}).value.trim(),
+    empresa: (l.querySelector('.m-nome')||{}).value.trim()
+  })).filter(m=>m.codigo);
+
+  try{
+    const { error } = await sb.rpc('ata_grupo_salvar', {
+      p_senha: admSenhaAtual, p_nome: nome, p_principal_codigo: pc, p_principal_nome: pn || null,
+      p_membros: membros, p_observacao: document.getElementById('grupoObs').value.trim() || null,
+      p_id: document.getElementById('grupoId').value || null,
+      p_autor: (window.APP && APP.usuario && APP.usuario.nome) || null
+    });
+    if(error) throw new Error(error.message);
+    fecharModalGrupo();
+    await admCarregarCarteira();
+    // revisa os cards abertos no formulário com a regra nova
+    document.querySelectorAll('.registro').forEach(verificarEmpresaDoCard);
+    toast('Grupo salvo.');
+  }catch(err){
+    erro.textContent = err.message;
+    erro.style.display = 'block';
+  }
+}
+
 function admAba(qual){
-  const atas = qual === 'atas';
-  document.getElementById('abaAtas').style.display = atas ? '' : 'none';
-  document.getElementById('abaSecoes').style.display = atas ? 'none' : '';
-  document.getElementById('abaBtnAtas').classList.toggle('ativa', atas);
-  document.getElementById('abaBtnSecoes').classList.toggle('ativa', !atas);
-  document.getElementById('btnExportar').style.display = atas ? '' : 'none';
-  if(!atas && !admSecoes.length) admCarregarSecoes();
+  ['atas','secoes','carteira'].forEach(k=>{
+    const painel = document.getElementById(k === 'atas' ? 'abaAtas' : k === 'secoes' ? 'abaSecoes' : 'abaCarteira');
+    const botao  = document.getElementById(k === 'atas' ? 'abaBtnAtas' : k === 'secoes' ? 'abaBtnSecoes' : 'abaBtnCarteira');
+    if(painel) painel.style.display = (qual === k) ? '' : 'none';
+    if(botao)  botao.classList.toggle('ativa', qual === k);
+  });
+  document.getElementById('btnExportar').style.display = (qual === 'atas') ? '' : 'none';
+  if(qual === 'secoes' && !admSecoes.length) admCarregarSecoes();
+  if(qual === 'carteira') admCarregarCarteira();
 }
 
 async function admEntrar(){
@@ -2948,6 +3396,9 @@ async function admSalvarSecoes(){
    mover qualquer card manualmente a qualquer momento.
 ═══════════════════════════════════════════════════════════ */
 const ICONES = {
+  alerta:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>`,
+  grupo:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9.5" width="7" height="11" rx="1.4"/><rect x="14" y="3.5" width="7" height="17" rx="1.4"/><path d="M6 13h1M6 16.5h1M17 7h1M17 10.5h1M17 14h1"/></svg>`,
+  excecao:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>`,
   agenda:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M12 12.5v3l2 1.2"/></svg>`,
   realizada: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8.5" y="2.5" width="7" height="4" rx="1.3"/><path d="M8.8 13.4l2.2 2.2 4.2-4.6"/></svg>`,
   plano:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.2a.7.7 0 0 1 .4-.6c3.3-1.5 6.9 1.5 10.2 0a.7.7 0 0 1 1 .6v8a.7.7 0 0 1-.4.6c-3.3 1.5-6.9-1.5-10.2 0"/></svg>`,
@@ -2993,6 +3444,7 @@ async function funilCarregar(){
     rot.style.display = admLiberado ? '' : 'none';
     funilRenderBoard();
     calRender();
+    atualizarChavesEliminar();
   }catch(err){
     const msg = '<div class="funil-vazio" style="grid-column:1/-1">Não foi possível carregar o funil: ' + esc(err.message) + '</div>';
     document.getElementById('funilBoard').innerHTML = msg;
@@ -3331,6 +3783,7 @@ async function iniciar(){
   if(btn) btn.style.display = (admLiberado || !temPortal) ? '' : 'none';
 
   await carregarVisibilidade();
+  await carregarExcecoesEGrupos();
   await abrirFunil();
   if(location.hash === '#form') funilAba('form');
   if(location.hash === '#adm' && admLiberado) abrirADM();
