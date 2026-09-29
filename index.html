@@ -313,6 +313,9 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .registro.subsidiaria{border-left-color:var(--azul,#1E5A9E);}
 .selo-sub{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--azul,#1E5A9E);background:var(--azul-suave,#EEF4FB);border:1px solid rgba(30,90,158,.3);border-radius:10px;padding:1px 7px;margin-left:6px;}
 .elim-toggle{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--cinza-borda);}
+.grupo-toggle{display:flex;align-items:center;gap:9px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--cinza-borda);flex-wrap:wrap;}
+.grupo-toggle span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--azul,#1E5A9E);}
+.grupo-toggle .grupo-resumo{font-style:normal;font-size:11px;color:var(--cinza-texto);}
 .elim-toggle span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#B4690E;}
 .ico{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:7px;}
 .ico svg{width:100%;height:100%;display:block;}
@@ -1247,20 +1250,13 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
           <input type="text" id="grupoNome" placeholder="Ex.: Grupo Malwee">
         </div>
       </div>
-      <div class="vis-grupo" style="margin-top:6px">Empresa principal</div>
-      <div class="linha">
-        <div class="col-fixa">
-          <label>Código</label>
-          <input type="text" id="grupoPrincCod" placeholder="Ex.: 20414/01">
-        </div>
-        <div class="col">
-          <label>Nome da empresa</label>
-          <input type="text" id="grupoPrincNome" placeholder="Razão social da principal">
-        </div>
+      <div class="vis-grupo" style="margin-top:6px">Empresas do grupo</div>
+      <div class="vis-aviso" style="margin-bottom:10px">
+        Marque qual delas é a <b>principal</b> — é a empresa que concentra o volume de compras.
+        As demais entram como subsidiárias, sem ordem entre si.
       </div>
-      <div class="vis-grupo" style="margin-top:12px">Subsidiárias</div>
       <div id="grupoMembros"></div>
-      <button type="button" class="btn btn-claro btn-mini" onclick="addLinhaMembro()">+ Adicionar subsidiária</button>
+      <button type="button" class="btn btn-claro btn-mini" onclick="addLinhaMembro()">+ Adicionar empresa</button>
       <div style="margin-top:12px">
         <label>Observação</label>
         <textarea id="grupoObs" placeholder="Ex.: mudou de razão social em 2025; compra pelo CNPJ da matriz..."></textarea>
@@ -1743,6 +1739,7 @@ function verificarEmpresaDoCard(div){
       '<div class="acoes-alerta">' +
         '<button type="button" onclick="eliminarPeloGrupo(this)">Eliminar da análise</button>' +
         '<button type="button" onclick="manterAtrelado(this)">Manter atrelado</button>' +
+        '<button type="button" onclick="abrirGrupoDoCard(this)">Ver/editar grupo</button>' +
       '</div></div></div>';
   } else if(g && g.membro.papel === 'principal'){
     const subs = (g.grupo.membros||[]).filter(m=>m.papel==='subsidiaria').length;
@@ -1752,6 +1749,15 @@ function verificarEmpresaDoCard(div){
   } else {
     delete div.dataset.grupo;
   }
+}
+
+function abrirGrupoDoCard(btn){
+  const div = btn.closest('.registro');
+  if(!div) return;
+  const codigo = (div.querySelector('.campo-codigo')||{}).value.trim();
+  const nome   = (div.querySelector('.campo-empresa')||{}).value.trim();
+  const g = acharGrupo(codigo);
+  abrirModalGrupo(g ? g.grupo.id : null, {codigo:codigo, empresa:nome, cardId:div.id});
 }
 
 function manterAtrelado(btn){
@@ -1777,7 +1783,87 @@ function blocoEliminar(dados){
     <div class="elim-toggle" style="display:none">
       <label class="sw"><input type="checkbox" class="campo-eliminar"${dados.eliminado?' checked':''} onchange="toggleEliminar(this)"><i></i></label>
       <span>Eliminar da análise</span>
+    </div>
+    <div class="grupo-toggle" style="display:none">
+      <label class="sw"><input type="checkbox" class="campo-grupo" onchange="toggleGrupoCard(this)"><i></i></label>
+      <span>Atrelar a Grupo Empresarial</span>
+      <em class="grupo-resumo"></em>
     </div>`;
+}
+
+/* A chave reflete o banco: ligada quando a empresa do card já pertence a um
+   grupo. Ligar abre a janela (a mesma da Área ADM) com a empresa do card já
+   dentro; desligar tira só essa empresa do grupo. */
+function sincronizarChavesGrupo(){
+  const mostrar = !!admLiberado;
+  document.querySelectorAll('.registro').forEach(div=>{
+    const bloco = div.querySelector('.grupo-toggle');
+    if(!bloco) return;
+    bloco.style.display = mostrar ? '' : 'none';
+    const codigo = (div.querySelector('.campo-codigo')||{}).value || '';
+    const g = acharGrupo(codigo);
+    const chk = div.querySelector('.campo-grupo');
+    const res = div.querySelector('.grupo-resumo');
+    if(chk) chk.checked = !!g;
+    if(res){
+      res.textContent = g
+        ? (g.membro.papel === 'principal'
+            ? 'principal do ' + g.grupo.nome
+            : 'subsidiária de ' + (g.grupo.principal_nome || g.grupo.principal_codigo))
+        : '';
+    }
+  });
+}
+
+async function toggleGrupoCard(chk){
+  const div = chk.closest('.registro');
+  if(!div) return;
+  const codigo = (div.querySelector('.campo-codigo')||{}).value.trim();
+  const nome   = (div.querySelector('.campo-empresa')||{}).value.trim();
+  const g = acharGrupo(codigo);
+
+  if(chk.checked){
+    if(!codigo){
+      alert('Preencha o código da empresa antes de atrelá-la a um grupo.');
+      chk.checked = false; return;
+    }
+    // já existe grupo para esta empresa? abre o grupo dela para ajuste
+    if(g){ abrirModalGrupo(g.grupo.id, {codigo:codigo, empresa:nome, cardId:div.id}); return; }
+    // existe grupo em que ela caiba? deixa escolher entre criar e entrar num existente
+    if(gruposEmp.length){
+      const lista = gruposEmp.map((x,i)=> (i+1) + ') ' + x.nome + ' — principal: ' + (x.principal_nome||x.principal_codigo)).join('\n');
+      const r = prompt('Atrelar "' + (nome||codigo) + '" a qual grupo?\n\n' + lista +
+                       '\n\nDigite o número do grupo, ou deixe em branco para criar um grupo novo.', '');
+      if(r === null){ chk.checked = false; return; }
+      const i = parseInt(r, 10);
+      if(isFinite(i) && i >= 1 && i <= gruposEmp.length){
+        abrirModalGrupo(gruposEmp[i-1].id, {codigo:codigo, empresa:nome, cardId:div.id});
+        return;
+      }
+    }
+    abrirModalGrupo(null, {codigo:codigo, empresa:nome, cardId:div.id});
+    return;
+  }
+
+  // desligando: tira a empresa do grupo
+  if(!g){ return; }
+  if(g.membro.papel === 'principal'){
+    alert('Esta é a empresa principal do grupo "' + g.grupo.nome + '".\n\n' +
+          'Para trocar a principal ou desfazer o grupo, use a aba "Exceções e grupos" na Área ADM.');
+    chk.checked = true; return;
+  }
+  if(!confirm('Desatrelar "' + (nome||codigo) + '" do grupo "' + g.grupo.nome + '"?')){ chk.checked = true; return; }
+  try{
+    const { error } = await sb.rpc('ata_grupo_desatrelar', { p_senha: admSenhaAtual, p_codigo: codigo });
+    if(error) throw new Error(error.message);
+    await carregarExcecoesEGrupos();
+    verificarEmpresaDoCard(div);
+    sincronizarChavesGrupo();
+    toast('Empresa desatrelada do grupo.');
+  }catch(err){
+    chk.checked = true;
+    alert('Não foi possível desatrelar: ' + err.message);
+  }
 }
 
 function podeEliminarDaAnalise(){
@@ -1790,6 +1876,7 @@ function podeEliminarDaAnalise(){
 function atualizarChavesEliminar(){
   const mostrar = podeEliminarDaAnalise();
   document.querySelectorAll('.elim-toggle').forEach(el => { el.style.display = mostrar ? '' : 'none'; });
+  sincronizarChavesGrupo();
 }
 
 async function toggleEliminar(chk){
@@ -1865,7 +1952,7 @@ document.addEventListener('input', function(e){
   if(e.target.classList && e.target.classList.contains('campo-codigo')){
     const div = e.target.closest('.registro');
     clearTimeout(div._tv);
-    div._tv = setTimeout(()=>verificarEmpresaDoCard(div), 350);
+    div._tv = setTimeout(()=>{ verificarEmpresaDoCard(div); sincronizarChavesGrupo(); }, 350);
   }
 });
 
@@ -1913,6 +2000,7 @@ function addRegistroEmpresa(containerId, tipo, dados){
   if(dados.grupo) div.dataset.grupo = JSON.stringify(dados.grupo);
   if(dados.eliminado) div.classList.add('eliminado');
   verificarEmpresaDoCard(div);
+  sincronizarChavesGrupo();
   statusDoContainer(containerId);
   return div;
 }
@@ -3013,49 +3101,91 @@ async function admRemoverGrupo(id, nome){
 }
 
 /* ── Modal do grupo ── */
-function addLinhaMembro(codigo, empresa){
+function addLinhaMembro(codigo, empresa, principal){
   const box = document.getElementById('grupoMembros');
   const div = document.createElement('div');
   div.className = 'linha membro-grupo';
+  div.style.alignItems = 'flex-end';
   div.innerHTML =
-    '<div class="col-fixa"><input type="text" class="m-cod" placeholder="Código" value="' + esc(codigo||'') + '"></div>' +
-    '<div class="col"><input type="text" class="m-nome" placeholder="Nome da empresa" value="' + esc(empresa||'') + '"></div>' +
-    '<button type="button" class="btn btn-remover btn-mini" onclick="this.parentNode.remove()">Remover</button>';
+    '<div class="col-fixa"><label>Código</label><input type="text" class="m-cod" placeholder="Ex.: 20414/01" value="' + esc(codigo||'') + '"></div>' +
+    '<div class="col"><label>Nome da empresa</label><input type="text" class="m-nome" placeholder="Razão social" value="' + esc(empresa||'') + '"></div>' +
+    '<label class="sem-reg ok" style="flex:none;margin-bottom:7px" title="Empresa que concentra as compras do grupo">' +
+      '<input type="radio" name="grupoPrincipal" class="m-princ"' + (principal?' checked':'') + '> Principal</label>' +
+    '<button type="button" class="btn btn-remover btn-mini" style="margin-bottom:4px" onclick="removerLinhaMembro(this)">Remover</button>';
   box.appendChild(div);
+  if(!box.querySelector('.m-princ:checked')){
+    const r = box.querySelector('.m-princ'); if(r) r.checked = true;
+  }
 }
 
-function abrirModalGrupo(id){
+function removerLinhaMembro(btn){
+  const linha = btn.closest('.membro-grupo');
+  const era = !!linha.querySelector('.m-princ:checked');
+  linha.remove();
+  if(era){   // sobrou sem principal: promove a primeira
+    const r = document.querySelector('#grupoMembros .m-princ');
+    if(r) r.checked = true;
+  }
+}
+
+/* pre = {codigo, empresa, cardId} quando a janela é aberta pela chave do card.
+   A empresa do card entra já preenchida; a gestão só acrescenta as outras e
+   marca qual é a principal. */
+let grupoOrigemCard = null;
+
+function abrirModalGrupo(id, pre){
   const g = id ? gruposEmp.find(x=>x.id===id) : null;
-  document.getElementById('grupoId').value        = g ? g.id : '';
-  document.getElementById('grupoNome').value      = g ? g.nome : '';
-  document.getElementById('grupoPrincCod').value  = g ? g.principal_codigo : '';
-  document.getElementById('grupoPrincNome').value = g ? (g.principal_nome||'') : '';
-  document.getElementById('grupoObs').value       = g ? (g.observacao||'') : '';
+  grupoOrigemCard = (pre && pre.cardId) ? pre.cardId : null;
+
+  document.getElementById('grupoId').value  = g ? g.id : '';
+  document.getElementById('grupoNome').value = g ? g.nome : (pre && pre.empresa ? 'Grupo ' + pre.empresa.split(' ')[0] : '');
+  document.getElementById('grupoObs').value  = g ? (g.observacao||'') : '';
   document.getElementById('grupoMembros').innerHTML = '';
   document.getElementById('grupoErro').style.display = 'none';
   document.getElementById('modalGrupoTitulo').firstChild.textContent =
     g ? 'Editar grupo empresarial ' : 'Atrelar a grupo empresarial ';
-  if(g) (g.membros||[]).filter(m=>m.papel==='subsidiaria').forEach(m=>addLinhaMembro(m.codigo, m.empresa));
-  else addLinhaMembro();
+
+  if(g){
+    (g.membros||[]).forEach(m => addLinhaMembro(m.codigo, m.empresa, m.papel === 'principal'));
+    // a empresa do card ainda não está no grupo: entra como mais uma linha
+    if(pre && pre.codigo && !(g.membros||[]).some(m => chaveEmpresa(m.codigo) === chaveEmpresa(pre.codigo))){
+      addLinhaMembro(pre.codigo, pre.empresa, false);
+    }
+  }else if(pre && pre.codigo){
+    addLinhaMembro(pre.codigo, pre.empresa, true);   // a do card entra como principal por padrão
+    addLinhaMembro('', '', false);                   // e uma linha em branco para a outra
+  }else{
+    addLinhaMembro();
+  }
   document.getElementById('modalGrupo').classList.add('aberto');
 }
 
-function fecharModalGrupo(){ document.getElementById('modalGrupo').classList.remove('aberto'); }
+function fecharModalGrupo(){
+  document.getElementById('modalGrupo').classList.remove('aberto');
+  grupoOrigemCard = null;
+  sincronizarChavesGrupo();   // chave volta ao que o banco diz
+}
 
 async function salvarGrupo(){
   const erro = document.getElementById('grupoErro');
   erro.style.display = 'none';
   const nome = document.getElementById('grupoNome').value.trim();
-  const pc   = document.getElementById('grupoPrincCod').value.trim();
-  const pn   = document.getElementById('grupoPrincNome').value.trim();
-  if(!nome || !pc){
-    erro.textContent = 'Informe o nome do grupo e o código da empresa principal.';
+
+  const linhas = Array.from(document.querySelectorAll('#grupoMembros .membro-grupo')).map(l=>({
+    codigo:  (l.querySelector('.m-cod')||{}).value.trim(),
+    empresa: (l.querySelector('.m-nome')||{}).value.trim(),
+    principal: !!(l.querySelector('.m-princ')||{}).checked
+  })).filter(m=>m.codigo);
+
+  if(!nome){ erro.textContent = 'Informe o nome do grupo.'; erro.style.display='block'; return; }
+  if(linhas.length < 2){
+    erro.textContent = 'Um grupo precisa de pelo menos duas empresas: a principal e uma subsidiária.';
     erro.style.display = 'block'; return;
   }
-  const membros = Array.from(document.querySelectorAll('#grupoMembros .membro-grupo')).map(l=>({
-    codigo: (l.querySelector('.m-cod')||{}).value.trim(),
-    empresa: (l.querySelector('.m-nome')||{}).value.trim()
-  })).filter(m=>m.codigo);
+  const princ = linhas.find(m=>m.principal) || linhas[0];
+  const pc = princ.codigo, pn = princ.empresa;
+  const membros = linhas.filter(m => chaveEmpresa(m.codigo) !== chaveEmpresa(pc))
+                        .map(m => ({codigo:m.codigo, empresa:m.empresa}));
 
   try{
     const { error } = await sb.rpc('ata_grupo_salvar', {
@@ -3066,10 +3196,13 @@ async function salvarGrupo(){
     });
     if(error) throw new Error(error.message);
     fecharModalGrupo();
-    await admCarregarCarteira();
+    await carregarExcecoesEGrupos();
+    admRenderExcecoes(); admRenderGrupos();
     // revisa os cards abertos no formulário com a regra nova
     document.querySelectorAll('.registro').forEach(verificarEmpresaDoCard);
-    toast('Grupo salvo.');
+    sincronizarChavesGrupo();
+    grupoOrigemCard = null;
+    toast('Grupo salvo — ' + (membros.length + 1) + ' empresa(s) atreladas a ' + esc(pn || pc) + '.');
   }catch(err){
     erro.textContent = err.message;
     erro.style.display = 'block';
