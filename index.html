@@ -92,6 +92,9 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 }
 .sem-reg input{width:15px;height:15px;accent-color:var(--verde);cursor:pointer;margin:0;}
 .sem-reg.ok{color:var(--verde);}
+/* "(nada a registrar)" só aparece quando o tópico está inteiramente em branco */
+.hint-nada{display:none;font-style:normal;margin-left:5px;color:var(--cinza-texto);font-weight:600;}
+.card.vazio .hint-nada{display:inline;}
 .registro .sup{margin-top:8px;}
 .registro .sup label{color:var(--vermelho);}
 .registro .sup textarea{background:#FFFCFC;border-color:rgba(200,16,46,.28);min-height:42px;}
@@ -100,7 +103,7 @@ body{background:var(--branco);color:var(--preto);padding-bottom:30px;}
 .card.completo .card-titulo{border-bottom-color:var(--verde);background:var(--verde-suave);}
 .card.completo .dot{background:var(--verde);}
 .card.completo .status{background:var(--verde);color:#fff;border-color:var(--verde);}
-.card.semreg .card-corpo{opacity:.45;pointer-events:none;}
+
 
 .card-corpo{padding:10px 12px;}
 .guia{background:var(--vermelho-suave);border-left:4px solid var(--vermelho);padding:8px 11px;border-radius:0 4px 4px 0;margin-bottom:10px;font-size:12px;color:var(--cinza-texto);line-height:1.45;}
@@ -296,7 +299,9 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .funil-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;}
 .funil-col{background:#FAFAFB;border:1px solid var(--cinza-borda);border-radius:8px;overflow:hidden;min-width:0;}
 .funil-col-head{padding:10px 12px;border-bottom:2px solid var(--vermelho);background:var(--branco);}
-.funil-col-head .tit{font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--vermelho);}
+.ico{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:7px;}
+.ico svg{width:100%;height:100%;display:block;}
+.funil-col-head .tit{display:flex;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--vermelho);}
 .funil-col-head .qt{font-size:11px;color:var(--cinza-texto);margin-top:2px;}
 .funil-col-corpo{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:60px;}
 .funil-card{background:var(--branco);border:1px solid var(--cinza-borda);border-left:3px solid var(--vermelho);border-radius:0 6px 6px 0;padding:8px 10px;font-size:12px;}
@@ -454,7 +459,9 @@ button:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible{outline:
 .funil-board{gap:18px;}
 .funil-col{background:#f0f2f2;border:0;border-radius:12px;}
 .funil-col-head{padding:18px 16px;background:transparent;border:0;}
-.funil-col-head .tit{font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--preto);}
+.ico{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:none;vertical-align:-3px;margin-right:7px;}
+.ico svg{width:100%;height:100%;display:block;}
+.funil-col-head .tit{display:flex;align-items:center;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--preto);}
 .funil-col-corpo{padding:0 10px 12px;gap:10px;}
 .funil-card,.funil-col.col-agenda .funil-card,.funil-col.col-arquivo .funil-card{border:1px solid var(--cinza-borda);border-radius:9px;background:#fff;padding:16px;}
 .funil-card.clicavel:hover{border-color:#bfc6ca;box-shadow:0 2px 8px rgba(25,35,40,.04);}
@@ -543,8 +550,8 @@ html[data-theme=dark] .card,html[data-theme=dark] .adm-card,html[data-theme=dark
   --cinza-borda:var(--fi-line);
   --cinza-texto:var(--fi-muted);
   --branco:var(--fi-surface);
-  --verde:var(--fi-success);
-  --verde-suave:color-mix(in srgb,var(--fi-success) 11%,var(--fi-surface));
+  --verde:var(--fi-success,#1E7A3C);
+  --verde-suave:color-mix(in srgb,var(--fi-success,#1E7A3C) 11%,var(--fi-surface,#FFFFFF));
   --azul:var(--fi-info);
   --azul-suave:color-mix(in srgb,var(--fi-info) 10%,var(--fi-surface));
   --page:var(--fi-bg);
@@ -620,7 +627,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--fi-brand);box-shadow:
 .btn-vermelho:hover:not(:disabled){background:var(--fi-brand-strong);border-color:var(--fi-brand-strong);}
 .btn-claro,.btn-preto,.btn-remover,.btn-toggle{background:var(--fi-surface);color:var(--fi-text);border-color:var(--fi-line);}
 .btn-claro:hover:not(:disabled),.btn-preto:hover:not(:disabled),.btn-remover:hover,.btn-toggle:hover{background:var(--fi-surface-alt);color:var(--fi-text);border-color:var(--fi-line-strong);}
-.btn-verde{background:var(--fi-success);border-color:var(--fi-success);color:#fff;}
+.btn-verde{background:var(--fi-success,#1E7A3C);border-color:var(--fi-success,#1E7A3C);color:#fff;}
 .btn-cinza{background:var(--fi-muted);border-color:var(--fi-muted);color:#fff;}
 .btn-mini{min-height:32px;padding:5px 10px;}
 .btn-grande{min-height:44px;}
@@ -727,9 +734,9 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   </div>
   <div class="funil-corpo">
     <div class="funil-abas">
-      <button type="button" class="aba ativa" id="funilAbaBtnCal" onclick="funilAba('calendario')">Calendário</button>
-      <button type="button" class="aba" id="funilAbaBtnBoard" onclick="funilAba('board')">Funil</button>
-      <button type="button" class="aba" id="funilAbaBtnForm" onclick="funilAba('form')">Formulário</button>
+      <button type="button" class="aba ativa" id="funilAbaBtnCal" onclick="funilAba('calendario')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg></span>Calendário</button>
+      <button type="button" class="aba" id="funilAbaBtnBoard" onclick="funilAba('board')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="7" rx="1.5"/></svg></span>Funil</button>
+      <button type="button" class="aba" id="funilAbaBtnForm" onclick="funilAba('form')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9z"/><path d="M14 3v6h5M12 12v5M9.5 14.5h5"/></svg></span>Nova reunião</button>
     </div>
 
     <div id="funilAbaCalendario">
@@ -804,8 +811,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES EM RISCO DE PERDA</span>
     <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('risco',this)"> Item concluído</label>
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('risco',this)"> Nada a registrar</label>
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('risco',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec1',this)">EXIBIR</button>
     </span>
@@ -845,8 +851,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES PERDIDOS</span>
     <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('perdidos',this)"> Item concluído</label>
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('perdidos',this)"> Nada a registrar</label>
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('perdidos',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec2',this)">EXIBIR</button>
     </span>
@@ -900,8 +905,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>CLIENTES SEM CONTATO</span>
     <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('semcontato',this)"> Item concluído</label>
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('semcontato',this)"> Nada a registrar</label>
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('semcontato',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec3',this)">EXIBIR</button>
     </span>
@@ -943,8 +947,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>OPORTUNIDADES RELEVANTES</span>
     <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('oportunidades',this)"> Item concluído</label>
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('oportunidades',this)"> Nada a registrar</label>
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('oportunidades',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec4',this)">EXIBIR</button>
     </span>
@@ -968,8 +971,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <div class="card-titulo">
     <span class="ct-esq"><span class="dot"></span>AÇÕES DA SEMANA ANTERIOR</span>
     <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('acoes',this)"> Item concluído</label>
-      <label class="sem-reg"><input type="checkbox" class="chk-sem" onchange="marcarSemRegistro('acoes',this)"> Nada a registrar</label>
+      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('acoes',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
       <span class="status">PENDENTE</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">EXIBIR</button>
     </span>
@@ -1083,7 +1085,11 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR</button>
   <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">GERAR ATA SUPERVISÃO</button>
   <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">GERAR ATA VENDEDOR</button>
-  <button type="button" class="btn btn-claro btn-grande" id="btnGerarPlano" onclick="gerarPlanoAcaoForm()" style="display:none">GERAR PLANO DE AÇÃO</button>
+  <button type="button" class="btn btn-claro btn-grande" id="btnGerarPlano" onclick="gerarPlanoAcaoForm()" style="display:none">GERAR ATA DO PLANO DE AÇÃO</button>
+</div>
+<div class="acoes-finais">
+  <button type="button" class="btn btn-verde btn-grande" id="btnEncerrarReuniao" style="display:none"
+          onclick="encerrarReuniaoDoForm()">ENCERRAR REUNIÃO</button>
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-claro btn-grande" onclick="limparTudo()">LIMPAR E GERAR NOVO FORMULÁRIO</button>
@@ -1369,11 +1375,12 @@ function atualizarStatus(slug){
   const card = document.getElementById(t.card);
   if(!card) return;
   const chip = card.querySelector('.status');
-  const nada = !!semRegistro[slug];
+  const vazio = !temConteudo(slug);
   const ok = !!concluido[slug];
-  card.classList.toggle('semreg', nada);
-  card.classList.toggle('completo', nada || ok);
-  if(chip) chip.textContent = nada ? 'SEM REGISTRO' : (ok ? 'CONCLUÍDO' : 'PENDENTE');
+  semRegistro[slug] = ok && vazio;          // derivado, não é mais uma caixa
+  card.classList.toggle('vazio', vazio);    // controla o "(nada a registrar)"
+  card.classList.toggle('completo', ok);
+  if(chip) chip.textContent = ok ? (vazio ? 'SEM REGISTRO' : 'CONCLUÍDO') : 'PENDENTE';
   atualizarProgresso();
 }
 
@@ -1384,7 +1391,7 @@ function atualizarTodosStatus(){
 
 function atualizarProgresso(){
   const ativos = TOPICOS.filter(t => t.controlavel && visibilidade[t.slug]);
-  const ok = ativos.filter(t => semRegistro[t.slug] || concluido[t.slug]).length;
+  const ok = ativos.filter(t => concluido[t.slug]).length;
   const pct = ativos.length ? Math.round(ok / ativos.length * 100) : 0;
   const barra = document.getElementById('barraProg');
   if(barra) barra.style.width = pct + '%';
@@ -1392,31 +1399,19 @@ function atualizarProgresso(){
   if(txt) txt.textContent = ok + ' de ' + ativos.length;
 }
 
-function marcarSemRegistro(slug, chk){
-  if(chk.checked && temConteudo(slug)){
-    if(!confirm('Este tópico já tem informação preenchida.\n\nMarcar como "nada a registrar" faz com que esse conteúdo NÃO entre na ata. Continuar?')){
-      chk.checked = false; return;
-    }
-  }
-  semRegistro[slug] = chk.checked;
-  if(chk.checked){
-    concluido[slug] = false;
-    const card = document.getElementById(TOP[slug].card);
-    const outro = card && card.querySelector('.chk-ok');
-    if(outro) outro.checked = false;
-  }
+/* Agora existe UMA caixa por tópico: "Item concluído".
+   "Nada a registrar" deixou de ser uma segunda caixa — é a leitura automática
+   de um tópico concluído e inteiramente em branco. O complemento
+   "(nada a registrar)" aparece ao lado do rótulo enquanto o tópico está vazio. */
+function marcarConcluido(slug, chk){
+  concluido[slug] = chk.checked;
+  semRegistro[slug] = chk.checked && !temConteudo(slug);
   atualizarStatus(slug);
 }
 
-function marcarConcluido(slug, chk){
-  concluido[slug] = chk.checked;
-  if(chk.checked){
-    semRegistro[slug] = false;
-    const card = document.getElementById(TOP[slug].card);
-    const outro = card && card.querySelector('.chk-sem');
-    if(outro) outro.checked = false;
-  }
-  atualizarStatus(slug);
+/* Mantida por compatibilidade: versões antigas do formulário chamavam isto. */
+function marcarSemRegistro(slug, chk){
+  if(chk) marcarConcluido(slug, chk);
 }
 
 document.addEventListener('input', function(e){
@@ -1424,7 +1419,7 @@ document.addEventListener('input', function(e){
   if(card) atualizarStatus(card.dataset.slug);
 });
 document.addEventListener('change', function(e){
-  if(e.target.classList && (e.target.classList.contains('chk-sem') || e.target.classList.contains('chk-ok'))) return;
+  if(e.target.classList && e.target.classList.contains('chk-ok')) return;
   const card = e.target.closest('.card[data-slug]');
   if(card) atualizarStatus(card.dataset.slug);
 });
@@ -2079,13 +2074,12 @@ function carregarAtaNoFormulario(a){
   semRegistro = {}; concluido = {};
   TOPICOS.forEach(t=>{
     const card = document.getElementById(t.card);
+    // atas antigas: "nada a registrar" virou simplesmente "item concluído"
     const nada = !!(d.semRegistro && d.semRegistro[t.slug]);
-    const ok   = !nada && !!(d.concluido && d.concluido[t.slug]);
+    const ok   = nada || !!(d.concluido && d.concluido[t.slug]);
     semRegistro[t.slug] = nada;
     concluido[t.slug]   = ok;
-    const chkN = card && card.querySelector('.chk-sem');
     const chkO = card && card.querySelector('.chk-ok');
-    if(chkN) chkN.checked = nada;
     if(chkO) chkO.checked = ok;
   });
 
@@ -2094,6 +2088,11 @@ function carregarAtaNoFormulario(a){
   aplicarVisibilidade();
   atualizarTodosStatus();
   atualizarBotoesLimpar();
+}
+
+function encerrarReuniaoDoForm(){
+  if(!editandoId){ alert('Gere a ata antes de encerrar a reunião.'); return; }
+  encerrarReuniao(editandoId);
 }
 
 async function salvarPreparacao(){
@@ -2473,10 +2472,10 @@ async function gerarAtaPDF(comSupervisao){
     return;
   }
 
-  const pendentes = TOPICOS.filter(t => t.controlavel && visibilidade[t.slug] && !semRegistro[t.slug] && !concluido[t.slug]);
+  const pendentes = TOPICOS.filter(t => t.controlavel && visibilidade[t.slug] && !concluido[t.slug]);
   if(pendentes.length){
     const nomes = pendentes.map(t => '• ' + t.titulo).join('\n');
-    if(!confirm('Estes tópicos ainda não foram marcados como "Item concluído" nem como "Nada a registrar":\n\n' + nomes +
+    if(!confirm('Estes tópicos ainda não foram marcados como "Item concluído":\n\n' + nomes +
                 '\n\nGerar a ata mesmo assim?')) return;
   }
 
@@ -2530,7 +2529,10 @@ async function gerarAtaPDF(comSupervisao){
   const outro = comSupervisao ? 'ata do vendedor' : 'ata da supervisão';
   const info = document.getElementById('edInfo');
   if(info) info.textContent = 'Ata finalizada. Você ainda pode gerar a ' + outro +
-                              ' ou usar "Limpar e gerar novo formulário" para começar outra.';
+                              ' ou encerrar a reunião para mandá-la à avaliação.';
+  // com a ata gerada, a reunião pode ser encerrada e seguir no funil
+  const btnEnc = document.getElementById('btnEncerrarReuniao');
+  if(btnEnc && editandoId) btnEnc.style.display = '';
   btn.disabled = false;
 }
 
@@ -2945,11 +2947,17 @@ async function admSalvarSecoes(){
    automática (ver ata_funil_listar/dias_arquivar), mas a Área ADM pode
    mover qualquer card manualmente a qualquer momento.
 ═══════════════════════════════════════════════════════════ */
+const ICONES = {
+  agenda:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M12 12.5v3l2 1.2"/></svg>`,
+  realizada: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8.5" y="2.5" width="7" height="4" rx="1.3"/><path d="M8.8 13.4l2.2 2.2 4.2-4.6"/></svg>`,
+  plano:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.2a.7.7 0 0 1 .4-.6c3.3-1.5 6.9 1.5 10.2 0a.7.7 0 0 1 1 .6v8a.7.7 0 0 1-.4.6c-3.3 1.5-6.9-1.5-10.2 0"/></svg>`,
+  arquivo:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.8" y="3.8" width="18.4" height="4.6" rx="1.4"/><path d="M4.6 8.4v10a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-10M9.8 12.4h4.4"/></svg>`
+};
 const ETAPAS_FUNIL = [
-  { slug:'agenda',       titulo:'Reuniões a serem realizadas' },
-  { slug:'realizada',    titulo:'Atas de reuniões realizadas' },
-  { slug:'em_andamento', titulo:'Planos de ação em andamento' },
-  { slug:'arquivo',      titulo:'Arquivo' }
+  { slug:'agenda',       titulo:'Reuniões agendadas',                        ico:'agenda'    },
+  { slug:'realizada',    titulo:'Reuniões realizadas, aguardando avaliação',  ico:'realizada' },
+  { slug:'em_andamento', titulo:'Ag. Execução de Plano de Ação',              ico:'plano'     },
+  { slug:'arquivo',      titulo:'Arquivo',                                    ico:'arquivo'   }
 ];
 let funilCards = [];
 let funilDiasArquivar = 21;
@@ -3001,7 +3009,7 @@ function funilRenderBoard(){
     const col = document.createElement('div');
     col.className = 'funil-col col-' + et.slug;
     col.innerHTML =
-      '<div class="funil-col-head"><div class="tit">' + esc(et.titulo) + '</div>' +
+      '<div class="funil-col-head"><div class="tit"><span class="ico">' + (ICONES[et.ico]||'') + '</span>' + esc(et.titulo) + '</div>' +
       '<div class="qt">' + cards.length + ' item(ns)</div></div>' +
       '<div class="funil-col-corpo"></div>';
     board.appendChild(col);
@@ -3033,6 +3041,21 @@ function funilMontarCard(c, idxEtapa){
     div.onclick = ()=>admVer(c.id);
   }
 
+  /* Avanço de etapa pelo próprio card:
+       etapa 1 → "Encerrar reunião"   leva para "aguardando avaliação";
+       etapa 2 → "Encerrar avaliação" decide entre plano de ação e arquivo. */
+  if(c.tipo === 'ata' && admLiberado && (c.etapa === 'agenda' || c.etapa === 'realizada')){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn btn-mini ' + (c.etapa === 'agenda' ? 'btn-vermelho' : 'btn-verde');
+    b.style.marginTop = '7px';
+    b.innerHTML = '<span class="ico">' + ICONES[c.etapa === 'agenda' ? 'realizada' : 'plano'] + '</span>' +
+                  (c.etapa === 'agenda' ? 'Encerrar reunião' : 'Encerrar avaliação');
+    b.onclick = (ev)=>{ ev.stopPropagation();
+      if(c.etapa === 'agenda') encerrarReuniao(c.id); else encerrarAvaliacao(c.id); };
+    div.appendChild(b);
+  }
+
   if(admLiberado){
     const ctl = document.createElement('div');
     ctl.className = 'adm-ctl';
@@ -3057,6 +3080,57 @@ function funilMontarCard(c, idxEtapa){
     div.appendChild(ctl);
   }
   return div;
+}
+
+/* Quantos planos de ação ainda esperam execução nesta ata. */
+function contarPlanosPendentes(d){
+  if(!d) return 0;
+  let n = 0;
+  ['risco','perdidos','semContato','oportunidades','chamados'].forEach(k=>{
+    (d[k]||[]).forEach(r=>{ if(r && r.planoAtivo && !r.planoExecutado) n++; });
+  });
+  return n;
+}
+
+async function definirEtapaAta(id, etapa){
+  const { error } = await sb.rpc('ata_funil_definir_etapa',
+    { p_senha: admSenhaAtual, p_tipo: 'ata', p_id: id, p_etapa: etapa });
+  if(error) throw new Error(error.message);
+}
+
+/* Etapa 1 → 2 */
+async function encerrarReuniao(id){
+  if(!confirm('Encerrar a reunião desta ata?\n\nEla passa para "Reuniões realizadas, aguardando avaliação".')) return;
+  try{
+    await definirEtapaAta(id, 'realizada');
+    toast('Reunião encerrada — a ata está aguardando avaliação.');
+    await funilCarregar();
+    const b = document.getElementById('btnEncerrarReuniao');
+    if(b && editandoId === id) b.style.display = 'none';
+  }catch(err){ alert('Não foi possível encerrar a reunião: ' + err.message); }
+}
+
+/* Etapa 2 → 3 (há plano de ação) ou → 4 (não há) */
+async function encerrarAvaliacao(id){
+  let planos = 0;
+  try{
+    const a = await admObter(id);
+    planos = contarPlanosPendentes(a && a.dados);
+  }catch(err){
+    alert('Não foi possível ler a ata para conferir os planos de ação: ' + err.message);
+    return;
+  }
+  const destino = planos > 0 ? 'em_andamento' : 'arquivo';
+  const nome = planos > 0 ? 'Ag. Execução de Plano de Ação' : 'Arquivo';
+  const detalhe = planos > 0
+    ? planos + ' plano(s) de ação aguardando execução.'
+    : 'Nenhum plano de ação em aberto.';
+  if(!confirm('Encerrar a avaliação desta ata?\n\n' + detalhe + '\nA ata vai para "' + nome + '".')) return;
+  try{
+    await definirEtapaAta(id, destino);
+    toast('Avaliação encerrada — ata movida para "' + nome + '".');
+    await funilCarregar();
+  }catch(err){ alert('Não foi possível encerrar a avaliação: ' + err.message); }
 }
 
 async function moverEtapaFunil(tipo, id, novaEtapa){
