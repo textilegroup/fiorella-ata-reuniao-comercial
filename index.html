@@ -789,6 +789,10 @@ html[data-theme=dark] .nav-card{
   border-color:var(--fi-line,var(--cinza-borda,#46535f));
 }
 html[data-theme=dark] .nav-card:hover{background:var(--fi-surface-alt,#2a343e);}
+.mini-tab .linha-ref td{background:#F7F7F9;border-bottom:0;padding:5px 8px;}
+.mini-tab .linha-ref .ref{margin:0;gap:5px;}
+.mini-tab .linha-ref .ref span{font-size:10px;padding:2px 7px;}
+html[data-theme=dark] .mini-tab .linha-ref td{background:rgba(255,255,255,.04);}
 html[data-theme=dark] .btn-cinza{background:#4A545C;color:#EEF2F5;border:1px solid #4A545C;}
 html[data-theme=dark] .btn-cinza:hover:not(:disabled){background:#5A656E;border-color:#5A656E;color:#fff;}
 html[data-theme=dark] .reg-nav{
@@ -1664,6 +1668,44 @@ function fmtNum(v){
   return n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
+/* Variação entre a maior média do triênio e a média atual, em texto.
+   Sem setas unicode: o helvetica do PDF não as imprime. */
+function varRef(ref){
+  if(!ref) return '';
+  const nt = Number(ref.trienio), na = Number(ref.atual);
+  if(!isFinite(nt) || nt <= 0 || !isFinite(na) || ref.atual === '' || ref.atual === null) return '';
+  const v = (na / nt - 1) * 100;
+  return (v < 0 ? '-' : '+') + Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%';
+}
+function refTemDados(ref){
+  if(!ref) return false;
+  return !!(ref.regiao || ref.vendedor || fmtNum(ref.trienio) || fmtNum(ref.atual));
+}
+/* Uma linha só — para o resumo em texto. */
+function textoRef(ref){
+  if(!refTemDados(ref)) return '';
+  const p = [];
+  if(ref.regiao)   p.push('Região ' + ref.regiao);
+  if(ref.vendedor) p.push('Vendedor ' + ref.vendedor);
+  const t = fmtNum(ref.trienio), a = fmtNum(ref.atual), v = varRef(ref);
+  if(t) p.push('Maior média triênio ' + t);
+  if(a) p.push('Média atual ' + a);
+  if(v) p.push('Variação ' + v);
+  return p.join(' · ');
+}
+/* Linhas empilhadas — para a célula do PDF e do resumo em tela. */
+function linhasRef(ref){
+  if(!refTemDados(ref)) return [];
+  const L = [];
+  if(ref.regiao)   L.push('Região ' + ref.regiao);
+  if(ref.vendedor) L.push('Vendedor ' + ref.vendedor);
+  const t = fmtNum(ref.trienio), a = fmtNum(ref.atual), v = varRef(ref);
+  if(t) L.push('Triênio ' + t);
+  if(a) L.push('Atual ' + a);
+  if(v) L.push('Variação ' + v);
+  return L;
+}
+
 function htmlRef(ref){
   if(!ref) return '';
   const partes = [];
@@ -2250,7 +2292,7 @@ function gerarModelo(rotulo){
     [''],
     ['As colunas são localizadas pelo NOME do cabeçalho, em qualquer ordem.'],
     ['Colunas extras do seu relatório podem permanecer no arquivo — são ignoradas.'],
-    ['VENDEDOR, REGIAO e as médias aparecem no formulário como apoio à conversa e não entram na ata em PDF.']
+    ['VENDEDOR, REGIAO e as médias aparecem no formulário e também saem na ata em PDF e no resumo.']
   ]);
   wsInfo['!cols'] = [{wch:24},{wch:60},{wch:14}];
   XLSX.utils.book_append_sheet(wb, wsInfo, 'INSTRUCOES');
@@ -2761,31 +2803,49 @@ function construirPDF(d, numero, comSupervisao){
       doc.text('Sem registros nesta reunião.', 14, y); doc.setTextColor(...PRETO); y += 8;
       return;
     }
-    let head, body, cols;
+    let head, body, cols, temFaixaRef = false;
     const sup = !!comSupervisao;
     if(comApoio){
       head = [['CÓDIGO','EMPRESA','TIPO DE APOIO','DESCRIÇÃO']];
       body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.tipoApoio||'—', r.texto||'—']);
       cols = {0:{cellWidth:22}, 1:{cellWidth:42}, 2:{cellWidth:32}};
-    } else if(comDocs){
-      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[]).concat(['DOCUMENTOS'])];
-      body = lista.map(r=>{
-        const x = nomesDocs(r);
-        return [r.codigo||'—', r.empresa||'—', r.texto||'—']
-          .concat(sup?[r.supervisao||'—']:[])
-          .concat([x.length? x.join('\n') : '—']);
-      });
-      cols = sup ? {0:{cellWidth:17}, 1:{cellWidth:33}, 4:{cellWidth:25}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
     } else {
-      head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[])];
-      body = lista.map(r=>[r.codigo||'—', r.empresa||'—', r.texto||'—'].concat(sup?[r.supervisao||'—']:[]));
-      cols = sup ? {0:{cellWidth:18}, 1:{cellWidth:38}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
+      /* Os números do relatório não ganham coluna: entram como uma faixa de uma
+         linha só, no topo de cada cliente, atravessando a tabela inteira. */
+      const nCols = 3 + (sup?1:0) + (comDocs?1:0);
+      const faixa = r => {
+        const t = textoRef(r.ref);
+        return t ? [[{ content:t, colSpan:nCols,
+                       styles:{ fontSize:7.2, fontStyle:'bold', textColor:CINZA,
+                                fillColor:[244,244,246], cellPadding:{top:1.4,bottom:1.4,left:2,right:2} } }]] : [];
+      };
+      if(comDocs){
+        head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[]).concat(['DOCUMENTOS'])];
+        body = [];
+        lista.forEach(r=>{
+          const x = nomesDocs(r);
+          body = body.concat(faixa(r));
+          body.push([r.codigo||'—', r.empresa||'—', r.texto||'—']
+            .concat(sup?[r.supervisao||'—']:[])
+            .concat([x.length? x.join('\n') : '—']));
+        });
+        cols = sup ? {0:{cellWidth:19}, 1:{cellWidth:33}, 4:{cellWidth:24}} : {0:{cellWidth:22}, 1:{cellWidth:48}, 3:{cellWidth:26}};
+      } else {
+        head = [['CÓDIGO','EMPRESA','REGISTRO EM ATA (INFORMAÇÃO PÚBLICA)'].concat(sup?['REGISTRO SUPERVISÃO (INFORMAÇÃO APENAS P/ SUPERVISÃO)']:[])];
+        body = [];
+        lista.forEach(r=>{
+          body = body.concat(faixa(r));
+          body.push([r.codigo||'—', r.empresa||'—', r.texto||'—'].concat(sup?[r.supervisao||'—']:[]));
+        });
+        cols = sup ? {0:{cellWidth:19}, 1:{cellWidth:38}} : {0:{cellWidth:22}, 1:{cellWidth:48}};
+      }
+      temFaixaRef = lista.some(r => refTemDados(r.ref));
     }
     doc.autoTable({
       startY:y, theme:'grid', head, body,
       headStyles:{fillColor:VERMELHO, textColor:[255,255,255], fontSize:7.5},
       styles:{fontSize:8.5, cellPadding:2, valign:'top', lineColor:BORDA, textColor:PRETO},
-      alternateRowStyles:{fillColor:[253,242,244]},
+      alternateRowStyles: temFaixaRef ? {} : {fillColor:[253,242,244]},
       columnStyles:cols,
       margin:{left:14, right:14}
     });
@@ -3265,7 +3325,11 @@ function montarResumoAta(d, dataFmt, numero){
     L.push('— ' + titulo + ' —');
     if(nada[slug]) L.push('Nada a registrar — confirmado pelo vendedor.');
     else if(!lista || !lista.length) L.push('Sem registros.');
-    else lista.forEach(r=>L.push('• ' + (r.codigo||'s/ código') + ' | ' + (r.empresa||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—')));
+    else lista.forEach(r=>{
+      L.push('• ' + (r.codigo||'s/ código') + ' | ' + (r.empresa||'s/ nome') + (r.tipoApoio? ' | '+r.tipoApoio:'') + ' | ' + (r.texto||'—'));
+      const rf = textoRef(r.ref);
+      if(rf) L.push('    ' + rf);
+    });
     L.push('');
   }
   function blocoObs(slug, titulo, texto){
@@ -3708,6 +3772,15 @@ async function admVer(id){
     document.getElementById('modalBtnPlano').onclick = ()=>admBaixarPlano(id);
     document.getElementById('modalBtnEditar').onclick = ()=>{ fecharModal(); admEditar(id); };
 
+    // os dados do relatório ficam no jsonb da ata; aqui são indexados pelo código da empresa
+    const refsPorCodigo = {};
+    ['risco','perdidos','semContato','oportunidades','chamados'].forEach(k=>{
+      (d[k]||[]).forEach(r=>{
+        if(r && r.codigo && refTemDados(r.ref)) refsPorCodigo[String(r.codigo).trim().toUpperCase()] = r.ref;
+      });
+    });
+    const refDo = cod => refsPorCodigo[String(cod==null?'':cod).trim().toUpperCase()] || null;
+
     let html = '';
     SECOES_DET.forEach(([sec, slug, rot])=>{
       html += '<div class="bloco-sec"><h4>'+rot+'</h4>';
@@ -3717,10 +3790,14 @@ async function admVer(id){
       if(!itens.length){ html += '<div class="sem">Sem registros.</div>'; }
       else{
         const temSup = itens.some(i => (i.supervisao||'').trim());
+        const nCols = 3 + (temSup?1:0);
         html += '<table class="mini-tab"><thead><tr><th style="width:80px">Código</th><th style="width:180px">Empresa</th>'+
                 '<th>Registro em ata (informação pública)</th>'+
                 (temSup?'<th>Registro supervisão (informação apenas p/ supervisão)</th>':'')+'</tr></thead><tbody>';
         itens.forEach(i=>{
+          const rf = refDo(i.codigo);
+          // faixa de uma linha só, no topo do cliente, atravessando a tabela
+          if(rf) html += '<tr class="linha-ref"><td colspan="'+nCols+'">'+htmlRef(rf)+'</td></tr>';
           html += '<tr><td>'+esc(i.codigo||'—')+'</td><td>'+esc(i.empresa||'—')+'</td>'+
                   '<td>'+esc(i.texto||'—')+'</td>'+
                   (temSup?'<td style="background:#FFFCFC">'+esc(i.supervisao||'—')+'</td>':'')+'</tr>';
