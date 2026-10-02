@@ -717,6 +717,61 @@ html[data-theme=dark] .btn-claro:hover,html[data-theme=dark] .btn-preto:hover,ht
 }
 html[data-theme=dark] .btn-vermelho{background:#e7ebee!important;border-color:#e7ebee!important;color:#18212a!important;}
 html[data-theme=dark] .btn-vermelho:hover:not(:disabled){background:#fff!important;border-color:#fff!important;color:#18212a!important;}
+/* ═════════ PENDÊNCIA DA ETAPA · LIBERAR REUNIÃO · NAVEGAÇÃO ENTRE BLOCOS ═════════ */
+:root{ --destaque-pend:#B4530A; --destaque-pend-forte:#8F410A; }
+.pendencia{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--destaque-pend);color:#fff;
+  font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+  padding:5px 12px;border-radius:999px;border:1px solid rgba(0,0,0,.08);
+  line-height:1.3;white-space:normal;box-shadow:0 1px 3px rgba(180,83,10,.35);
+}
+.pendencia .pct{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.95;flex:none;}
+.pendencia.neutra{background:#62696D;box-shadow:none;}
+.pendencia.ok{background:var(--verde,#1E7A3C);box-shadow:none;}
+.btn-pendencia{background:var(--destaque-pend)!important;border:1px solid var(--destaque-pend)!important;color:#fff!important;}
+.btn-pendencia:hover:not(:disabled){background:var(--destaque-pend-forte)!important;border-color:var(--destaque-pend-forte)!important;color:#fff!important;}
+
+/* pé de cada bloco: andar um bloco por vez */
+.card-nav{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:9px 14px;border-top:1px dashed var(--cinza-borda);background:#FCFCFD;
+}
+.card-nav .rot{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--cinza-texto);margin-right:auto;}
+.nav-card{
+  display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  background:#fff;border:1px solid var(--cinza-borda);color:var(--preto);
+  border-radius:8px;padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.2px;
+}
+.nav-card:hover{background:#EEF0F0;border-color:#BCC2C5;}
+.nav-card svg{width:17px;height:17px;flex:none;}
+.nav-card:disabled{opacity:.32;cursor:default;}
+.realce-card{box-shadow:0 0 0 3px rgba(180,83,10,.35)!important;}
+html[data-theme=dark] .card-nav{background:rgba(255,255,255,.04);}
+html[data-theme=dark] .nav-card{background:transparent;color:var(--preto);}
+
+/* flutuante: primeiro / último bloco */
+.flutua-nav{position:fixed;right:18px;bottom:18px;z-index:60;display:none;flex-direction:column;gap:8px;}
+.flutua-nav.mostrar{display:flex;}
+.flutua-nav button{
+  display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  background:#252A2E;color:#fff;border:0;border-radius:999px;min-width:98px;
+  padding:9px 15px;font-size:11px;font-weight:800;letter-spacing:1.4px;
+  box-shadow:0 6px 18px rgba(0,0,0,.24);
+}
+.flutua-nav button:hover{background:#3A4146;}
+.ct-esq{flex-wrap:wrap;}
+#funilAbaForm{padding-bottom:90px;}
+.flutua-nav svg{width:15px;height:15px;flex:none;}
+html[data-theme=dark] .flutua-nav button{background:#E7EBEE;color:#18212A;}
+@media(max-width:700px){
+  .flutua-nav{right:10px;bottom:10px;gap:6px;flex-direction:row;}
+  .flutua-nav button{padding:7px 11px;font-size:10px;min-width:0;letter-spacing:1px;opacity:.94;}
+  .pendencia{font-size:9.5px;padding:4px 10px;letter-spacing:.4px;}
+  .card-nav{padding:9px 12px;}
+  .card-nav .rot{display:none;}
+  .nav-card{flex:1 1 0;justify-content:center;}
+}
 </style>
 <script>
 function aplicarTema(escuro){document.documentElement.dataset.theme=escuro?'dark':'light'; const b=document.getElementById('btnTema'); if(b){b.textContent=escuro?'Modo claro':'Modo escuro';b.setAttribute('aria-pressed',String(escuro));}}
@@ -759,7 +814,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
     <div class="funil-abas">
       <button type="button" class="aba ativa" id="funilAbaBtnBoard" onclick="funilAba('board')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="7" rx="1.5"/></svg></span>Funil</button>
       <button type="button" class="aba" id="funilAbaBtnCal" onclick="funilAba('calendario')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg></span>Calendário</button>
-      <button type="button" class="aba" id="funilAbaBtnForm" onclick="funilAba('form')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9z"/><path d="M14 3v6h5M12 12v5M9.5 14.5h5"/></svg></span>Nova reunião</button>
+      <button type="button" class="aba" id="funilAbaBtnForm" onclick="novaReuniaoAba()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9z"/><path d="M14 3v6h5M12 12v5M9.5 14.5h5"/></svg></span>Nova reunião</button>
     </div>
 
     <div id="funilAbaCalendario">
@@ -799,7 +854,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
 <!-- ═══════════ DADOS DA REUNIÃO ═══════════ -->
 <div class="card recolhivel aberto" id="sec0">
   <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>DADOS DA REUNIÃO</span>
+    <span class="ct-esq"><span class="dot"></span>DADOS DA REUNIÃO<span class="pendencia" id="pendEtapa"><span class="pct"></span><b id="pendTexto">AGUARDANDO DADOS PARA REUNIÃO</b></span></span>
     <span class="ct-dir">
       <span class="status">OBRIGATÓRIO</span>
       <button type="button" class="btn-toggle" onclick="toggleSecao('sec0',this)">RECOLHER</button>
@@ -1109,6 +1164,10 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">GERAR ATA SUPERVISÃO</button>
   <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">GERAR ATA VENDEDOR</button>
   <button type="button" class="btn btn-claro btn-grande" id="btnGerarPlano" onclick="gerarPlanoAcaoForm()" style="display:none">GERAR ATA DO PLANO DE AÇÃO</button>
+</div>
+<div class="acoes-finais">
+  <button type="button" class="btn btn-pendencia btn-grande" id="btnLiberarReuniao"
+          onclick="liberarReuniao()">LIBERAR REUNIÃO</button>
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-verde btn-grande" id="btnEncerrarReuniao" style="display:none"
@@ -1434,6 +1493,7 @@ function aplicarVisibilidade(){
   const temOrient = GRUPO_ORIENTACOES.some(s => visibilidade[s]);
   document.getElementById('sepOrientacoes').style.display = temOrient ? '' : 'none';
   atualizarTodosStatus();
+  if(typeof atualizarNavBlocos === 'function') atualizarNavBlocos();
 }
 
 /* ═══════════════════ CONTROLE DE PREENCHIMENTO ═══════════════════ */
@@ -2485,6 +2545,11 @@ function entrarModoEdicao(id, numero, finalizada, criadoEm){
   setTimeout(atualizarChavesEliminar, 0);
   editandoId = id;
   editandoNumero = numero;
+  ataFinalizadaAtual = finalizada !== false;
+  const noFunil = (typeof funilCards !== 'undefined' ? funilCards : [])
+                    .find(x => x.tipo === 'ata' && x.id === id);
+  etapaAtual = noFunil ? noFunil.etapa : null;
+  setTimeout(atualizarPendencia, 0);
   document.getElementById('barraEdicao').style.display = '';
   document.getElementById('btnGerarPlano').style.display = '';
   document.getElementById('edNumero').textContent = String(numero).padStart(4,'0');
@@ -3009,6 +3074,133 @@ async function gerarAtaPDF(comSupervisao){
   const btnEnc = document.getElementById('btnEncerrarReuniao');
   if(btnEnc && editandoId) btnEnc.style.display = '';
   btn.disabled = false;
+}
+
+/* ═══════════════════ PENDÊNCIA DA ETAPA ═══════════════════
+   O selo ao lado de "Dados da reunião" diz, em destaque, o que falta
+   nesta etapa. O botão LIBERAR REUNIÃO usa a mesma cor do selo. */
+let etapaAtual = null;          // etapa do card no funil, quando a ata já existe
+let ataFinalizadaAtual = false;
+
+const PENDENCIAS = {
+  nova:         { txt:'AGUARDANDO DADOS PARA REUNIÃO',        cls:'' },
+  preparada:    { txt:'AGUARDANDO LIBERAÇÃO DA REUNIÃO',      cls:'' },
+  agenda:       { txt:'REUNIÃO LIBERADA — AGUARDANDO REALIZAÇÃO', cls:'' },
+  realizada:    { txt:'AGUARDANDO AVALIAÇÃO',                  cls:'' },
+  em_andamento: { txt:'AG. EXECUÇÃO DE PLANO DE AÇÃO',         cls:'' },
+  arquivo:      { txt:'ATA ARQUIVADA',                         cls:'neutra' }
+};
+
+function atualizarPendencia(){
+  const selo = document.getElementById('pendEtapa');
+  const txt  = document.getElementById('pendTexto');
+  if(!selo || !txt) return;
+  let k = 'nova';
+  if(editandoId){
+    if(etapaAtual && PENDENCIAS[etapaAtual]) k = etapaAtual;
+    else k = ataFinalizadaAtual ? 'realizada' : 'preparada';
+  }
+  const p = PENDENCIAS[k] || PENDENCIAS.nova;
+  txt.textContent = p.txt;
+  selo.className = 'pendencia' + (p.cls ? ' ' + p.cls : '');
+  // liberar só faz sentido enquanto a reunião ainda não foi para "Reuniões agendadas"
+  const b = document.getElementById('btnLiberarReuniao');
+  if(b) b.style.display = (k === 'nova' || k === 'preparada') ? '' : 'none';
+}
+
+/* Etapa 0 → 1: a reunião é liberada e o card entra em "Reuniões agendadas" */
+async function liberarReuniao(){
+  const btn = document.getElementById('btnLiberarReuniao');
+  if(!document.getElementById('dataReuniao').value || !document.getElementById('vendedorNome').value.trim()){
+    alert('Informe a data da reunião e o nome do vendedor antes de liberar.');
+    return;
+  }
+  if(!confirm('Liberar esta reunião?\n\nO card vai para "Reuniões agendadas" e a reunião fica pronta para ser realizada.')) return;
+  btn.disabled = true;
+  try{
+    const r = await salvarAta(false);
+    if(!r){ btn.disabled = false; return; }
+    if(!editandoId) entrarModoEdicao(r.id, r.numero, false, new Date().toISOString());
+    await definirEtapaAta(r.id, 'agenda');
+    etapaAtual = 'agenda';
+    ataFinalizadaAtual = false;
+    atualizarPendencia();
+    const info = document.getElementById('edInfo');
+    if(info) info.textContent = 'Reunião liberada — o card está em "Reuniões agendadas".';
+    await funilCarregar();
+    toast('Reunião nº ' + String(r.numero).padStart(4,'0') + ' liberada — card em "Reuniões agendadas".');
+  }catch(err){
+    alert('Não foi possível liberar a reunião:\n\n' + err.message);
+  }
+  btn.disabled = false;
+}
+
+/* A guia "Nova reunião" sempre abre um card novo, em branco */
+function novaReuniaoAba(){
+  if(editandoId){
+    const n = editandoNumero ? ' nº ' + String(editandoNumero).padStart(4,'0') : '';
+    if(!confirm('Abrir uma reunião nova?\n\nA ata' + n + ' que está na tela será fechada e o que não tiver sido salvo será perdido.')) return;
+    location.hash = 'form';
+    location.reload();
+    return;
+  }
+  funilAba('form');
+  atualizarPendencia();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ═══════════════════ NAVEGAÇÃO ENTRE OS BLOCOS DO FORMULÁRIO ═══════════════════ */
+const ICO_BLOCO_CIMA  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="13.5" width="17" height="7" rx="2"/><path d="M12 10.5V3.5"/><path d="M8.6 6.9 12 3.5l3.4 3.4"/></svg>';
+const ICO_BLOCO_BAIXO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="7" rx="2"/><path d="M12 13.5v7"/><path d="M8.6 17.1 12 20.5l3.4-3.4"/></svg>';
+
+function blocosVisiveis(){
+  return Array.from(document.querySelectorAll('#funilAbaForm .card'))
+              .filter(c => c.offsetParent !== null);
+}
+function irParaBloco(el){
+  if(!el) return;
+  const y = el.getBoundingClientRect().top + window.pageYOffset - 72;
+  window.scrollTo({ top: Math.max(0, y), behavior:'smooth' });
+  el.classList.add('realce-card');
+  clearTimeout(el._realce);
+  el._realce = setTimeout(()=>el.classList.remove('realce-card'), 1300);
+}
+function navBloco(btn, passo){
+  const atual = btn.closest('.card');
+  const lista = blocosVisiveis();
+  const i = lista.indexOf(atual);
+  if(i < 0) return;
+  irParaBloco(lista[i + passo]);
+}
+function navExtremo(qual){
+  const lista = blocosVisiveis();
+  if(!lista.length) return;
+  irParaBloco(qual === 'primeiro' ? lista[0] : lista[lista.length - 1]);
+}
+function montarNavBlocos(){
+  document.querySelectorAll('#funilAbaForm .card').forEach(c=>{
+    if(c.querySelector('.card-nav')) return;
+    const nav = document.createElement('div');
+    nav.className = 'card-nav';
+    nav.innerHTML =
+      '<span class="rot">Andar um bloco</span>' +
+      '<button type="button" class="nav-card" onclick="navBloco(this,-1)" title="Subir um bloco">' +
+        ICO_BLOCO_CIMA + 'Bloco acima</button>' +
+      '<button type="button" class="nav-card" onclick="navBloco(this,1)" title="Descer um bloco">' +
+        ICO_BLOCO_BAIXO + 'Bloco abaixo</button>';
+    c.appendChild(nav);
+    atualizarNavBlocos();
+  });
+}
+function atualizarNavBlocos(){
+  const lista = blocosVisiveis();
+  lista.forEach((c, i)=>{
+    const bs = c.querySelectorAll('.card-nav .nav-card');
+    if(bs.length === 2){
+      bs[0].disabled = (i === 0);
+      bs[1].disabled = (i === lista.length - 1);
+    }
+  });
 }
 
 function toast(msg){
@@ -3648,6 +3840,9 @@ function funilAba(qual){
   document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', qual === 'board');
   document.getElementById('funilAbaBtnCal').classList.toggle('ativa', qual === 'calendario');
   document.getElementById('funilAbaBtnForm').classList.toggle('ativa', qual === 'form');
+  const fl = document.getElementById('flutuaNav');
+  if(fl) fl.classList.toggle('mostrar', qual === 'form');
+  if(qual === 'form'){ montarNavBlocos(); atualizarNavBlocos(); atualizarPendencia(); }
   if(qual === 'calendario') calRender();
 }
 
@@ -3777,6 +3972,7 @@ async function encerrarReuniao(id){
     await funilCarregar();
     const b = document.getElementById('btnEncerrarReuniao');
     if(b && editandoId === id) b.style.display = 'none';
+    if(editandoId === id){ etapaAtual = 'realizada'; atualizarPendencia(); }
   }catch(err){ alert('Não foi possível encerrar a reunião: ' + err.message); }
 }
 
@@ -4041,6 +4237,8 @@ async function iniciar(){
   await carregarVisibilidade();
   await carregarExcecoesEGrupos();
   await abrirFunil();
+  montarNavBlocos();
+  atualizarPendencia();
   if(location.hash === '#form') funilAba('form');
   if(location.hash === '#adm' && admLiberado) abrirADM();
 }
@@ -4064,5 +4262,13 @@ document.getElementById('modalConfigFunil').addEventListener('click', function(e
   if(e.target === this) fecharConfigFunil();
 });
 </script>
+<!-- ═══════════ NAVEGAÇÃO FLUTUANTE: PRIMEIRO / ÚLTIMO BLOCO ═══════════ -->
+<div class="flutua-nav" id="flutuaNav" aria-label="Ir para o primeiro ou o último bloco">
+  <button type="button" onclick="navExtremo('primeiro')" title="Ir para o primeiro bloco do formulário">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg>UP</button>
+  <button type="button" onclick="navExtremo('ultimo')" title="Ir para o último bloco do formulário">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M19 13l-7 7-7-7"/></svg>DOWN</button>
+</div>
+
 </body>
 </html>
