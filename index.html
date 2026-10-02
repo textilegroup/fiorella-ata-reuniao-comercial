@@ -732,12 +732,13 @@ html[data-theme=dark] .btn-vermelho:hover:not(:disabled){background:#fff!importa
 .btn-pendencia{background:var(--destaque-pend)!important;border:1px solid var(--destaque-pend)!important;color:#fff!important;}
 .btn-pendencia:hover:not(:disabled){background:var(--destaque-pend-forte)!important;border-color:var(--destaque-pend-forte)!important;color:#fff!important;}
 
-/* pé de cada bloco: andar um bloco por vez */
-.card-nav{
+/* pé de cada cliente: separa um do outro e leva ao próximo */
+.reg-nav{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  padding:9px 14px;border-top:1px dashed var(--cinza-borda);background:#FCFCFD;
+  margin:16px -18px -18px;padding:10px 18px;
+  border-top:2px solid var(--cinza-borda);border-radius:0 0 9px 9px;background:#FCFCFD;
 }
-.card-nav .rot{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--cinza-texto);margin-right:auto;}
+.reg-nav .rot{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--cinza-texto);margin-right:auto;}
 .nav-card{
   display:inline-flex;align-items:center;gap:7px;cursor:pointer;
   background:#fff;border:1px solid var(--cinza-borda);color:var(--preto);
@@ -747,7 +748,7 @@ html[data-theme=dark] .btn-vermelho:hover:not(:disabled){background:#fff!importa
 .nav-card svg{width:17px;height:17px;flex:none;}
 .nav-card:disabled{opacity:.32;cursor:default;}
 .realce-card{box-shadow:0 0 0 3px rgba(180,83,10,.35)!important;}
-html[data-theme=dark] .card-nav{background:rgba(255,255,255,.04);}
+html[data-theme=dark] .reg-nav{background:rgba(255,255,255,.04);}
 html[data-theme=dark] .nav-card{background:transparent;color:var(--preto);}
 
 /* flutuante: primeiro / último bloco */
@@ -764,12 +765,43 @@ html[data-theme=dark] .nav-card{background:transparent;color:var(--preto);}
 #funilAbaForm{padding-bottom:90px;}
 .flutua-nav svg{width:15px;height:15px;flex:none;}
 html[data-theme=dark] .flutua-nav button{background:#E7EBEE;color:#18212A;}
+/* modo escuro: as colunas "agendadas" e "arquivo" tinham fundo branco fixo
+   com especificidade maior que a regra do tema — aqui elas voltam ao escuro. */
+html[data-theme=dark] .funil-col .funil-card,
+html[data-theme=dark] .funil-col.col-agenda .funil-card,
+html[data-theme=dark] .funil-col.col-arquivo .funil-card{
+  background:var(--fi-surface,var(--surface,#222a32));
+  border-color:var(--fi-line,var(--cinza-borda,#46535f));
+  color:var(--fi-text,var(--preto,#edf1f4));
+}
+html[data-theme=dark] .funil-col .funil-card .data{color:var(--fi-text,var(--preto,#edf1f4));}
+html[data-theme=dark] .funil-col .funil-card .vend,
+html[data-theme=dark] .funil-col .funil-card .num{color:var(--fi-muted,var(--cinza-texto,#bbc5ce));}
+html[data-theme=dark] .funil-col .funil-card .adm-ctl{border-top-color:var(--fi-line,var(--cinza-borda,#46535f));}
+html[data-theme=dark] .funil-col .funil-card .adm-ctl button{
+  color:var(--fi-text,var(--preto,#edf1f4));
+  border-color:var(--fi-line,var(--cinza-borda,#46535f));
+  background:transparent;
+}
+html[data-theme=dark] .funil-col .funil-card .adm-ctl button:hover{background:var(--fi-surface-alt,#2a343e);}
+html[data-theme=dark] .nav-card{
+  background:transparent;color:var(--fi-text,var(--preto,#edf1f4));
+  border-color:var(--fi-line,var(--cinza-borda,#46535f));
+}
+html[data-theme=dark] .nav-card:hover{background:var(--fi-surface-alt,#2a343e);}
+html[data-theme=dark] .btn-cinza{background:#4A545C;color:#EEF2F5;border:1px solid #4A545C;}
+html[data-theme=dark] .btn-cinza:hover:not(:disabled){background:#5A656E;border-color:#5A656E;color:#fff;}
+html[data-theme=dark] .reg-nav{
+  background:rgba(255,255,255,.045);
+  border-top-color:var(--fi-line,var(--cinza-borda,#46535f));
+}
+
 @media(max-width:700px){
   .flutua-nav{right:10px;bottom:10px;gap:6px;flex-direction:row;}
   .flutua-nav button{padding:7px 11px;font-size:10px;min-width:0;letter-spacing:1px;opacity:.94;}
   .pendencia{font-size:9.5px;padding:4px 10px;letter-spacing:.4px;}
-  .card-nav{padding:9px 12px;}
-  .card-nav .rot{display:none;}
+  .reg-nav{padding:10px 14px;margin:14px -18px -18px;}
+  .reg-nav .rot{display:none;}
   .nav-card{flex:1 1 0;justify-content:center;}
 }
 </style>
@@ -1501,7 +1533,6 @@ function aplicarVisibilidade(){
   const temOrient = GRUPO_ORIENTACOES.some(s => visibilidade[s]);
   document.getElementById('sepOrientacoes').style.display = temOrient ? '' : 'none';
   atualizarTodosStatus();
-  if(typeof atualizarNavBlocos === 'function') atualizarNavBlocos();
 }
 
 /* ═══════════════════ CONTROLE DE PREENCHIMENTO ═══════════════════ */
@@ -2148,7 +2179,11 @@ function addRegistroEmpresa(containerId, tipo, dados){
       <ul class="lista-arquivos" id="${docsId}"></ul>
     </div>` : ''}
     ${blocoPlanoAcao(dados)}
-    ${blocoEliminar(dados)}`;
+    ${blocoEliminar(dados)}
+    ${tipo==='risco' ? `<div class="reg-nav">
+      <span class="rot">Fim deste cliente</span>
+      <button type="button" class="nav-card" onclick="irClienteAbaixo(this)" title="Ir para o próximo cliente da lista">${ICO_BLOCO_BAIXO}Cliente abaixo</button>
+    </div>` : ''}`;
   document.getElementById(containerId).appendChild(div);
   if(dados.grupo) div.dataset.grupo = JSON.stringify(dados.grupo);
   if(dados.eliminado) div.classList.add('eliminado');
@@ -3167,7 +3202,6 @@ async function novaReuniaoAba(){
 }
 
 /* ═══════════════════ NAVEGAÇÃO ENTRE OS BLOCOS DO FORMULÁRIO ═══════════════════ */
-const ICO_BLOCO_CIMA  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="13.5" width="17" height="7" rx="2"/><path d="M12 10.5V3.5"/><path d="M8.6 6.9 12 3.5l3.4 3.4"/></svg>';
 const ICO_BLOCO_BAIXO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="7" rx="2"/><path d="M12 13.5v7"/><path d="M8.6 17.1 12 20.5l3.4-3.4"/></svg>';
 
 function blocosVisiveis(){
@@ -3182,42 +3216,23 @@ function irParaBloco(el){
   clearTimeout(el._realce);
   el._realce = setTimeout(()=>el.classList.remove('realce-card'), 1300);
 }
-function navBloco(btn, passo){
-  const atual = btn.closest('.card');
-  const lista = blocosVisiveis();
-  const i = lista.indexOf(atual);
-  if(i < 0) return;
-  irParaBloco(lista[i + passo]);
-}
 function navExtremo(qual){
   const lista = blocosVisiveis();
   if(!lista.length) return;
   irParaBloco(qual === 'primeiro' ? lista[0] : lista[lista.length - 1]);
 }
-function montarNavBlocos(){
-  document.querySelectorAll('#funilAbaForm .card').forEach(c=>{
-    if(c.querySelector('.card-nav')) return;
-    const nav = document.createElement('div');
-    nav.className = 'card-nav';
-    nav.innerHTML =
-      '<span class="rot">Andar um bloco</span>' +
-      '<button type="button" class="nav-card" onclick="navBloco(this,-1)" title="Subir um bloco">' +
-        ICO_BLOCO_CIMA + 'Bloco acima</button>' +
-      '<button type="button" class="nav-card" onclick="navBloco(this,1)" title="Descer um bloco">' +
-        ICO_BLOCO_BAIXO + 'Bloco abaixo</button>';
-    c.appendChild(nav);
-    atualizarNavBlocos();
-  });
-}
-function atualizarNavBlocos(){
-  const lista = blocosVisiveis();
-  lista.forEach((c, i)=>{
-    const bs = c.querySelectorAll('.card-nav .nav-card');
-    if(bs.length === 2){
-      bs[0].disabled = (i === 0);
-      bs[1].disabled = (i === lista.length - 1);
-    }
-  });
+/* Navegação cliente a cliente, dentro da lista de clientes em risco. */
+function irClienteAbaixo(btn){
+  const atual = btn.closest('.registro');
+  if(!atual) return;
+  let prox = atual.nextElementSibling;
+  while(prox && !prox.classList.contains('registro')) prox = prox.nextElementSibling;
+  if(!prox){ toast('Este é o último cliente da lista.'); return; }
+  const y = prox.getBoundingClientRect().top + window.pageYOffset - 72;
+  window.scrollTo({ top: Math.max(0, y), behavior:'smooth' });
+  prox.classList.add('realce-card');
+  clearTimeout(prox._realce);
+  prox._realce = setTimeout(()=>prox.classList.remove('realce-card'), 1300);
 }
 
 function toast(msg){
@@ -3859,7 +3874,8 @@ let agendaOrigemId = null;   // id do agendamento em curso, ligado à próxima a
 let calAno, calMes;          // mês em exibição no calendário (0-based)
 
 async function abrirFunil(){
-  document.getElementById('btnAgendarReuniao').style.display = admLiberado ? '' : 'none';
+  // o agendamento passou a ser feito pela guia "Nova reunião"
+  document.getElementById('btnAgendarReuniao').style.display = 'none';
   document.getElementById('btnConfigFunil').style.display = 'none';   // arquivamento agora é só por botão
   const hoje = new Date();
   if(calAno === undefined){ calAno = hoje.getFullYear(); calMes = hoje.getMonth(); }
@@ -3875,7 +3891,7 @@ function funilAba(qual){
   document.getElementById('funilAbaBtnForm').classList.toggle('ativa', qual === 'form');
   const fl = document.getElementById('flutuaNav');
   if(fl) fl.classList.toggle('mostrar', qual === 'form');
-  if(qual === 'form'){ montarNavBlocos(); atualizarNavBlocos(); atualizarPendencia(); }
+  if(qual === 'form'){ atualizarPendencia(); }
   if(qual === 'calendario') calRender();
 }
 
@@ -3944,25 +3960,24 @@ function funilMontarCard(c, idxEtapa){
        agenda    → "Encerrar reunião"      vai para "aguardando avaliação";
        realizada → "Ir para plano de ação" ou "Arquivar", escolha do usuário. */
   if(c.tipo === 'ata' && admLiberado){
-    const botoes = [];
+    let bt = null;
     if(c.etapa === 'agenda')
-      botoes.push(['Encerrar reunião', 'btn-vermelho', 'realizada', 'realizada']);
-    else if(c.etapa === 'realizada'){
-      botoes.push(['Ir para plano de ação', 'btn-verde', 'em_andamento', 'plano']);
-      botoes.push(['Arquivar', 'btn-cinza', 'arquivo', 'arquivo']);
-    }
+      bt = ['Encerrar reunião', 'btn-vermelho', 'realizada', 'realizada'];
+    else if(c.etapa === 'realizada')
+      bt = ['Finalizar avaliação', 'btn-verde', null, 'plano'];           // destino decidido pelos planos abertos
     else if(c.etapa === 'em_andamento')
-      botoes.push(['Arquivar', 'btn-cinza', 'arquivo', 'arquivo']);
-    botoes.forEach(([rot, cls, destino, ico])=>{
+      bt = ['Plano de ação finalizado', 'btn-cinza', 'arquivo', 'arquivo'];
+    if(bt){
+      const [rot, cls, destino, ico] = bt;
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'btn btn-mini ' + cls;
       b.style.marginTop = '7px';
-      b.style.marginRight = '5px';
       b.innerHTML = '<span class="ico">' + (ICONES[ico]||'') + '</span>' + rot;
-      b.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaComAviso(c, destino, rot); };
+      b.onclick = (ev)=>{ ev.stopPropagation();
+        if(destino) moverEtapaComAviso(c, destino, rot); else finalizarAvaliacao(c); };
       div.appendChild(b);
-    });
+    }
   }
 
   if(admLiberado){
@@ -4012,6 +4027,31 @@ async function encerrarReuniao(id){
     if(b && editandoId === id) b.style.display = 'none';
     if(editandoId === id){ etapaAtual = 'realizada'; atualizarPendencia(); }
   }catch(err){ alert('Não foi possível encerrar a reunião: ' + err.message); }
+}
+
+/* Fim da avaliação: havendo plano de ação em aberto a ata segue para a execução;
+   não havendo, vai direto para o arquivo. É a única regra que olha o conteúdo. */
+async function finalizarAvaliacao(c){
+  const nAta = c.numero ? ' nº ' + String(c.numero).padStart(4,'0') : '';
+  let planos = 0;
+  try{
+    const a = await admObter(c.id);
+    planos = contarPlanosPendentes(a && a.dados);
+  }catch(err){
+    alert('Não foi possível ler a ata' + nAta + ' para conferir os planos de ação:\n\n' + err.message);
+    return;
+  }
+  const destino = planos > 0 ? 'em_andamento' : 'arquivo';
+  const et = ETAPAS_FUNIL.find(e => e.slug === destino);
+  const detalhe = planos > 0 ? planos + ' plano(s) de ação em aberto.' : 'Nenhum plano de ação em aberto.';
+  if(!confirm('Finalizar a avaliação da ata' + nAta + '?\n\n' + detalhe +
+              '\nEla vai para "' + (et ? et.titulo : destino) + '".')) return;
+  try{
+    await definirEtapaAta(c.id, destino);
+    await funilCarregar();
+    if(editandoId === c.id){ etapaAtual = destino; atualizarPendencia(); }
+    toast('Avaliação finalizada — ata em "' + (et ? et.titulo : destino) + '".');
+  }catch(err){ alert('Não foi possível mover a ata: ' + err.message); }
 }
 
 /* Movimentação de etapa pelo card — sempre explícita, nunca automática. */
@@ -4256,7 +4296,6 @@ async function iniciar(){
   await carregarVisibilidade();
   await carregarExcecoesEGrupos();
   await abrirFunil();
-  montarNavBlocos();
   atualizarPendencia();
   if(location.hash === '#form') funilAba('form');
   if(location.hash === '#adm' && admLiberado) abrirADM();
