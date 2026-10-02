@@ -824,7 +824,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
         <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
-      <div class="cal-legenda" aria-label="Legenda do calendário"><span><i aria-hidden="true"></i>Agendamento de reunião</span><span><i class="leg-plano" aria-hidden="true"></i>Plano de ação</span><span><i class="leg-ata" aria-hidden="true"></i>Ata de reunião</span></div>
+      <div class="cal-legenda" aria-label="Legenda do calendário"><span><i aria-hidden="true"></i>Agendamento de reunião</span><span><i class="leg-ata" aria-hidden="true"></i>Ata de reunião</span></div>
       <div id="calDiaDetalhe" style="margin-top:16px"></div>
     </div>
 
@@ -865,6 +865,10 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       <div class="col-fixa">
         <label>Data da reunião</label>
         <input type="date" id="dataReuniao" onclick="this.showPicker && this.showPicker()">
+      </div>
+      <div class="col-fixa">
+        <label>Horário</label>
+        <input type="time" id="horaReuniao" value="09:00" onclick="this.showPicker && this.showPicker()">
       </div>
       <div class="col">
         <label>Vendedor</label>
@@ -1350,6 +1354,10 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
         <div class="col-fixa">
           <label>Data</label>
           <input type="date" id="agData" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Horário</label>
+          <input type="time" id="agHora" value="09:00" onclick="this.showPicker && this.showPicker()">
         </div>
         <div class="col">
           <label>Vendedor</label>
@@ -2441,6 +2449,7 @@ function coletarTudo(){
   return {
     concluido: feito,
     dataReuniao: document.getElementById('dataReuniao').value,
+    horaReuniao: document.getElementById('horaReuniao').value,
     vendedorNome: document.getElementById('vendedorNome').value.trim(),
     vendedorCodigo: document.getElementById('vendedorCodigo').value.trim(),
     condutor: document.getElementById('condutor').value.trim(),
@@ -2496,8 +2505,8 @@ function chavePayload(d){
 
 async function salvarAta(finalizar){
   const d = coletarTudo();
-  if(!d.dataReuniao || !d.vendedorNome){
-    alert('Preencha a data da reunião e o nome do vendedor.');
+  if(!d.dataReuniao || !d.horaReuniao || !d.vendedorNome){
+    alert('Preencha a data, o horário da reunião e o nome do vendedor.');
     document.getElementById('sec0').classList.add('aberto');
     return null;
   }
@@ -2582,6 +2591,7 @@ function carregarAtaNoFormulario(a){
   Object.keys(arquivos).forEach(k => delete arquivos[k]);
 
   document.getElementById('dataReuniao').value   = a.data_reuniao || d.dataReuniao || '';
+  document.getElementById('horaReuniao').value   = d.horaReuniao || '';
   document.getElementById('vendedorNome').value  = a.vendedor_nome || d.vendedorNome || '';
   document.getElementById('vendedorCodigo').value= a.vendedor_codigo || d.vendedorCodigo || '';
   document.getElementById('condutor').value      = a.condutor || d.condutor || '';
@@ -3006,7 +3016,7 @@ async function gerarAtaPDF(comSupervisao){
   const btn = document.getElementById(comSupervisao ? 'btnGerar' : 'btnGerarVend');
   const rotuloVersao = comSupervisao ? 'supervisão' : 'vendedor';
 
-  if(!document.getElementById('dataReuniao').value || !document.getElementById('vendedorNome').value.trim()){
+  if(!document.getElementById('dataReuniao').value || !document.getElementById('horaReuniao').value || !document.getElementById('vendedorNome').value.trim()){
     alert('Preencha a data da reunião e o nome do vendedor antes de gerar a ata.');
     document.getElementById('sec0').classList.add('aberto');
     return;
@@ -3111,8 +3121,8 @@ function atualizarPendencia(){
 /* Etapa 0 → 1: a reunião é liberada e o card entra em "Reuniões agendadas" */
 async function liberarReuniao(){
   const btn = document.getElementById('btnLiberarReuniao');
-  if(!document.getElementById('dataReuniao').value || !document.getElementById('vendedorNome').value.trim()){
-    alert('Informe a data da reunião e o nome do vendedor antes de liberar.');
+  if(!document.getElementById('dataReuniao').value || !document.getElementById('horaReuniao').value || !document.getElementById('vendedorNome').value.trim()){
+    alert('Informe a data, o horário da reunião e o nome do vendedor antes de liberar.');
     return;
   }
   if(!confirm('Liberar esta reunião?\n\nO card vai para "Reuniões agendadas" e a reunião fica pronta para ser realizada.')) return;
@@ -3136,10 +3146,17 @@ async function liberarReuniao(){
 }
 
 /* A guia "Nova reunião" sempre abre um card novo, em branco */
-function novaReuniaoAba(){
+async function novaReuniaoAba(){
   if(editandoId){
     const n = editandoNumero ? ' nº ' + String(editandoNumero).padStart(4,'0') : '';
-    if(!confirm('Abrir uma reunião nova?\n\nA ata' + n + ' que está na tela será fechada e o que não tiver sido salvo será perdido.')) return;
+    if(!confirm('Abrir uma reunião nova?\n\nA ata' + n + ' que está na tela será SALVA e fechada. ' +
+                'Ela continua no funil e no calendário — é só clicar nela para voltar a editar.')) return;
+    try{
+      await salvarAta(false);      // nada se perde: grava antes de trocar de tela
+    }catch(err){
+      if(!confirm('Não foi possível salvar a ata antes de trocar de tela:\n\n' + err.message +
+                  '\n\nAbrir mesmo assim uma reunião nova? O que não foi salvo será perdido.')) return;
+    }
     location.hash = 'form';
     location.reload();
     return;
@@ -3549,6 +3566,22 @@ function admRenderCards(r){
     <div class="adm-card"><div class="rot">Empresas registradas</div><div class="val">${(ps.risco||0)+(ps.perdido||0)+(ps.semcontato||0)+(ps.oportunidade||0)+(ps.chamado||0)}</div></div>`;
 }
 
+function horaBR(h){
+  if(!h) return '';
+  const m = String(h).match(/^(\d{1,2}):(\d{2})/);
+  return m ? String(m[1]).padStart(2,'0') + ':' + m[2] : '';
+}
+/* Pendência de um card do funil/calendário, no mesmo vocabulário do selo do formulário. */
+function pendenciaDoCard(c){
+  if(c.tipo === 'agenda') return { txt:'AGUARDANDO REALIZAÇÃO', cls:'' };
+  const mapa = {
+    agenda:       { txt:'AGUARDANDO REALIZAÇÃO',          cls:'' },
+    realizada:    { txt:'AGUARDANDO AVALIAÇÃO',           cls:'' },
+    em_andamento: { txt:'AG. EXECUÇÃO DE PLANO DE AÇÃO',  cls:'' },
+    arquivo:      { txt:'ARQUIVADA',                      cls:'neutra' }
+  };
+  return mapa[c.etapa] || { txt:'AGUARDANDO REALIZAÇÃO', cls:'' };
+}
 function dataBR(iso){
   if(!iso) return '—';
   const s = String(iso).slice(0,10).split('-');
@@ -3827,7 +3860,7 @@ let calAno, calMes;          // mês em exibição no calendário (0-based)
 
 async function abrirFunil(){
   document.getElementById('btnAgendarReuniao').style.display = admLiberado ? '' : 'none';
-  document.getElementById('btnConfigFunil').style.display = admLiberado ? '' : 'none';
+  document.getElementById('btnConfigFunil').style.display = 'none';   // arquivamento agora é só por botão
   const hoje = new Date();
   if(calAno === undefined){ calAno = hoje.getFullYear(); calMes = hoje.getMonth(); }
   funilAba('board');          // o funil é a página inicial
@@ -3853,8 +3886,8 @@ async function funilCarregar(){
     funilCards = (data && data.cards) || [];
     funilDiasArquivar = (data && data.dias_arquivar) || 21;
     const rot = document.getElementById('funilRegra');
-    rot.textContent = 'Arquiva automaticamente após ' + funilDiasArquivar + ' dia(s) sem alteração.';
-    rot.style.display = admLiberado ? '' : 'none';
+    rot.textContent = '';
+    rot.style.display = 'none';
     funilRenderBoard();
     calRender();
     atualizarChavesEliminar();
@@ -3891,8 +3924,9 @@ function funilMontarCard(c, idxEtapa){
   const div = document.createElement('div');
   const clicavel = c.tipo === 'ata' && admLiberado;
   div.className = 'funil-card' + (clicavel ? ' clicavel' : '');
+  const hr = horaBR(c.hora);
   div.innerHTML =
-    '<div class="data">' + dataBR(c.data) + '</div>' +
+    '<div class="data">' + dataBR(c.data) + (hr ? ' · ' + esc(hr) : '') + '</div>' +
     '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
     (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '');
 
@@ -3906,19 +3940,29 @@ function funilMontarCard(c, idxEtapa){
     div.onclick = ()=>admVer(c.id);
   }
 
-  /* Avanço de etapa pelo próprio card:
-       etapa 1 → "Encerrar reunião"   leva para "aguardando avaliação";
-       etapa 2 → "Encerrar avaliação" decide entre plano de ação e arquivo. */
-  if(c.tipo === 'ata' && admLiberado && (c.etapa === 'agenda' || c.etapa === 'realizada')){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'btn btn-mini ' + (c.etapa === 'agenda' ? 'btn-vermelho' : 'btn-verde');
-    b.style.marginTop = '7px';
-    b.innerHTML = '<span class="ico">' + ICONES[c.etapa === 'agenda' ? 'realizada' : 'plano'] + '</span>' +
-                  (c.etapa === 'agenda' ? 'Encerrar reunião' : 'Encerrar avaliação');
-    b.onclick = (ev)=>{ ev.stopPropagation();
-      if(c.etapa === 'agenda') encerrarReuniao(c.id); else encerrarAvaliacao(c.id); };
-    div.appendChild(b);
+  /* Avanço de etapa SÓ por botão — nada é decidido automaticamente.
+       agenda    → "Encerrar reunião"      vai para "aguardando avaliação";
+       realizada → "Ir para plano de ação" ou "Arquivar", escolha do usuário. */
+  if(c.tipo === 'ata' && admLiberado){
+    const botoes = [];
+    if(c.etapa === 'agenda')
+      botoes.push(['Encerrar reunião', 'btn-vermelho', 'realizada', 'realizada']);
+    else if(c.etapa === 'realizada'){
+      botoes.push(['Ir para plano de ação', 'btn-verde', 'em_andamento', 'plano']);
+      botoes.push(['Arquivar', 'btn-cinza', 'arquivo', 'arquivo']);
+    }
+    else if(c.etapa === 'em_andamento')
+      botoes.push(['Arquivar', 'btn-cinza', 'arquivo', 'arquivo']);
+    botoes.forEach(([rot, cls, destino, ico])=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn btn-mini ' + cls;
+      b.style.marginTop = '7px';
+      b.style.marginRight = '5px';
+      b.innerHTML = '<span class="ico">' + (ICONES[ico]||'') + '</span>' + rot;
+      b.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaComAviso(c, destino, rot); };
+      div.appendChild(b);
+    });
   }
 
   if(admLiberado){
@@ -3935,12 +3979,6 @@ function funilMontarCard(c, idxEtapa){
       b.title = 'Mover para "' + ETAPAS_FUNIL[idxEtapa+1].titulo + '"';
       b.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaFunil(c.tipo, c.id, ETAPAS_FUNIL[idxEtapa+1].slug); };
       ctl.appendChild(b);
-    }
-    if(c.manual){
-      const m = document.createElement('span'); m.className = 'manual'; m.textContent = 'movido manualmente';
-      const rst = document.createElement('button'); rst.type='button'; rst.textContent='automático'; rst.style.marginLeft = '4px';
-      rst.onclick = (ev)=>{ ev.stopPropagation(); moverEtapaFunil(c.tipo, c.id, null); };
-      ctl.appendChild(m); ctl.appendChild(rst);
     }
     div.appendChild(ctl);
   }
@@ -3976,27 +4014,18 @@ async function encerrarReuniao(id){
   }catch(err){ alert('Não foi possível encerrar a reunião: ' + err.message); }
 }
 
-/* Etapa 2 → 3 (há plano de ação) ou → 4 (não há) */
-async function encerrarAvaliacao(id){
-  let planos = 0;
+/* Movimentação de etapa pelo card — sempre explícita, nunca automática. */
+async function moverEtapaComAviso(c, destino, rotulo){
+  const et = ETAPAS_FUNIL.find(e => e.slug === destino);
+  if(!confirm(rotulo + '?\n\nA ata' + (c.numero ? ' nº ' + String(c.numero).padStart(4,'0') : '') +
+              ' vai para "' + (et ? et.titulo : destino) + '".')) return;
   try{
-    const a = await admObter(id);
-    planos = contarPlanosPendentes(a && a.dados);
-  }catch(err){
-    alert('Não foi possível ler a ata para conferir os planos de ação: ' + err.message);
-    return;
-  }
-  const destino = planos > 0 ? 'em_andamento' : 'arquivo';
-  const nome = planos > 0 ? 'Ag. Execução de Plano de Ação' : 'Arquivo';
-  const detalhe = planos > 0
-    ? planos + ' plano(s) de ação aguardando execução.'
-    : 'Nenhum plano de ação em aberto.';
-  if(!confirm('Encerrar a avaliação desta ata?\n\n' + detalhe + '\nA ata vai para "' + nome + '".')) return;
-  try{
-    await definirEtapaAta(id, destino);
-    toast('Avaliação encerrada — ata movida para "' + nome + '".');
+    await definirEtapaAta(c.id, destino);
     await funilCarregar();
-  }catch(err){ alert('Não foi possível encerrar a avaliação: ' + err.message); }
+    if(editandoId === c.id){ etapaAtual = destino; atualizarPendencia(); }
+    toast('Ata movida para "' + (et ? et.titulo : destino) + '".');
+  }catch(err){ alert('Não foi possível mover a ata: ' + err.message); }
+
 }
 
 async function moverEtapaFunil(tipo, id, novaEtapa){
@@ -4005,7 +4034,7 @@ async function moverEtapaFunil(tipo, id, novaEtapa){
       { p_senha: admSenhaAtual, p_tipo: tipo, p_id: id, p_etapa: novaEtapa });
     if(error) throw new Error(error.message);
     await funilCarregar();
-    toast(novaEtapa ? 'Card movido.' : 'Card voltou para a regra automática.');
+    toast('Card movido.');
   }catch(err){ alert('Não foi possível mover o card: ' + err.message); }
 }
 
@@ -4015,6 +4044,7 @@ function abrirModalAgenda(){
   document.getElementById('agVendedor').value = '';
   document.getElementById('agCodigo').value = '';
   document.getElementById('agObs').value = '';
+  document.getElementById('agHora').value = '09:00';
   document.getElementById('agendaErro').style.display = 'none';
   document.getElementById('modalAgenda').classList.add('aberto');
 }
@@ -4025,15 +4055,16 @@ async function salvarAgendamento(){
   const vendedor = document.getElementById('agVendedor').value.trim();
   const codigo = document.getElementById('agCodigo').value.trim();
   const obs = document.getElementById('agObs').value.trim();
+  const hora = document.getElementById('agHora').value;
   const err = document.getElementById('agendaErro');
   err.style.display = 'none';
-  if(!data || !vendedor){
-    err.textContent = 'Informe a data e o nome do vendedor.'; err.style.display = ''; return;
+  if(!data || !hora || !vendedor){
+    err.textContent = 'Informe a data, o horário e o nome do vendedor.'; err.style.display = ''; return;
   }
   try{
     const { error } = await sb.rpc('ata_agenda_criar', {
       p_senha: admSenhaAtual, p_data: data, p_vendedor_nome: vendedor,
-      p_vendedor_codigo: codigo || null, p_observacao: obs || null
+      p_vendedor_codigo: codigo || null, p_observacao: obs || null, p_hora: hora || null
     });
     if(error) throw new Error(error.message);
     fecharModalAgenda();
@@ -4071,6 +4102,7 @@ function iniciarAtaDeAgenda(c){
   }
   agendaOrigemId = c.id;
   document.getElementById('dataReuniao').value = c.data;
+  if(c.hora) document.getElementById('horaReuniao').value = horaBR(c.hora);
   document.getElementById('vendedorNome').value = c.vendedor_nome || '';
   document.getElementById('vendedorCodigo').value = c.vendedor_codigo || '';
   funilAba('form');
@@ -4099,8 +4131,13 @@ function calRender(){
     grid.appendChild(h);
   });
 
+  // o calendário mostra apenas reuniões (atas e agendamentos), ordenadas pelo horário
   const porDia = {};
-  funilCards.forEach(c=>{ (porDia[c.data] = porDia[c.data] || []).push(c); });
+  funilCards.filter(c => c.tipo !== 'plano')
+            .forEach(c=>{ (porDia[c.data] = porDia[c.data] || []).push(c); });
+  Object.keys(porDia).forEach(k=>{
+    porDia[k].sort((a,b)=> String(a.hora||'99:99').localeCompare(String(b.hora||'99:99')));
+  });
 
   const primeiro = new Date(calAno, calMes, 1);
   const diasNoMes = new Date(calAno, calMes+1, 0).getDate();
@@ -4119,22 +4156,17 @@ function calRender(){
     if(itens.length){
       // Mostra o número da ata quando existe — é por ele que a reunião é
       // identificada na conversa ("a 0008 do Murilo").
-      html += '<div class="cal-eventos">' + ['agenda','plano','ata'].map(tipo=>{
-        const doTipo = itens.filter(c=>c.tipo===tipo);
-        if(!doTipo.length) return '';
-        const n = doTipo.length;
-        const nome  = tipo==='agenda'?'Reunião':tipo==='plano'?'Plano de ação':'Ata';
-        const curto = tipo==='agenda'?'Reun.':tipo==='plano'?'Plano':'Ata';
-        const nums = doTipo.map(c=>c.numero).filter(Boolean).map(x=>String(x).padStart(4,'0'));
-        const etiq = nums.length ? (nums.length === n ? 'nº ' + nums.join(', ') : n + ' · ' + nome)
-                                 : n + ' · ' + nome;
-        const etiqCurta = nums.length ? nums.join(',') : n + ' ' + curto;
-        return '<span class="cal-evento '+tipo+'" data-short="'+esc(etiqCurta)+'" title="'+n+' · '+nome+
-               (nums.length?' — nº '+nums.join(', '):'')+'"><span class="evento-label">'+esc(etiq)+'</span></span>';
+      // uma etiqueta por reunião: número da ata + horário. Nada mais.
+      html += '<div class="cal-eventos">' + itens.map(c=>{
+        const num  = c.numero ? 'nº ' + String(c.numero).padStart(4,'0') : 'Reunião';
+        const hora = horaBR(c.hora);
+        const etiq = num + (hora ? ' · ' + hora : '');
+        return '<span class="cal-evento '+c.tipo+'" data-short="'+esc(etiq)+'" title="'+esc(etiq+' — '+(c.vendedor_nome||''))+
+               '"><span class="evento-label">'+esc(etiq)+'</span></span>';
       }).join('') + '</div>';
     }
     cel.innerHTML = html;
-    if(itens.length){ cel.onclick = ()=>calMostrarDia(key, itens); cel.tabIndex=0; cel.setAttribute('role','button'); cel.setAttribute('aria-label',dia+' de '+CAL_MESES[calMes]+': '+itens.map(c=>c.tipo==='plano'?'Plano de ação':c.tipo==='agenda'?'Agendamento de reunião':'Ata de reunião').join(', ')); cel.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();calMostrarDia(key,itens);}}; }
+    if(itens.length){ cel.onclick = ()=>calMostrarDia(key, itens); cel.tabIndex=0; cel.setAttribute('role','button'); cel.setAttribute('aria-label',dia+' de '+CAL_MESES[calMes]+': '+itens.length+' reunião(ões)'); cel.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();calMostrarDia(key,itens);}}; }
     grid.appendChild(cel);
   }
 
@@ -4145,39 +4177,26 @@ function calMostrarDia(key, itens){
   const box = document.getElementById('calDiaDetalhe');
   let html = '<div class="card"><div class="card-titulo"><span class="ct-esq">' + dataBR(key) + '</span></div><div class="card-corpo">';
   itens.forEach(c=>{
-    // Só dá pra ir para a ata quando o card realmente tem uma (tipo "ata" ou
-    // "plano" — este carrega ata_id); "agenda" ainda não virou ata nenhuma.
-    const ataId = c.tipo === 'plano' ? c.ata_id : (c.tipo === 'ata' ? c.id : null);
-    const podeAbrir = !!(ataId && admLiberado);
-    const clsCard = 'funil-card' + (podeAbrir ? ' clicavel' : '');
-    const attrVer = podeAbrir ? ' data-ver="' + esc(ataId) + '"' : '';
-    if(c.tipo === 'plano'){
-      const periodo = c.data_inicial && c.data_final && c.data_inicial !== c.data_final
-        ? dataBR(c.data_inicial) + ' – ' + dataBR(c.data_final)
-        : dataBR(c.data_final || c.data_inicial);
-      html += '<div class="' + clsCard + '"' + attrVer + ' style="margin-bottom:7px">' +
-        '<div class="vend">Plano de ação · ' + esc(c.vendedor_nome) +
-        (c.empresa ? ' · ' + esc(c.empresa) : '') +
-        (c.numero ? ' (ata nº ' + String(c.numero).padStart(4,'0') + ')' : '') + '</div>' +
-        (c.texto ? '<div class="num">' + esc(c.texto) + '</div>' : '') +
-        '<div class="num">' +
-        (c.envolvidos ? 'Envolvidos: ' + esc(c.envolvidos) + ' · ' : '') +
-        'Período: ' + periodo +
-        '</div>' +
-        (podeAbrir ? '<div class="adm-ctl"><button type="button" data-abrir="' + esc(ataId) + '">Abrir ata</button></div>' : '') +
-        '</div>';
-      return;
-    }
-    const et = ETAPAS_FUNIL.find(e=>e.slug===c.etapa);
-    html += '<div class="' + clsCard + '"' + attrVer + ' style="margin-bottom:7px">' +
-      (c.numero ? '<div class="data">Ata nº ' + String(c.numero).padStart(4,'0') + '</div>' : '') +
-      '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
-      '<div class="num">' + esc(et ? et.titulo : c.etapa) + '</div>' +
+    // Só os dados da reunião: número, horário, vendedor, condutor e a pendência
+    // da etapa. Os cards dos tópicos ficam dentro da ata, não aqui.
+    const ehAta = c.tipo === 'ata';
+    const podeAbrir = !!(ehAta && admLiberado);
+    const hora = horaBR(c.hora);
+    html += '<div class="funil-card' + (podeAbrir ? ' clicavel' : '') + '"' +
+        (podeAbrir ? ' data-ver="' + esc(c.id) + '"' : '') + ' style="margin-bottom:7px">' +
+      '<div class="data">' + (c.numero ? 'Ata nº ' + String(c.numero).padStart(4,'0') : 'Reunião a agendar') +
+        (hora ? ' · ' + esc(hora) : '') + '</div>' +
+      '<div class="vend">' + esc(c.vendedor_nome || '—') +
+        (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
+      (c.condutor ? '<div class="num">Condutor: ' + esc(c.condutor) + '</div>' : '') +
+      (c.observacao ? '<div class="num">' + esc(c.observacao) + '</div>' : '') +
+      '<div style="margin-top:7px"><span class="pendencia' + (pendenciaDoCard(c).cls ? ' ' + pendenciaDoCard(c).cls : '') +
+        '"><span class="pct"></span>' + esc(pendenciaDoCard(c).txt) + '</span></div>' +
       (admLiberado
-        ? '<div class="adm-ctl">' + (c.tipo === 'agenda'
-            ? '<button type="button" data-iniciar="' + esc(c.id) + '">Iniciar ata</button>'
-            : '<button type="button" data-abrir="' + esc(c.id) + '">Abrir ata</button>' +
-              '<button type="button" data-ver2="' + esc(c.id) + '">Ver resumo</button>') + '</div>'
+        ? '<div class="adm-ctl">' + (ehAta
+            ? '<button type="button" data-abrir="' + esc(c.id) + '">Abrir ata</button>' +
+              '<button type="button" data-ver2="' + esc(c.id) + '">Ver resumo</button>'
+            : '<button type="button" data-iniciar="' + esc(c.id) + '">Iniciar ata</button>') + '</div>'
         : '') +
     '</div>';
   });
