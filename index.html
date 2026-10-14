@@ -296,7 +296,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .funil-corpo{max-width:1300px;margin:16px auto;padding:0 14px 30px;}
 .funil-abas{display:flex;gap:4px;border-bottom:1px solid var(--cinza-borda);margin-bottom:16px;flex-wrap:wrap;}
 
-.funil-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;}
+.funil-board{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:start;}
 .funil-col{background:#FAFAFB;border:1px solid var(--cinza-borda);border-radius:8px;overflow:hidden;min-width:0;}
 .funil-col-head{padding:10px 12px;border-bottom:2px solid var(--vermelho);background:var(--branco);}
 /* ── Avisos de exceção / grupo empresarial no card da empresa ── */
@@ -360,6 +360,7 @@ table.tabela .acoes{display:flex;gap:5px;flex-wrap:wrap;}
 .cal-dia.com-item{cursor:pointer;}
 .cal-dia.com-item:hover{border-color:var(--vermelho);}
 
+@media(max-width:1200px){ .funil-board{grid-template-columns:repeat(3,1fr);} }
 @media(max-width:900px){ .funil-board{grid-template-columns:1fr 1fr;} }
 @media(max-width:640px){
   #funilAbaCalendario{max-width:100%;}
@@ -793,6 +794,9 @@ html[data-theme=dark] .nav-card:hover{background:var(--fi-surface-alt,#2a343e);}
 .mini-tab .linha-ref .ref{margin:0;gap:5px;}
 .mini-tab .linha-ref .ref span{font-size:10px;padding:2px 7px;}
 html[data-theme=dark] .mini-tab .linha-ref td{background:rgba(255,255,255,.04);}
+.plano-retorno{margin-top:12px;padding-top:12px;border-top:2px dashed var(--cinza-borda);}
+.plano-retorno > label{color:var(--verde,#1E7A3C);}
+.plano-retorno textarea{min-height:64px;}
 html[data-theme=dark] .btn-cinza{background:#4A545C;color:#EEF2F5;border:1px solid #4A545C;}
 html[data-theme=dark] .btn-cinza:hover:not(:disabled){background:#5A656E;border-color:#5A656E;color:#fff;}
 html[data-theme=dark] .reg-nav{
@@ -1204,6 +1208,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <button type="button" class="btn btn-vermelho btn-grande" id="btnGerar" onclick="gerarAtaPDF(true)">GERAR ATA SUPERVISÃO</button>
   <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">GERAR ATA VENDEDOR</button>
   <button type="button" class="btn btn-claro btn-grande" id="btnGerarPlano" onclick="gerarPlanoAcaoForm()" style="display:none">GERAR ATA DO PLANO DE AÇÃO</button>
+  <button type="button" class="btn btn-claro btn-grande" id="btnPlanoRetorno" onclick="gerarPlanoRetornoForm()" style="display:none">GERAR PLANO DE AÇÃO COM RETORNO</button>
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-pendencia btn-grande" id="btnLiberarReuniao"
@@ -1447,6 +1452,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
         <button type="button" class="btn btn-vermelho btn-mini" id="modalBtnPDF">PDF supervisão</button>
         <button type="button" class="btn btn-cinza btn-mini" id="modalBtnPDFVend">PDF vendedor</button>
         <button type="button" class="btn btn-claro btn-mini" id="modalBtnPlano">PDF plano de ação</button>
+        <button type="button" class="btn btn-claro btn-mini" id="modalBtnPlanoRet">PDF plano + retorno</button>
         <button type="button" class="btn btn-claro btn-mini" onclick="fecharModal()">Fechar</button>
       </div>
     </div>
@@ -1766,10 +1772,20 @@ function blocoPlanoAcao(dados){
           <input type="date" class="campo-plano-data-final" value="${esc(dados.planoDataFinal||'')}" onclick="this.showPicker && this.showPicker()">
         </div>
       </div>
+      <div class="plano-retorno" style="display:none">
+        <label>RETORNO DO PLANO DE AÇÃO</label>
+        <textarea class="campo-plano-retorno" placeholder="O que foi feito, com quem, qual o resultado...">${esc(dados.planoRetorno||'')}</textarea>
+        <div class="linha" style="margin:8px 0 0">
+          <div class="col-fixa">
+            <label>Data do retorno</label>
+            <input type="date" class="campo-plano-retorno-data" value="${esc(dados.planoRetornoData||'')}" onclick="this.showPicker && this.showPicker()">
+          </div>
+        </div>
+      </div>
       <input type="hidden" class="campo-plano-executado" value="${executado?'1':''}">
       <div class="plano-executado-linha">
         <button type="button" class="btn btn-verde btn-mini campo-plano-btn-executar" style="${executado?'display:none':''}" onclick="encerrarPlanoCard(this)">Encerrar plano de ação como executado</button>
-        <span class="plano-executado-selo" style="${executado?'':'display:none'}">✓ Executado — ata movida para Arquivo no funil</span>
+        <span class="plano-executado-selo" style="${executado?'':'display:none'}">✓ Executado</span>
       </div>
     </div>`;
 }
@@ -1779,34 +1795,47 @@ function togglePlanoCard(chk){
   const bloco = registro.querySelector('.plano-bloco');
   if(bloco) bloco.style.display = chk.checked ? '' : 'none';
   registro.classList.toggle('tem-plano', chk.checked);
+  atualizarCamposRetorno();
+}
+
+/* ── Retorno do plano de ação ──
+   Só aparece a partir de "Ag. Execução de Plano de Ação" e apenas nos
+   clientes que realmente tiveram plano de ação aberto. */
+function etapaDaAtaEmEdicao(){
+  if(!editandoId) return null;
+  if(etapaAtual) return etapaAtual;
+  const c = (typeof funilCards !== 'undefined' ? funilCards : []).find(x => x.tipo === 'ata' && x.id === editandoId);
+  return c ? c.etapa : null;
+}
+function podeRegistrarRetorno(){
+  const e = etapaDaAtaEmEdicao();
+  return e === 'em_andamento' || e === 'conferencia';
+}
+function atualizarCamposRetorno(){
+  const ok = podeRegistrarRetorno();
+  document.querySelectorAll('.registro').forEach(div=>{
+    const bloco = div.querySelector('.plano-retorno');
+    if(!bloco) return;
+    const temPlano = !!(div.querySelector('.campo-plano-ativo')||{}).checked;
+    bloco.style.display = (ok && temPlano) ? '' : 'none';
+  });
+  const b = document.getElementById('btnPlanoRetorno');
+  if(b) b.style.display = ok ? '' : 'none';
 }
 async function encerrarPlanoCard(btn){
   const bloco = btn.closest('.plano-bloco');
   if(!bloco) return;
-  if(!confirm('Encerrar este plano de ação como executado?' + (admLiberado ? ' A ata vai para "Arquivo" no funil.' : ''))) return;
+  if(!confirm('Encerrar este plano de ação como executado?\n\nO card só muda de etapa pelos botões do funil.')) return;
   bloco.classList.add('executado');
   const registro = btn.closest('.registro');
   if(registro) registro.classList.add('plano-executado');
   bloco.querySelector('.campo-plano-executado').value = '1';
   btn.style.display = 'none';
   const selo = bloco.querySelector('.plano-executado-selo');
-  if(!admLiberado) selo.textContent = '✓ Executado — salve a ata para confirmar';
+  selo.textContent = editandoId ? '✓ Executado' : '✓ Executado — salve a ata para registrar';
   selo.style.display = '';
+  toast(editandoId ? 'Plano marcado como executado.' : 'Plano marcado como executado — salve a ata para registrar.');
 
-  if(admLiberado && editandoId){
-    try{
-      const { error } = await sb.rpc('ata_funil_definir_etapa',
-        { p_senha: admSenhaAtual, p_tipo: 'ata', p_id: editandoId, p_etapa: 'arquivo' });
-      if(error) throw new Error(error.message);
-      toast('Plano encerrado. Ata movida para "Arquivo" no funil.');
-    }catch(err){
-      toast('Plano marcado como executado, mas não consegui mover a ata no funil: ' + err.message, true);
-    }
-  } else if(!editandoId){
-    toast('Plano marcado como executado — salve a ata para registrar.');
-  } else {
-    toast('Plano marcado como executado.');
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2021,8 +2050,8 @@ async function toggleGrupoCard(chk){
 
 function podeEliminarDaAnalise(){
   if(!admLiberado || !editandoId) return false;
-  const c = (typeof funilCards !== 'undefined' ? funilCards : []).find(x => x.tipo === 'ata' && x.id === editandoId);
-  return !!c && c.etapa === 'realizada';
+  const e = etapaDaAtaEmEdicao();
+  return e === 'realizada' || e === 'em_andamento' || e === 'conferencia';
 }
 
 /* Mostra/esconde a chave em todos os cards conforme a fase da ata. */
@@ -2041,6 +2070,7 @@ function atualizarChavesEliminar(){
     abrirCampoEliminar(div, ex ? 'registrado' : 'oculto', ex);
   });
   sincronizarChavesGrupo();
+  atualizarCamposRetorno();
 }
 
 function campoElim(div){ return div.querySelector('.elim-campo'); }
@@ -2505,6 +2535,8 @@ function coletarRegistros(containerId){
       planoDataInicial: (div.querySelector('.campo-plano-data-inicial')||{}).value || '',
       planoDataFinal: (div.querySelector('.campo-plano-data-final')||{}).value || '',
       planoExecutado: (div.querySelector('.campo-plano-executado')||{}).value === '1',
+      planoRetorno: (div.querySelector('.campo-plano-retorno')||{}).value || '',
+      planoRetornoData: (div.querySelector('.campo-plano-retorno-data')||{}).value || '',
       eliminado: (div.querySelector('.campo-eliminar')||{}).checked || false,
       atrelado: div.dataset.atrelado === '1',
       grupo: (function(){ try{ return div.dataset.grupo ? JSON.parse(div.dataset.grupo) : null; }catch(e){ return null; } })()
@@ -2682,7 +2714,8 @@ function carregarAtaNoFormulario(a){
     (d[chave]||[]).forEach(r=>{
       const div = addRegistroEmpresa(lista, tipo, {codigo:r.codigo, empresa:r.empresa, texto:r.texto, supervisao:r.supervisao, ref:r.ref,
         planoAtivo:r.planoAtivo, planoTipoApoio:r.planoTipoApoio, planoTexto:r.planoTexto, planoEnvolvidos:r.planoEnvolvidos,
-        planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal, planoExecutado:r.planoExecutado});
+        planoDataInicial:r.planoDataInicial, planoDataFinal:r.planoDataFinal, planoExecutado:r.planoExecutado,
+        planoRetorno:r.planoRetorno, planoRetornoData:r.planoRetornoData});
       const docs = (r.docs||[]).filter(x => x && x.caminho);
       if(docs.length){
         const k = 'docs_' + div.id;
@@ -2976,7 +3009,8 @@ function construirPDFPlanos(atas, opts){
   doc.text('Emitido em ' + new Date().toLocaleString('pt-BR'), W-14, 19, {align:'right'});
   let y = 33;
 
-  let totalPlanos = 0, totalExec = 0;
+  let totalPlanos = 0, totalExec = 0, totalRet = 0;
+  const ret = !!opts.comRetorno;
   const blocos = atas.map(a => ({ a, planos: planosDaAta(a.dados, opts.filtro) })).filter(b => b.planos.length);
 
   if(!blocos.length){
@@ -2997,9 +3031,21 @@ function construirPDFPlanos(atas, opts){
 
     doc.autoTable({
       startY:y, theme:'grid',
-      head:[['SITUAÇÃO','CÓDIGO','EMPRESA','TIPO DE APOIO','PLANO DE AÇÃO','ENVOLVIDOS','INÍCIO','FIM','STATUS']],
+      head:[ret
+        ? ['SITUAÇÃO','CÓDIGO','EMPRESA','TIPO DE APOIO','PLANO DE AÇÃO','ENVOLVIDOS','PRAZO','RETORNO DO PLANO DE AÇÃO','STATUS']
+        : ['SITUAÇÃO','CÓDIGO','EMPRESA','TIPO DE APOIO','PLANO DE AÇÃO','ENVOLVIDOS','INÍCIO','FIM','STATUS']],
       body: planos.map(r=>{
         totalPlanos++; if(r.planoExecutado) totalExec++;
+        if(ret){
+          const prazo = [fmt(r.planoDataInicial), fmt(r.planoDataFinal)].filter(x=>x && x!=='—').join('\na ') || '—';
+          const retTxt = (r.planoRetorno||'').trim();
+          if(retTxt) totalRet++;
+          return [r._secao, r.codigo||'—', r.empresa||'—', r.planoTipoApoio||'—', (r.planoTexto||'').trim()||'—',
+                  r.planoEnvolvidos||'—', prazo,
+                  (retTxt ? retTxt + (r.planoRetornoData ? '\n(retorno em ' + fmt(r.planoRetornoData) + ')' : '')
+                          : 'Sem retorno registrado'),
+                  r.planoExecutado ? 'Executado' : 'Em andamento'];
+        }
         return [r._secao, r.codigo||'—', r.empresa||'—', r.planoTipoApoio||'—', (r.planoTexto||'').trim()||'—',
                 r.planoEnvolvidos||'—', fmt(r.planoDataInicial), fmt(r.planoDataFinal),
                 r.planoExecutado ? 'Executado' : 'Em andamento'];
@@ -3007,8 +3053,13 @@ function construirPDFPlanos(atas, opts){
       headStyles:{fillColor:VERMELHO, textColor:[255,255,255], fontSize:7.5},
       styles:{fontSize:8.5, cellPadding:2, valign:'top', lineColor:BORDA, textColor:PRETO},
       alternateRowStyles:{fillColor:[253,242,244]},
-      columnStyles:{0:{cellWidth:24},1:{cellWidth:18},2:{cellWidth:40},3:{cellWidth:28},5:{cellWidth:32},6:{cellWidth:19},7:{cellWidth:19},8:{cellWidth:26}},
-      didParseCell: c => { if(c.section==='body' && c.column.index===8){ c.cell.styles.fontStyle='bold'; c.cell.styles.textColor = c.cell.raw==='Executado' ? VERDE : [30,90,158]; } },
+      columnStyles: ret
+        ? {0:{cellWidth:22},1:{cellWidth:18},2:{cellWidth:34},3:{cellWidth:24},5:{cellWidth:26},6:{cellWidth:20},8:{cellWidth:22}}
+        : {0:{cellWidth:24},1:{cellWidth:18},2:{cellWidth:40},3:{cellWidth:28},5:{cellWidth:32},6:{cellWidth:19},7:{cellWidth:19},8:{cellWidth:26}},
+      didParseCell: c => {
+        if(c.section==='body' && c.column.index===8){ c.cell.styles.fontStyle='bold'; c.cell.styles.textColor = c.cell.raw==='Executado' ? VERDE : [30,90,158]; }
+        if(ret && c.section==='body' && c.column.index===7 && c.cell.raw==='Sem retorno registrado'){ c.cell.styles.fontStyle='italic'; c.cell.styles.textColor = CINZA; }
+      },
       margin:{left:14, right:14}
     });
     y = doc.lastAutoTable.finalY + 10;
@@ -3018,7 +3069,8 @@ function construirPDFPlanos(atas, opts){
     if(y > H-20){ doc.addPage(); y = 20; }
     doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...PRETO);
     doc.text('Total: ' + totalPlanos + ' plano(s) de ação em ' + blocos.length + ' ata(s)  ·  ' +
-             totalExec + ' executado(s)  ·  ' + (totalPlanos-totalExec) + ' em andamento', 14, y);
+             totalExec + ' executado(s)  ·  ' + (totalPlanos-totalExec) + ' em andamento' +
+             (ret ? '  ·  ' + totalRet + ' com retorno registrado' : ''), 14, y);
   }
 
   const total = doc.internal.getNumberOfPages();
@@ -3030,7 +3082,7 @@ function construirPDFPlanos(atas, opts){
     doc.text('FIORELLA — ' + (opts.rodape || 'Plano de Ação'), 14, H-5);
     doc.text('Página ' + p + ' de ' + total, W-14, H-5, {align:'right'});
   }
-  return { doc, totalPlanos, totalAtas: blocos.length };
+  return { doc, totalPlanos, totalRetornos: totalRet, totalAtas: blocos.length };
 }
 
 function nomeArquivoPlano(sufixo){
@@ -3048,6 +3100,40 @@ function gerarPlanoAcaoForm(){
   });
   if(!totalPlanos && !confirm('Nenhum cliente desta ata está com "Gerar Plano de Ação" ligado.\n\nGerar o PDF mesmo assim?')) return;
   doc.save(nomeArquivoPlano((numero ? String(numero).padStart(4,'0') + '_' : '') + dataBR(d.dataReuniao).replace(/\//g,'-') + '_' + String(d.vendedorNome||'').split(' ')[0].toUpperCase()));
+}
+
+/* Ata aberta no formulário, agora com a coluna de retorno */
+function gerarPlanoRetornoForm(){
+  const d = coletarTudo();
+  const numero = editandoNumero || null;
+  const { doc, totalPlanos, totalRetornos } = construirPDFPlanos([{dados:d, numero}], {
+    comRetorno: true,
+    titulo: 'PLANO DE AÇÃO E RETORNO — ATA DE REUNIÃO SEMANAL' + (numero ? '   ·   ATA Nº ' + numero : ''),
+    subtitulo: 'Data: ' + dataBR(d.dataReuniao),
+    rodape: 'Plano de Ação e Retorno' + (numero ? ' · Ata nº ' + numero : '')
+  });
+  if(!totalPlanos){ alert('Nenhum cliente desta ata está com "Gerar Plano de Ação" ligado.'); return; }
+  if(!totalRetornos && !confirm('Nenhum retorno foi registrado ainda.\n\nGerar o PDF mesmo assim?')) return;
+  doc.save(nomeArquivoPlano('RETORNO_' + (numero ? String(numero).padStart(4,'0') + '_' : '') +
+           dataBR(d.dataReuniao).replace(/\//g,'-') + '_' + String(d.vendedorNome||'').split(' ')[0].toUpperCase()));
+}
+
+/* ADM — uma ata, com retorno */
+async function admBaixarPlanoRetorno(id){
+  try{
+    const a = await admObter(id);
+    const d = a.dados || {};
+    const { doc, totalPlanos, totalRetornos } = construirPDFPlanos([{dados:d, numero:a.numero}], {
+      comRetorno: true,
+      titulo: 'PLANO DE AÇÃO E RETORNO — ATA DE REUNIÃO SEMANAL   ·   ATA Nº ' + a.numero,
+      subtitulo: 'Data: ' + dataBR(a.data_reuniao || d.dataReuniao),
+      rodape: 'Plano de Ação e Retorno · Ata nº ' + a.numero
+    });
+    if(!totalPlanos){ alert('Esta ata não tem clientes com plano de ação solicitado.'); return; }
+    if(!totalRetornos && !confirm('Nenhum retorno foi registrado nesta ata.\n\nGerar o PDF mesmo assim?')) return;
+    doc.save(nomeArquivoPlano('RETORNO_' + String(a.numero).padStart(4,'0') + '_' +
+             dataBR(a.data_reuniao).replace(/\//g,'-') + '_' + String(a.vendedor_nome||'').split(' ')[0].toUpperCase()));
+  }catch(err){ alert('Erro ao gerar o PDF do plano de ação com retorno: ' + err.message); }
 }
 
 /* ADM — uma ata (modal de detalhe) */
@@ -3193,6 +3279,7 @@ const PENDENCIAS = {
   agenda:       { txt:'REUNIÃO LIBERADA — AGUARDANDO REALIZAÇÃO', cls:'' },
   realizada:    { txt:'AGUARDANDO AVALIAÇÃO',                  cls:'' },
   em_andamento: { txt:'AG. EXECUÇÃO DE PLANO DE AÇÃO',         cls:'' },
+  conferencia:  { txt:'AG. CONFERÊNCIA DO PLANO DE AÇÃO',      cls:'' },
   arquivo:      { txt:'ATA ARQUIVADA',                         cls:'neutra' }
 };
 
@@ -3657,6 +3744,7 @@ function pendenciaDoCard(c){
     agenda:       { txt:'AGUARDANDO REALIZAÇÃO',          cls:'' },
     realizada:    { txt:'AGUARDANDO AVALIAÇÃO',           cls:'' },
     em_andamento: { txt:'AG. EXECUÇÃO DE PLANO DE AÇÃO',  cls:'' },
+    conferencia:  { txt:'AG. CONFERÊNCIA DO PLANO',       cls:'' },
     arquivo:      { txt:'ARQUIVADA',                      cls:'neutra' }
   };
   return mapa[c.etapa] || { txt:'AGUARDANDO REALIZAÇÃO', cls:'' };
@@ -3770,6 +3858,7 @@ async function admVer(id){
     document.getElementById('modalBtnPDF').onclick = ()=>admBaixarPDF(id, true);
     document.getElementById('modalBtnPDFVend').onclick = ()=>admBaixarPDF(id, false);
     document.getElementById('modalBtnPlano').onclick = ()=>admBaixarPlano(id);
+    document.getElementById('modalBtnPlanoRet').onclick = ()=>admBaixarPlanoRetorno(id);
     document.getElementById('modalBtnEditar').onclick = ()=>{ fecharModal(); admEditar(id); };
 
     // os dados do relatório ficam no jsonb da ata; aqui são indexados pelo código da empresa
@@ -3937,13 +4026,15 @@ const ICONES = {
   agenda:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M12 12.5v3l2 1.2"/></svg>`,
   realizada: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8.5" y="2.5" width="7" height="4" rx="1.3"/><path d="M8.8 13.4l2.2 2.2 4.2-4.6"/></svg>`,
   plano:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.2a.7.7 0 0 1 .4-.6c3.3-1.5 6.9 1.5 10.2 0a.7.7 0 0 1 1 .6v8a.7.7 0 0 1-.4.6c-3.3 1.5-6.9-1.5-10.2 0"/></svg>`,
+  conferencia: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.2 15.2 21 21"/><path d="M7.8 10.6l1.9 1.9 3.3-3.6"/></svg>`,
   arquivo:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.8" y="3.8" width="18.4" height="4.6" rx="1.4"/><path d="M4.6 8.4v10a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-10M9.8 12.4h4.4"/></svg>`
 };
 const ETAPAS_FUNIL = [
   { slug:'agenda',       titulo:'Reuniões agendadas',                        ico:'agenda'    },
   { slug:'realizada',    titulo:'Reuniões realizadas, aguardando avaliação',  ico:'realizada' },
-  { slug:'em_andamento', titulo:'Ag. Execução de Plano de Ação',              ico:'plano'     },
-  { slug:'arquivo',      titulo:'Arquivo',                                    ico:'arquivo'   }
+  { slug:'em_andamento', titulo:'Ag. Execução de Plano de Ação',              ico:'plano'       },
+  { slug:'conferencia',  titulo:'Ag. Conferência do Plano de Ação',            ico:'conferencia' },
+  { slug:'arquivo',      titulo:'Arquivo',                                    ico:'arquivo'     }
 ];
 let funilCards = [];
 let funilDiasArquivar = 21;
@@ -4043,7 +4134,9 @@ function funilMontarCard(c, idxEtapa){
     else if(c.etapa === 'realizada')
       bt = ['Finalizar avaliação', 'btn-verde', null, 'plano'];           // destino decidido pelos planos abertos
     else if(c.etapa === 'em_andamento')
-      bt = ['Plano de ação finalizado', 'btn-cinza', 'arquivo', 'arquivo'];
+      bt = ['Plano de ação finalizado', 'btn-verde', null, 'conferencia'];   // destino depende do retorno
+    else if(c.etapa === 'conferencia')
+      bt = ['Conferência concluída', 'btn-cinza', 'arquivo', 'arquivo'];
     if(bt){
       const [rot, cls, destino, ico] = bt;
       const b = document.createElement('button');
@@ -4052,7 +4145,9 @@ function funilMontarCard(c, idxEtapa){
       b.style.marginTop = '7px';
       b.innerHTML = '<span class="ico">' + (ICONES[ico]||'') + '</span>' + rot;
       b.onclick = (ev)=>{ ev.stopPropagation();
-        if(destino) moverEtapaComAviso(c, destino, rot); else finalizarAvaliacao(c); };
+        if(destino) moverEtapaComAviso(c, destino, rot);
+        else if(c.etapa === 'em_andamento') finalizarPlanoAcao(c);
+        else finalizarAvaliacao(c); };
       div.appendChild(b);
     }
   }
@@ -4104,6 +4199,52 @@ async function encerrarReuniao(id){
     if(b && editandoId === id) b.style.display = 'none';
     if(editandoId === id){ etapaAtual = 'realizada'; atualizarPendencia(); }
   }catch(err){ alert('Não foi possível encerrar a reunião: ' + err.message); }
+}
+
+/* Quantos planos de ação já têm retorno registrado. */
+function contarRetornos(d){
+  if(!d) return 0;
+  let n = 0;
+  ['risco','perdidos','semContato','oportunidades','chamados'].forEach(k=>{
+    (d[k]||[]).forEach(r=>{ if(r && r.planoAtivo && String(r.planoRetorno||'').trim()) n++; });
+  });
+  return n;
+}
+function contarPlanos(d){
+  if(!d) return 0;
+  let n = 0;
+  ['risco','perdidos','semContato','oportunidades','chamados'].forEach(k=>{
+    (d[k]||[]).forEach(r=>{ if(r && r.planoAtivo) n++; });
+  });
+  return n;
+}
+
+/* Fim da execução: só vai para a conferência quando existe plano de ação E
+   retorno registrado. Sem retorno, segue direto para o arquivo. */
+async function finalizarPlanoAcao(c){
+  const nAta = c.numero ? ' nº ' + String(c.numero).padStart(4,'0') : '';
+  let planos = 0, retornos = 0;
+  try{
+    const a = await admObter(c.id);
+    planos   = contarPlanos(a && a.dados);
+    retornos = contarRetornos(a && a.dados);
+  }catch(err){
+    alert('Não foi possível ler a ata' + nAta + ' para conferir os retornos:\n\n' + err.message);
+    return;
+  }
+  const destino = (planos > 0 && retornos > 0) ? 'conferencia' : 'arquivo';
+  const et = ETAPAS_FUNIL.find(e => e.slug === destino);
+  const detalhe = destino === 'conferencia'
+    ? retornos + ' de ' + planos + ' plano(s) de ação com retorno registrado.'
+    : (planos > 0 ? 'Nenhum retorno registrado nos planos de ação.' : 'Nenhum plano de ação nesta ata.');
+  if(!confirm('Encerrar a execução do plano de ação da ata' + nAta + '?\n\n' + detalhe +
+              '\nEla vai para "' + (et ? et.titulo : destino) + '".')) return;
+  try{
+    await definirEtapaAta(c.id, destino);
+    await funilCarregar();
+    if(editandoId === c.id){ etapaAtual = destino; atualizarPendencia(); atualizarCamposRetorno(); }
+    toast('Ata movida para "' + (et ? et.titulo : destino) + '".');
+  }catch(err){ alert('Não foi possível mover a ata: ' + err.message); }
 }
 
 /* Fim da avaliação: havendo plano de ação em aberto a ata segue para a execução;
