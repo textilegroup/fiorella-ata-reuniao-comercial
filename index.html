@@ -794,9 +794,68 @@ html[data-theme=dark] .nav-card:hover{background:var(--fi-surface-alt,#2a343e);}
 .mini-tab .linha-ref .ref{margin:0;gap:5px;}
 .mini-tab .linha-ref .ref span{font-size:10px;padding:2px 7px;}
 html[data-theme=dark] .mini-tab .linha-ref td{background:rgba(255,255,255,.04);}
-.plano-retorno{margin-top:12px;padding-top:12px;border-top:2px dashed var(--cinza-borda);}
-.plano-retorno > label{color:var(--verde,#1E7A3C);}
-.plano-retorno textarea{min-height:64px;}
+/* O retorno é o campo mais importante desta etapa: moldura verde grossa,
+   fundo tintado e texto maior, para ele saltar à frente de todo o resto. */
+.plano-retorno{
+  margin:16px 0 4px;padding:15px 16px;
+  border:2px solid var(--verde,#1E7A3C);border-left-width:7px;border-radius:11px;
+  background:#E9F5EE;box-shadow:0 3px 14px rgba(30,122,60,.18);
+}
+.plano-retorno > label{
+  display:flex;align-items:center;gap:7px;
+  color:#13612E;font-size:12.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;margin-bottom:9px;
+}
+.plano-retorno > label:before{
+  content:'';width:9px;height:9px;border-radius:50%;background:var(--verde,#1E7A3C);flex:none;
+}
+.plano-retorno textarea{
+  min-height:92px;background:#fff;border:1.5px solid rgba(30,122,60,.5);
+  font-size:14.5px;line-height:1.6;color:#17241C;
+}
+.plano-retorno textarea::placeholder{color:#6E8C7C;}
+.plano-retorno textarea:focus,.plano-retorno input[type=date]:focus{
+  border-color:var(--verde,#1E7A3C);box-shadow:0 0 0 3px rgba(30,122,60,.2);
+}
+.plano-retorno label{color:#13612E;}
+.plano-retorno input[type=date]{background:#fff;border:1.5px solid rgba(30,122,60,.5);color:#17241C;}
+.plano-retorno.pendente{border-color:var(--destaque-pend,#B4530A);background:#FBF0E6;box-shadow:0 3px 14px rgba(180,83,10,.18);}
+.plano-retorno.pendente > label{color:#8F410A;}
+.plano-retorno.pendente > label:before{background:var(--destaque-pend,#B4530A);}
+.plano-retorno.pendente textarea,.plano-retorno.pendente input[type=date]{border-color:rgba(180,83,10,.5);}
+html[data-theme=dark] .plano-retorno{background:#15301F;border-color:#4FA574;box-shadow:0 3px 16px rgba(0,0,0,.4);}
+html[data-theme=dark] .plano-retorno > label,html[data-theme=dark] .plano-retorno label{color:#A6E0BF;}
+html[data-theme=dark] .plano-retorno > label:before{background:#4FA574;}
+html[data-theme=dark] .plano-retorno textarea,html[data-theme=dark] .plano-retorno input[type=date]{
+  background:#0F2217;border-color:#3C7E59;color:#E8F4ED;
+}
+html[data-theme=dark] .plano-retorno textarea::placeholder{color:#7FA791;}
+html[data-theme=dark] .plano-retorno.pendente{background:#2E2012;border-color:#C98A4A;box-shadow:0 3px 16px rgba(0,0,0,.4);}
+html[data-theme=dark] .plano-retorno.pendente > label,html[data-theme=dark] .plano-retorno.pendente label{color:#EFC18A;}
+html[data-theme=dark] .plano-retorno.pendente > label:before{background:#C98A4A;}
+html[data-theme=dark] .plano-retorno.pendente textarea,html[data-theme=dark] .plano-retorno.pendente input[type=date]{border-color:#9A6B3A;}
+
+/* Modo foco: na etapa de plano de ação só ficam na tela os clientes que
+   têm plano a executar — o resto da ata sai do caminho. */
+.card.foco-oculto .zona-import,
+.card.foco-oculto .lista-acoes,
+.card.foco-oculto .guia,
+.card.foco-oculto .reg-nav{display:none;}
+.foco-plano{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:0 0 20px;padding:14px 16px;border-radius:11px;
+  border:1px solid var(--verde,#1E7A3C);background:#E9F5EE;color:#13612E;
+}
+.foco-plano .ico{width:22px;height:22px;flex:none;color:var(--verde,#1E7A3C);}
+.foco-plano .ico svg{width:100%;height:100%;}
+.foco-plano b{font-size:12.5px;letter-spacing:.6px;text-transform:uppercase;}
+.foco-plano span{font-size:13px;line-height:1.5;}
+.foco-plano .qt{margin-left:auto;font-size:12px;font-weight:700;white-space:nowrap;}
+html[data-theme=dark] .foco-plano{background:#15301F;border-color:#4FA574;color:#A6E0BF;}
+html[data-theme=dark] .foco-plano .ico{color:#4FA574;}
+.btn-conferir{background:var(--verde,#1E7A3C)!important;border:1px solid var(--verde,#1E7A3C)!important;color:#fff!important;}
+.btn-conferir:hover:not(:disabled){background:#17612F!important;border-color:#17612F!important;color:#fff!important;}
+html[data-theme=dark] .btn-conferir{background:#2E8B52!important;border-color:#2E8B52!important;color:#fff!important;}
+html[data-theme=dark] .btn-conferir:hover:not(:disabled){background:#39A763!important;border-color:#39A763!important;}
 html[data-theme=dark] .btn-cinza{background:#4A545C;color:#EEF2F5;border:1px solid #4A545C;}
 html[data-theme=dark] .btn-cinza:hover:not(:disabled){background:#5A656E;border-color:#5A656E;color:#fff;}
 html[data-theme=dark] .reg-nav{
@@ -882,6 +941,14 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
     <small id="edInfo"></small>
   </div>
   <button type="button" class="btn btn-claro btn-mini" onclick="cancelarEdicao()">Cancelar edição</button>
+</div>
+
+<!-- ═══════════ MODO FOCO: SÓ OS CLIENTES COM PLANO DE AÇÃO ═══════════ -->
+<div class="foco-plano" id="focoPlano" style="display:none">
+  <span class="ico"></span>
+  <span><b>Etapa do plano de ação.</b><br>
+    Na tela estão apenas os clientes com plano de ação a executar — os demais ficam ocultos até o fim desta etapa.</span>
+  <span class="qt" id="focoPlanoQt"></span>
 </div>
 
 <!-- ═══════════ PROGRESSO ═══════════ -->
@@ -1209,6 +1276,10 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   <button type="button" class="btn btn-cinza btn-grande" id="btnGerarVend" onclick="gerarAtaPDF(false)">GERAR ATA VENDEDOR</button>
   <button type="button" class="btn btn-claro btn-grande" id="btnGerarPlano" onclick="gerarPlanoAcaoForm()" style="display:none">GERAR ATA DO PLANO DE AÇÃO</button>
   <button type="button" class="btn btn-claro btn-grande" id="btnPlanoRetorno" onclick="gerarPlanoRetornoForm()" style="display:none">GERAR PLANO DE AÇÃO COM RETORNO</button>
+</div>
+<div class="acoes-finais">
+  <button type="button" class="btn btn-conferir btn-grande" id="btnFinalizarPlano"
+          onclick="finalizarPlanoAcaoForm()" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.2 15.2 21 21"/><path d="M7.8 10.6l1.9 1.9 3.3-3.6"/></svg></span>PLANO DE AÇÃO FINALIZADO</button>
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-pendencia btn-grande" id="btnLiberarReuniao"
@@ -1543,6 +1614,7 @@ function aplicarVisibilidade(){
   const temOrient = GRUPO_ORIENTACOES.some(s => visibilidade[s]);
   document.getElementById('sepOrientacoes').style.display = temOrient ? '' : 'none';
   atualizarTodosStatus();
+  if(typeof atualizarCamposRetorno === 'function') atualizarCamposRetorno();
 }
 
 /* ═══════════════════ CONTROLE DE PREENCHIMENTO ═══════════════════ */
@@ -1812,15 +1884,81 @@ function podeRegistrarRetorno(){
   return e === 'em_andamento' || e === 'conferencia';
 }
 function atualizarCamposRetorno(){
-  const ok = podeRegistrarRetorno();
+  const foco = podeRegistrarRetorno();
+  let comPlano = 0, semRetorno = 0;
+
   document.querySelectorAll('.registro').forEach(div=>{
-    const bloco = div.querySelector('.plano-retorno');
-    if(!bloco) return;
     const temPlano = !!(div.querySelector('.campo-plano-ativo')||{}).checked;
-    bloco.style.display = (ok && temPlano) ? '' : 'none';
+    const bloco = div.querySelector('.plano-retorno');
+    if(bloco){
+      bloco.style.display = (foco && temPlano) ? '' : 'none';
+      const txt = (div.querySelector('.campo-plano-retorno')||{}).value || '';
+      bloco.classList.toggle('pendente', !String(txt).trim());
+      if(foco && temPlano && !String(txt).trim()) semRetorno++;
+    }
+    // na etapa do plano, cliente sem plano some da tela
+    div.style.display = (foco && !temPlano) ? 'none' : '';
+    if(temPlano) comPlano++;
   });
+
+  // tópicos de clientes sem nenhum cliente à vista também saem
+  TOPICOS.forEach(t=>{
+    if(!t.lista) return;
+    const card = document.getElementById(t.card);
+    if(!card) return;
+    if(!foco){
+      card.classList.remove('foco-oculto');
+      if(visibilidade[t.slug]) card.style.display = '';
+      return;
+    }
+    const lista = document.getElementById(t.lista);
+    const visiveis = lista ? Array.from(lista.querySelectorAll('.registro')).filter(r => r.style.display !== 'none').length : 0;
+    card.classList.add('foco-oculto');
+    card.style.display = visiveis ? '' : 'none';
+    if(visiveis) card.classList.add('aberto');
+  });
+  // os tópicos sem lista de clientes (ações, orientações) ficam fora da etapa
+  ['sec5','secEvitados','secRegra','sepOrientacoes'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(foco){ el.style.display = 'none'; return; }
+    if(id === 'sepOrientacoes'){
+      el.style.display = GRUPO_ORIENTACOES.some(x => visibilidade[x]) ? '' : 'none';
+      return;
+    }
+    const t = TOPICOS.find(x => x.card === id);
+    el.style.display = (t && !visibilidade[t.slug]) ? 'none' : '';
+  });
+
+  const faixa = document.getElementById('focoPlano');
+  if(faixa){
+    faixa.style.display = foco ? '' : 'none';
+    const ico = faixa.querySelector('.ico');
+    if(ico && !ico.innerHTML) ico.innerHTML = ICONES.plano || '';
+    const qt = document.getElementById('focoPlanoQt');
+    if(qt) qt.textContent = comPlano + ' cliente(s) com plano' +
+      (semRetorno ? '  ·  ' + semRetorno + ' sem retorno' : '  ·  todos com retorno');
+  }
+
   const b = document.getElementById('btnPlanoRetorno');
-  if(b) b.style.display = ok ? '' : 'none';
+  if(b) b.style.display = foco ? '' : 'none';
+  const f = document.getElementById('btnFinalizarPlano');
+  if(f) f.style.display = (etapaDaAtaEmEdicao() === 'em_andamento') ? '' : 'none';
+}
+
+/* Finalizar a execução pelo próprio formulário: grava o que está na tela
+   (senão o retorno recém-digitado não contaria) e segue a mesma regra do card. */
+async function finalizarPlanoAcaoForm(){
+  if(!editandoId){ alert('Abra uma ata antes de finalizar o plano de ação.'); return; }
+  const btn = document.getElementById('btnFinalizarPlano');
+  btn.disabled = true;
+  try{
+    await salvarAta(ataFinalizadaAtual);
+    await finalizarPlanoAcao({ id: editandoId, numero: editandoNumero, etapa: 'em_andamento' });
+  }catch(err){
+    alert('Não foi possível finalizar o plano de ação:\n\n' + err.message);
+  }
+  btn.disabled = false;
 }
 async function encerrarPlanoCard(btn){
   const bloco = btn.closest('.plano-bloco');
@@ -2202,6 +2340,14 @@ async function devolverAExcecao(btn){
   const div = btn.closest('.registro');
   if(div) await devolverAAnalise(div, div.querySelector('.campo-eliminar'));
 }
+
+/* Retorno preenchido/esvaziado: a moldura troca de cor na hora. */
+document.addEventListener('input', function(e){
+  if(e.target.classList && e.target.classList.contains('campo-plano-retorno')){
+    const bloco = e.target.closest('.plano-retorno');
+    if(bloco) bloco.classList.toggle('pendente', !e.target.value.trim());
+  }
+});
 
 /* O código da empresa mudou: revisa os avisos daquele card. */
 document.addEventListener('input', function(e){
