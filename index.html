@@ -834,6 +834,13 @@ html[data-theme=dark] .plano-retorno.pendente > label,html[data-theme=dark] .pla
 html[data-theme=dark] .plano-retorno.pendente > label:before{background:#C98A4A;}
 html[data-theme=dark] .plano-retorno.pendente textarea,html[data-theme=dark] .plano-retorno.pendente input[type=date]{border-color:#9A6B3A;}
 
+/* ───── ORIENTAÇÕES (guia própria) ───── */
+.orient-topo{margin-bottom:20px;}
+.orient-topo h3{font-size:15px;font-weight:700;margin:0 0 4px;color:var(--preto);}
+.orient-topo p{font-size:12.5px;color:var(--cinza-texto);margin:0;max-width:640px;line-height:1.55;}
+.orient-corpo{max-width:900px;margin:0;padding:0;}
+.orient-corpo .card:last-child{margin-bottom:0;}
+
 /* ───── PROGRAMAÇÃO ───── */
 .prog-topo{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
 .prog-topo h3{font-size:15px;font-weight:700;margin:0 0 4px;color:var(--preto);}
@@ -936,7 +943,7 @@ html[data-theme=dark] .reg-nav{
 <script>
 function aplicarTema(escuro){document.documentElement.dataset.theme=escuro?'dark':'light'; const b=document.getElementById('btnTema'); if(b){b.textContent=escuro?'Modo claro':'Modo escuro';b.setAttribute('aria-pressed',String(escuro));}}
 function alternarTema(){const escuro=document.documentElement.dataset.theme!=='dark';aplicarTema(escuro);try{localStorage.setItem('fiorella-tema',escuro?'dark':'light');}catch(e){}}
-(function(){let tema;try{tema=localStorage.getItem('fiorella-tema');}catch(e){}aplicarTema(tema?tema==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches);document.addEventListener('DOMContentLoaded',()=>aplicarTema(document.documentElement.dataset.theme==='dark'));})();
+(function(){let tema;try{tema=localStorage.getItem('fiorella-tema');}catch(e){}aplicarTema(tema==='dark');document.addEventListener('DOMContentLoaded',()=>aplicarTema(document.documentElement.dataset.theme==='dark'));})();
 </script>
 </head>
 <body>
@@ -975,6 +982,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       <button type="button" class="aba ativa" id="funilAbaBtnBoard" onclick="funilAba('board')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="7" rx="1.5"/></svg></span>Funil</button>
       <button type="button" class="aba" id="funilAbaBtnCal" onclick="funilAba('calendario')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg></span>Calendário</button>
       <button type="button" class="aba" id="funilAbaBtnProg" onclick="funilAba('programacao')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3.5V9h-5.5"/><path d="M12 7.5V12l3 1.8"/></svg></span>Programação</button>
+      <button type="button" class="aba" id="funilAbaBtnOrient" onclick="funilAba('orientacoes')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5C10.6 6.2 8.8 5.5 6.5 5.5H4v13h2.5c2.3 0 4.1.7 5.5 2 1.4-1.3 3.2-2 5.5-2H20v-13h-2.5c-2.3 0-4.1.7-5.5 2z"/><path d="M12 7.5v12"/></svg></span>Orientações</button>
       <button type="button" class="aba" id="funilAbaBtnForm" onclick="novaReuniaoAba()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9z"/><path d="M14 3v6h5M12 12v5M9.5 14.5h5"/></svg></span>Nova reunião</button>
     </div>
 
@@ -997,11 +1005,12 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       <div class="prog-topo">
         <div>
           <h3>Programação de reuniões</h3>
-          <p>Cada recorrência gera os eventos do calendário. A data que cair em sábado ou domingo é empurrada para o dia útil escolhido.</p>
+          <p>Cada recorrência define o intervalo e por quanto tempo se repete, e gera as reuniões no calendário.
+             A data que cair em sábado ou domingo vai para o dia útil escolhido. Alterar uma recorrência reprograma as reuniões futuras dela.</p>
         </div>
         <div class="prog-acoes">
           <div class="campo">
-            <label>Gerar eventos até</label>
+            <label>Limitar a geração até (opcional)</label>
             <input type="date" id="progAte" onclick="this.showPicker && this.showPicker()">
           </div>
           <button type="button" class="btn btn-verde" id="btnGerarTodas" onclick="gerarTodasSeries()">Gerar eventos de todas</button>
@@ -1010,6 +1019,105 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       </div>
       <div class="prog-lista" id="progLista"></div>
       <div class="prog-rodape" id="progRodape"></div>
+    </div>
+
+    <div id="funilAbaOrientacoes" style="display:none">
+      <div class="orient-topo">
+        <h3>Orientações da reunião</h3>
+        <p>Material de apoio para conduzir a reunião. Fica aqui, fora da ata — nada daqui é lançado ou sai no PDF.</p>
+      </div>
+      <div class="container orient-corpo">
+<!-- ═══════════════════════════════════════════════════════════
+     ORIENTAÇÕES
+═══════════════════════════════════════════════════════════ -->
+
+
+<!-- ═══════════ TEMAS QUE DEVEM SER EVITADOS ═══════════ -->
+<div class="card recolhivel aberto" id="secEvitados" data-slug="evitados">
+  <div class="card-titulo">
+    <span class="ct-esq"><span class="dot"></span>TEMAS QUE DEVEM SER EVITADOS</span>
+    <span class="ct-dir">
+      <button type="button" class="btn-toggle" onclick="toggleSecao('secEvitados',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="texto-orientativo">
+      <h4>a) Reclamações genéricas de mercado</h4>
+      Exemplos:
+      <ul>
+        <li>"O mercado está ruim."</li>
+        <li>"Todo mundo está parado."</li>
+        <li>"A concorrência está vendendo barato."</li>
+      </ul>
+      <div class="destaque">Se surgir, a pergunta deve ser: <strong>qual cliente especificamente foi impactado e qual ação será tomada?</strong></div>
+
+      <h4>b) Problemas operacionais de rotina</h4>
+      Exemplos:
+      <ul>
+        <li>Nota fiscal</li>
+        <li>Transportadora</li>
+        <li>Cadastro</li>
+        <li>Ajustes administrativos</li>
+      </ul>
+      Esses assuntos devem entrar em fluxo próprio.
+
+      <h4>c) Conversas sobre clientes sem relevância comercial</h4>
+      Evitar gastar 20 minutos discutindo um cliente que compra R$ 500 por mês quando existe um cliente de R$ 50 mil reduzindo compras.
+
+      <h4>d) Discussões técnicas profundas</h4>
+      A reunião comercial não deve virar reunião de desenvolvimento de produto. Registrar a necessidade e encaminhar.
+
+      <h4>e) Comparação entre vendedores</h4>
+      Evitar:
+      <ul>
+        <li>"Fulano vende mais."</li>
+        <li>"A carteira dele é melhor."</li>
+      </ul>
+      A comparação deve ser contra:
+      <ul>
+        <li>histórico do próprio vendedor;</li>
+        <li>potencial da carteira;</li>
+        <li>metas definidas.</li>
+      </ul>
+
+      <h4>f) Justificativas sem plano de ação</h4>
+      Sempre que surgir uma justificativa — "o cliente não respondeu" —
+      <div class="destaque">a próxima pergunta deve ser: <strong>qual será a próxima tentativa e quando?</strong></div>
+
+      <h4>g) Revisão detalhada de todos os clientes</h4>
+      Erro comum. Uma carteira pode ter centenas de clientes. A reunião deve focar apenas em:
+      <ul>
+        <li>clientes em risco;</li>
+        <li>clientes perdidos;</li>
+        <li>clientes estratégicos;</li>
+        <li>oportunidades relevantes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ REGRA PRÁTICA ═══════════ -->
+<div class="card recolhivel aberto" id="secRegra" data-slug="regra">
+  <div class="card-titulo">
+    <span class="ct-esq"><span class="dot"></span>REGRA PRÁTICA</span>
+    <span class="ct-dir">
+      <button type="button" class="btn-toggle" onclick="toggleSecao('secRegra',this)">RECOLHER</button>
+    </span>
+  </div>
+  <div class="card-corpo">
+    <div class="texto-orientativo">
+      Se a reunião tivesse que ser resumida em três perguntas, seriam:
+      <ul>
+        <li><strong>a)</strong> Quem estamos correndo risco de perder?</li>
+        <li><strong>b)</strong> Quem podemos recuperar?</li>
+        <li><strong>c)</strong> Quais ações concretas serão executadas até a próxima reunião?</li>
+      </ul>
+      <div class="destaque">Se a reunião responder essas três perguntas toda semana, ela provavelmente estará atacando os pontos que mais impactam o faturamento da Fiorella.</div>
+    </div>
+  </div>
+</div>
+
+      </div>
     </div>
 
     <div id="funilAbaForm" style="display:none">
@@ -1236,120 +1344,6 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
   </div>
 </div>
 
-<!-- ═══════════ AÇÕES DA SEMANA ANTERIOR ═══════════ -->
-<div class="card recolhivel" id="sec5" data-slug="acoes">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>AÇÕES DA SEMANA ANTERIOR</span>
-    <span class="ct-dir">
-      <label class="sem-reg ok"><input type="checkbox" class="chk-ok" onchange="marcarConcluido('acoes',this)"> Item concluído<em class="hint-nada">(nada a registrar)</em></label>
-      <span class="status">PENDENTE</span>
-      <button type="button" class="btn-toggle" onclick="toggleSecao('sec5',this)">EXIBIR</button>
-    </span>
-  </div>
-  <div class="card-corpo">
-    <div class="guia">
-      <strong>Talvez o item mais importante.</strong>
-      <ul>
-        <li>O que foi combinado?</li>
-        <li>Foi executado?</li>
-        <li>Qual resultado gerou?</li>
-      </ul>
-    </div>
-    <label>Observações gerais</label>
-    <textarea id="obsAcoes" placeholder="O que foi combinado, o que foi executado e qual resultado gerou..."></textarea>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     ORIENTAÇÕES
-═══════════════════════════════════════════════════════════ -->
-<div class="separador" id="sepOrientacoes"><span>Orientações</span></div>
-
-<!-- ═══════════ TEMAS QUE DEVEM SER EVITADOS ═══════════ -->
-<div class="card recolhivel" id="secEvitados" data-slug="evitados">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>TEMAS QUE DEVEM SER EVITADOS</span>
-    <span class="ct-dir">
-      <button type="button" class="btn-toggle" onclick="toggleSecao('secEvitados',this)">EXIBIR</button>
-    </span>
-  </div>
-  <div class="card-corpo">
-    <div class="texto-orientativo">
-      <h4>a) Reclamações genéricas de mercado</h4>
-      Exemplos:
-      <ul>
-        <li>"O mercado está ruim."</li>
-        <li>"Todo mundo está parado."</li>
-        <li>"A concorrência está vendendo barato."</li>
-      </ul>
-      <div class="destaque">Se surgir, a pergunta deve ser: <strong>qual cliente especificamente foi impactado e qual ação será tomada?</strong></div>
-
-      <h4>b) Problemas operacionais de rotina</h4>
-      Exemplos:
-      <ul>
-        <li>Nota fiscal</li>
-        <li>Transportadora</li>
-        <li>Cadastro</li>
-        <li>Ajustes administrativos</li>
-      </ul>
-      Esses assuntos devem entrar em fluxo próprio.
-
-      <h4>c) Conversas sobre clientes sem relevância comercial</h4>
-      Evitar gastar 20 minutos discutindo um cliente que compra R$ 500 por mês quando existe um cliente de R$ 50 mil reduzindo compras.
-
-      <h4>d) Discussões técnicas profundas</h4>
-      A reunião comercial não deve virar reunião de desenvolvimento de produto. Registrar a necessidade e encaminhar.
-
-      <h4>e) Comparação entre vendedores</h4>
-      Evitar:
-      <ul>
-        <li>"Fulano vende mais."</li>
-        <li>"A carteira dele é melhor."</li>
-      </ul>
-      A comparação deve ser contra:
-      <ul>
-        <li>histórico do próprio vendedor;</li>
-        <li>potencial da carteira;</li>
-        <li>metas definidas.</li>
-      </ul>
-
-      <h4>f) Justificativas sem plano de ação</h4>
-      Sempre que surgir uma justificativa — "o cliente não respondeu" —
-      <div class="destaque">a próxima pergunta deve ser: <strong>qual será a próxima tentativa e quando?</strong></div>
-
-      <h4>g) Revisão detalhada de todos os clientes</h4>
-      Erro comum. Uma carteira pode ter centenas de clientes. A reunião deve focar apenas em:
-      <ul>
-        <li>clientes em risco;</li>
-        <li>clientes perdidos;</li>
-        <li>clientes estratégicos;</li>
-        <li>oportunidades relevantes.</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════ REGRA PRÁTICA ═══════════ -->
-<div class="card recolhivel" id="secRegra" data-slug="regra">
-  <div class="card-titulo">
-    <span class="ct-esq"><span class="dot"></span>REGRA PRÁTICA</span>
-    <span class="ct-dir">
-      <button type="button" class="btn-toggle" onclick="toggleSecao('secRegra',this)">EXIBIR</button>
-    </span>
-  </div>
-  <div class="card-corpo">
-    <div class="texto-orientativo">
-      Se a reunião tivesse que ser resumida em três perguntas, seriam:
-      <ul>
-        <li><strong>a)</strong> Quem estamos correndo risco de perder?</li>
-        <li><strong>b)</strong> Quem podemos recuperar?</li>
-        <li><strong>c)</strong> Quais ações concretas serão executadas até a próxima reunião?</li>
-      </ul>
-      <div class="destaque">Se a reunião responder essas três perguntas toda semana, ela provavelmente estará atacando os pontos que mais impactam o faturamento da Fiorella.</div>
-    </div>
-  </div>
-</div>
-
 <!-- ═══════════ AÇÕES FINAIS ═══════════ -->
 <div class="acoes-finais">
   <button type="button" class="btn btn-preto btn-grande" id="btnPreparar" onclick="salvarPreparacao()">SALVAR</button>
@@ -1360,7 +1354,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-conferir btn-grande" id="btnFinalizarPlano"
-          onclick="finalizarPlanoAcaoForm()" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.2 15.2 21 21"/><path d="M7.8 10.6l1.9 1.9 3.3-3.6"/></svg></span>PLANO DE AÇÃO FINALIZADO</button>
+          onclick="finalizarPlanoAcaoForm()" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.2 15.2 21 21"/><path d="M7.8 10.6l1.9 1.9 3.3-3.6"/></svg></span>FINALIZAR PLANO DE AÇÃO</button>
 </div>
 <div class="acoes-finais">
   <button type="button" class="btn btn-pendencia btn-grande" id="btnLiberarReuniao"
@@ -1577,6 +1571,24 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
         </div>
       </div>
       <div class="linha">
+        <div class="col-fixa">
+          <label>A recorrência vai até</label>
+          <select id="serieLimite" onchange="serieLimiteMudou()">
+            <option value="data">Uma data final</option>
+            <option value="ocorrencias">Um número de reuniões</option>
+            <option value="sem_fim">Sem fim definido</option>
+          </select>
+        </div>
+        <div class="col-fixa" id="serieLimiteDataBox">
+          <label>Data final</label>
+          <input type="date" id="serieLimiteData" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa" id="serieLimiteQtBox" style="display:none">
+          <label>Quantas reuniões</label>
+          <input type="number" id="serieLimiteQt" min="1" max="500" value="12">
+        </div>
+      </div>
+      <div class="linha">
         <div class="col">
           <label>Observação (opcional)</label>
           <input type="text" id="serieObs" placeholder="Pauta padrão, sala, link...">
@@ -1585,7 +1597,8 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
           <label class="sem-reg ok" style="margin:0"><input type="checkbox" id="serieAtivo" checked> Recorrência ativa</label>
         </div>
       </div>
-      <div class="vis-aviso">Feriados não são considerados — só sábados e domingos. Eventos que já viraram ata nunca são alterados.</div>
+      <div class="vis-aviso"><b>Salvar reprograma todas as reuniões futuras desta recorrência</b> — as que já passaram e as que já viraram ata não são tocadas.<br>
+        Feriados não são considerados: só sábados e domingos.</div>
       <div id="serieErro" class="erro" style="display:none"></div>
       <div class="vis-acoes">
         <button type="button" class="btn btn-vermelho btn-grande" onclick="salvarSerie()">Salvar recorrência</button>
@@ -1799,12 +1812,9 @@ const TOPICOS = [
   {slug:'perdidos',      card:'sec2',         titulo:'CLIENTES PERDIDOS',            chave:'perdidos',      preenchivel:true,  controlavel:true,  lista:'listaPerdidos'},
   {slug:'semcontato',    card:'sec3',         titulo:'CLIENTES SEM CONTATO',         chave:'semContato',    preenchivel:true,  controlavel:true,  lista:'listaSemContato'},
   {slug:'oportunidades', card:'sec4',         titulo:'OPORTUNIDADES RELEVANTES',     chave:'oportunidades', preenchivel:true,  controlavel:true,  lista:'listaOportunidades'},
-  {slug:'acoes',         card:'sec5',         titulo:'AÇÕES DA SEMANA ANTERIOR',     chave:null,            preenchivel:true,  controlavel:true},
-  {slug:'evitados',      card:'secEvitados',  titulo:'TEMAS QUE DEVEM SER EVITADOS', chave:null,            preenchivel:false, controlavel:false},
-  {slug:'regra',         card:'secRegra',     titulo:'REGRA PRÁTICA',                chave:null,            preenchivel:false, controlavel:false}
 ];
 const TOP = {}; TOPICOS.forEach(t => TOP[t.slug] = t);
-const GRUPO_ORIENTACOES = ['evitados','regra'];
+const GRUPO_ORIENTACOES = [];   // orientações saíram da ata e viraram guia própria
 
 let visibilidade = {};   // {slug: true/false}
 let semRegistro  = {};   // {slug: true/false}
@@ -1850,8 +1860,6 @@ function aplicarVisibilidade(){
     const el = document.getElementById(t.card);
     if(el) el.style.display = visibilidade[t.slug] ? '' : 'none';
   });
-  const temOrient = GRUPO_ORIENTACOES.some(s => visibilidade[s]);
-  document.getElementById('sepOrientacoes').style.display = temOrient ? '' : 'none';
   atualizarTodosStatus();
   if(typeof atualizarCamposRetorno === 'function') atualizarCamposRetorno();
 }
@@ -2095,7 +2103,7 @@ function blocoPlanoAcao(dados){
       </div>
       <input type="hidden" class="campo-plano-executado" value="${executado?'1':''}">
       <div class="plano-executado-linha">
-        <button type="button" class="btn btn-verde btn-mini campo-plano-btn-executar" style="${executado?'display:none':''}" onclick="encerrarPlanoCard(this)">Encerrar plano de ação como executado</button>
+        <button type="button" class="btn btn-verde btn-mini campo-plano-btn-executar" style="${executado?'display:none':''}" onclick="encerrarPlanoCard(this)">Marcar plano como executado</button>
         <span class="plano-executado-selo" style="${executado?'':'display:none'}">✓ Executado</span>
       </div>
     </div>`;
@@ -2156,19 +2164,6 @@ function atualizarCamposRetorno(){
     card.style.display = visiveis ? '' : 'none';
     if(visiveis) card.classList.add('aberto');
   });
-  // os tópicos sem lista de clientes (ações, orientações) ficam fora da etapa
-  ['sec5','secEvitados','secRegra','sepOrientacoes'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    if(foco){ el.style.display = 'none'; return; }
-    if(id === 'sepOrientacoes'){
-      el.style.display = GRUPO_ORIENTACOES.some(x => visibilidade[x]) ? '' : 'none';
-      return;
-    }
-    const t = TOPICOS.find(x => x.card === id);
-    el.style.display = (t && !visibilidade[t.slug]) ? 'none' : '';
-  });
-
   const faixa = document.getElementById('focoPlano');
   if(faixa){
     faixa.style.display = foco ? '' : 'none';
@@ -2954,7 +2949,6 @@ function coletarTudo(){
     obsPerdidos: txt('obsPerdidos','perdidos'),
     semContato: regs('listaSemContato','semcontato'),
     obsSemContato: txt('obsSemContato','semcontato'),
-    obsAcoes: txt('obsAcoes','acoes'),
     oportunidades: regs('listaOportunidades','oportunidades'),
     docsGerais: ativo('perdidos')
       ? (arquivos['docsPerdidos']||[]).map(a=>({nome:a.nome, tipo:a.tipo, tamanho:a.tamanho, caminho:a.caminho||'', contexto:'perdidos'}))
@@ -3091,7 +3085,6 @@ function carregarAtaNoFormulario(a){
   document.getElementById('condutor').value      = a.condutor || d.condutor || '';
   document.getElementById('obsPerdidos').value   = d.obsPerdidos || '';
   document.getElementById('obsSemContato').value = d.obsSemContato || '';
-  document.getElementById('obsAcoes').value      = d.obsAcoes || '';
 
   [['risco','listaRisco','risco'], ['perdidos','listaPerdidos','perdido'],
    ['semContato','listaSemContato','semcontato'], ['oportunidades','listaOportunidades','oportunidade']]
@@ -3304,10 +3297,6 @@ function construirPDF(d, numero, comSupervisao){
   if(mostrar('oportunidades')){
     titulo('OPORTUNIDADES RELEVANTES');
     if(nada.oportunidades) semRegistroTexto(); else tabelaRegistros(d.oportunidades);
-  }
-  if(mostrar('acoes')){
-    titulo('AÇÕES DA SEMANA ANTERIOR');
-    if(nada.acoes) semRegistroTexto(); else blocoTexto('', d.obsAcoes);
   }
 
   if(mostrar('regra')){
@@ -3816,7 +3805,6 @@ function montarResumoAta(d, dataFmt, numero){
   bloco('semcontato','CLIENTES SEM CONTATO', d.semContato);
   if(ver('semcontato') && !nada.semcontato && (d.obsSemContato||'').trim()){ L.push('Obs. gerais (sem contato): ' + d.obsSemContato); L.push(''); }
   bloco('oportunidades','OPORTUNIDADES RELEVANTES', d.oportunidades);
-  blocoObs('acoes','AÇÕES DA SEMANA ANTERIOR', d.obsAcoes);
   return L.join('\n');
 }
 
@@ -4282,8 +4270,7 @@ async function admVer(id){
     });
 
     [['perdidos','Observações — clientes perdidos', d.obsPerdidos],
-     ['semcontato','Observações — clientes sem contato', d.obsSemContato],
-     ['acoes','Ações da semana anterior', d.obsAcoes]].forEach(([slug, rot, texto])=>{
+     ['semcontato','Observações — clientes sem contato', d.obsSemContato]].forEach(([slug, rot, texto])=>{
       html += '<div class="bloco-sec"><h4>'+rot+'</h4>';
       if(!ver(slug)) html += '<div class="marca-oculta">Tópico desativado no formulário nesta ata.</div>';
       else if(nada[slug]) html += '<div class="marca-nada">✓ Nada a registrar — confirmado pelo vendedor.</div>';
@@ -4439,10 +4426,12 @@ function funilAba(qual){
   document.getElementById('funilAbaBoard').style.display = qual === 'board' ? '' : 'none';
   document.getElementById('funilAbaCalendario').style.display = qual === 'calendario' ? '' : 'none';
   document.getElementById('funilAbaProgramacao').style.display = qual === 'programacao' ? '' : 'none';
+  document.getElementById('funilAbaOrientacoes').style.display = qual === 'orientacoes' ? '' : 'none';
   document.getElementById('funilAbaForm').style.display = qual === 'form' ? '' : 'none';
   document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', qual === 'board');
   document.getElementById('funilAbaBtnCal').classList.toggle('ativa', qual === 'calendario');
   document.getElementById('funilAbaBtnProg').classList.toggle('ativa', qual === 'programacao');
+  document.getElementById('funilAbaBtnOrient').classList.toggle('ativa', qual === 'orientacoes');
   document.getElementById('funilAbaBtnForm').classList.toggle('ativa', qual === 'form');
   const fl = document.getElementById('flutuaNav');
   if(fl) fl.classList.toggle('mostrar', qual === 'form');
@@ -4523,9 +4512,9 @@ function funilMontarCard(c, idxEtapa){
     else if(c.etapa === 'realizada')
       bt = ['Finalizar avaliação', 'btn-verde', null, 'plano'];           // destino decidido pelos planos abertos
     else if(c.etapa === 'em_andamento')
-      bt = ['Plano de ação finalizado', 'btn-verde', null, 'conferencia'];   // destino depende do retorno
+      bt = ['Finalizar plano de ação', 'btn-verde', null, 'conferencia'];   // destino depende do retorno
     else if(c.etapa === 'conferencia')
-      bt = ['Conferência concluída', 'btn-cinza', 'arquivo', 'arquivo'];
+      bt = ['Concluir conferência', 'btn-cinza', 'arquivo', 'arquivo'];
     if(bt){
       const [rot, cls, destino, ico] = bt;
       const b = document.createElement('button');
@@ -4767,6 +4756,11 @@ function rotuloDuracao(min){
   const h = Math.floor(min / 60), m = min % 60;
   return h + 'h' + (m ? String(m).padStart(2,'0') : '');
 }
+function rotuloLimite(s){
+  if(s.limite_tipo === 'ocorrencias') return (s.limite_ocorrencias || 0) + ' reunião(ões) no total';
+  if(s.limite_tipo === 'sem_fim')     return 'sem fim definido';
+  return s.limite_data ? 'até ' + dataBR(s.limite_data) : 'sem data final';
+}
 const AJUSTE_ROTULOS = {
   proximo:'fim de semana → próximo dia útil',
   anterior:'fim de semana → dia útil anterior',
@@ -4780,11 +4774,6 @@ async function carregarSeries(){
   if(bNova)  bNova.style.display  = admLiberado ? '' : 'none';
   if(bGerar) bGerar.style.display = admLiberado ? '' : 'none';
 
-  const ate = document.getElementById('progAte');
-  if(ate && !ate.value){
-    const d = new Date(); d.setMonth(d.getMonth() + 3);
-    ate.value = d.toISOString().slice(0,10);
-  }
   try{
     const { data, error } = await sb.rpc('ata_series_listar');
     if(error) throw new Error(error.message);
@@ -4816,6 +4805,7 @@ function renderSeries(){
       '</div>' +
       '<div class="tags">' +
         '<span class="tag">Início <b>' + esc(dataBR(s.data_inicial)) + '</b></span>' +
+        '<span class="tag">' + esc(rotuloLimite(s)) + '</span>' +
         '<span class="tag">' + esc(AJUSTE_ROTULOS[s.ajuste_dia_util] || '') + '</span>' +
       '</div>' +
       '<div class="tags">' +
@@ -4843,8 +4833,9 @@ function renderSeries(){
   const rod = document.getElementById('progRodape');
   const total = series.reduce((n,s)=> n + (Number(s.eventos_futuros)||0), 0);
   rod.innerHTML = series.length
-    ? '<b>' + total + '</b> evento(s) futuro(s) programado(s) em ' + series.length + ' recorrência(s). ' +
-      'Gerar de novo não duplica: datas que já existem são puladas.'
+    ? '<b>' + total + '</b> reunião(ões) futura(s) programada(s) em ' + series.length + ' recorrência(s). ' +
+      'Cada recorrência gera até a própria data final ou número de reuniões; o campo acima só encurta isso. ' +
+      'Gerar de novo não duplica, e salvar uma recorrência reprograma as futuras dela.'
     : '';
 }
 
@@ -4863,6 +4854,11 @@ function serieFreqMudou(){
   document.getElementById('serieCustomBox').style.display = custom ? '' : 'none';
   document.getElementById('serieCustomTipoBox').style.display = custom ? '' : 'none';
 }
+function serieLimiteMudou(){
+  const v = document.getElementById('serieLimite').value;
+  document.getElementById('serieLimiteDataBox').style.display = v === 'data' ? '' : 'none';
+  document.getElementById('serieLimiteQtBox').style.display = v === 'ocorrencias' ? '' : 'none';
+}
 
 function abrirModalSerie(id){
   if(!admLiberado){ alert('Só a Área ADM altera a programação.'); return; }
@@ -4880,6 +4876,14 @@ function abrirModalSerie(id){
   document.getElementById('serieAjuste').value = s ? (s.ajuste_dia_util || 'proximo') : 'proximo';
   document.getElementById('serieObs').value = s ? (s.observacao || '') : '';
   document.getElementById('serieAtivo').checked = s ? s.ativo !== false : true;
+
+  const lim = s ? (s.limite_tipo || 'data') : 'data';
+  document.getElementById('serieLimite').value = lim;
+  const padraoFim = new Date(); padraoFim.setMonth(padraoFim.getMonth() + 6);
+  document.getElementById('serieLimiteData').value =
+    (s && s.limite_data) ? String(s.limite_data).slice(0,10) : padraoFim.toISOString().slice(0,10);
+  document.getElementById('serieLimiteQt').value = (s && s.limite_ocorrencias) ? s.limite_ocorrencias : 12;
+  serieLimiteMudou();
 
   const chave = s ? (s.freq_tipo + ':' + s.freq_valor) : 'dias:7';
   const sel = document.getElementById('serieFreq');
@@ -4921,15 +4925,29 @@ async function salvarSerie(){
     data_inicial: document.getElementById('serieInicio').value,
     ajuste_dia_util: document.getElementById('serieAjuste').value,
     observacao: document.getElementById('serieObs').value.trim(),
-    ativo: document.getElementById('serieAtivo').checked
+    ativo: document.getElementById('serieAtivo').checked,
+    limite_tipo: document.getElementById('serieLimite').value,
+    limite_data: document.getElementById('serieLimite').value === 'data'
+                   ? document.getElementById('serieLimiteData').value : null,
+    limite_ocorrencias: document.getElementById('serieLimite').value === 'ocorrencias'
+                   ? (parseInt(document.getElementById('serieLimiteQt').value, 10) || null) : null
   };
+  if(dados.limite_tipo === 'data' && !dados.limite_data){
+    err.textContent = 'Informe até quando a recorrência vai.'; err.style.display = ''; return;
+  }
+  if(dados.limite_tipo === 'ocorrencias' && !dados.limite_ocorrencias){
+    err.textContent = 'Informe quantas reuniões a recorrência terá.'; err.style.display = ''; return;
+  }
   const id = document.getElementById('serieId').value || null;
   try{
-    const { error } = await sb.rpc('ata_serie_salvar', { p_senha: admSenhaAtual, p_id: id, p_dados: dados });
+    const { data, error } = await sb.rpc('ata_serie_salvar', { p_senha: admSenhaAtual, p_id: id, p_dados: dados });
     if(error) throw new Error(error.message);
     fecharModalSerie();
     await carregarSeries();
-    toast(id ? 'Recorrência atualizada.' : 'Recorrência criada — agora gere os eventos.');
+    await funilCarregar();
+    const criados = (data && data.criados) || 0;
+    toast((id ? 'Recorrência atualizada' : 'Recorrência criada') +
+          ' — ' + criados + ' reunião(ões) futura(s) reprogramada(s).');
   }catch(e){ err.textContent = e.message; err.style.display = ''; }
 }
 
@@ -4958,10 +4976,10 @@ async function excluirSerie(){
 
 /* ── Explosão de eventos ── */
 async function gerarSerie(id, silencioso){
-  const ate = document.getElementById('progAte').value;
-  if(!ate){ alert('Escolha até quando os eventos devem ser gerados.'); return null; }
+  const ate = document.getElementById('progAte').value || null;
   const s = series.find(x => x.id === id) || {};
-  if(!silencioso && !confirm('Gerar os eventos de "' + (s.nome||'') + '" até ' + dataBR(ate) + '?\n\n' +
+  if(!silencioso && !confirm('Gerar os eventos de "' + (s.nome||'') + '"?\n\n' +
+      'A recorrência vai ' + rotuloLimite(s) + (ate ? ', e aqui será limitada a ' + dataBR(ate) : '') + '.\n' +
       'Datas que já existem são puladas — nada é duplicado.')) return null;
   try{
     const { data, error } = await sb.rpc('ata_serie_gerar',
@@ -4981,11 +4999,11 @@ async function gerarSerie(id, silencioso){
 }
 
 async function gerarTodasSeries(){
-  const ate = document.getElementById('progAte').value;
-  if(!ate){ alert('Escolha até quando os eventos devem ser gerados.'); return; }
+  const ate = document.getElementById('progAte').value || null;
   const ativas = series.filter(s => s.ativo !== false);
   if(!ativas.length){ alert('Nenhuma recorrência ativa.'); return; }
-  if(!confirm('Gerar os eventos das ' + ativas.length + ' recorrências ativas até ' + dataBR(ate) + '?')) return;
+  if(!confirm('Gerar os eventos das ' + ativas.length + ' recorrências ativas?\n\n' +
+              'Cada uma respeita a própria duração' + (ate ? ', limitada a ' + dataBR(ate) : '') + '.')) return;
   const btn = document.getElementById('btnGerarTodas');
   btn.disabled = true;
   let criados = 0, existentes = 0, falhas = 0;
