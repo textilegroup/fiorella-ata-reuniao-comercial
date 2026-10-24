@@ -834,6 +834,42 @@ html[data-theme=dark] .plano-retorno.pendente > label,html[data-theme=dark] .pla
 html[data-theme=dark] .plano-retorno.pendente > label:before{background:#C98A4A;}
 html[data-theme=dark] .plano-retorno.pendente textarea,html[data-theme=dark] .plano-retorno.pendente input[type=date]{border-color:#9A6B3A;}
 
+/* ───── PROGRAMAÇÃO ───── */
+.prog-topo{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
+.prog-topo h3{font-size:15px;font-weight:700;margin:0 0 4px;color:var(--preto);}
+.prog-topo p{font-size:12.5px;color:var(--cinza-texto);margin:0;max-width:560px;line-height:1.55;}
+.prog-acoes{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.prog-acoes .campo{display:flex;flex-direction:column;}
+.prog-acoes .campo label{font-size:11px;margin-bottom:4px;}
+.prog-acoes .campo input{min-width:150px;}
+.prog-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;}
+.prog-card{
+  border:1px solid var(--cinza-borda);border-left:4px solid var(--vermelho);border-radius:11px;
+  background:var(--branco);padding:16px;display:flex;flex-direction:column;gap:10px;
+}
+.prog-card.off{border-left-color:#8A8A93;opacity:.72;}
+.prog-card .nome{font-size:14.5px;font-weight:700;color:var(--preto);}
+.prog-card .vend{font-size:12.5px;color:var(--cinza-texto);}
+.prog-card .tags{display:flex;flex-wrap:wrap;gap:6px;}
+.prog-card .tag{
+  font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--cinza-borda);
+  background:#F5F5F7;color:var(--cinza-texto);white-space:nowrap;
+}
+.prog-card .tag b{color:var(--preto);font-weight:700;}
+.prog-card .tag.forte{background:var(--verde-suave,#EAF5EE);border-color:rgba(30,122,60,.3);color:#13612E;}
+.prog-card .tag.forte b{color:#13612E;}
+.prog-card .tag.zero{background:var(--vermelho-suave);border-color:rgba(200,16,46,.28);color:var(--vermelho);}
+.prog-card .tag.zero b{color:var(--vermelho);}
+.prog-card .acoes{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;padding-top:4px;}
+.prog-vazio{grid-column:1/-1;padding:28px;text-align:center;color:var(--cinza-texto);font-style:italic;
+  border:1px dashed var(--cinza-borda);border-radius:11px;}
+.prog-rodape{margin-top:18px;font-size:12px;color:var(--cinza-texto);line-height:1.6;}
+html[data-theme=dark] .prog-card{background:var(--fi-surface,var(--surface,#222a32));border-color:var(--fi-line,var(--cinza-borda));}
+html[data-theme=dark] .prog-card .tag{background:var(--soft,#2a343e);border-color:var(--cinza-borda);}
+html[data-theme=dark] .prog-card .tag.forte{background:#15301F;border-color:#4FA574;color:#A6E0BF;}
+html[data-theme=dark] .prog-card .tag.forte b{color:#A6E0BF;}
+@media(max-width:700px){ .prog-lista{grid-template-columns:1fr;} .prog-acoes{width:100%;} }
+
 /* Modo foco: na etapa de plano de ação só ficam na tela os clientes que
    têm plano a executar — o resto da ata sai do caminho. */
 .card.foco-oculto .zona-import,
@@ -870,6 +906,31 @@ html[data-theme=dark] .reg-nav{
   .reg-nav{padding:10px 14px;margin:14px -18px -18px;}
   .reg-nav .rot{display:none;}
   .nav-card{flex:1 1 0;justify-content:center;}
+}
+/* ═════════ PADRÕES DOS TOKENS DO FIORELLA UI ═════════
+   O fiorella-ui.js define estes tokens em :root. Aqui ficam valores de
+   emergência com especificidade ZERO (:where), para que a página continue
+   legível nos dois temas se aquele script não carregar — e para que a
+   definição real, quando existe, sempre vença, venha ela antes ou depois. */
+:where(:root){
+  --fi-bg:#F4F5F6; --fi-surface:#FFFFFF; --fi-surface-alt:#F4F5F6;
+  --fi-line:#E2E6E8; --fi-line-strong:#C9D0D4;
+  --fi-text:#1A2024; --fi-muted:#6A7177;
+  --fi-brand:#C8102E; --fi-brand-soft:#FBEFF1; --fi-brand-strong:#9E0C24;
+  --fi-action:#252A2E; --fi-action-hover:#353B40;
+  --fi-success:#1E7A3C; --fi-radius:12px;
+  --fi-shadow:0 2px 8px rgba(20,35,45,.07);
+  --fi-header-bg:#FFFFFF; --fi-header-text:#1A2024;
+}
+:where(html[data-theme=dark]){
+  --fi-bg:#14191E; --fi-surface:#222A32; --fi-surface-alt:#2A343E;
+  --fi-line:#46535F; --fi-line-strong:#5A6873;
+  --fi-text:#EDF1F4; --fi-muted:#BBC5CE;
+  --fi-brand:#C3CDD6; --fi-brand-soft:#2A343E; --fi-brand-strong:#EDF1F4;
+  --fi-action:#E7EBEE; --fi-action-hover:#FFFFFF;
+  --fi-success:#99CDB1;
+  --fi-shadow:0 4px 18px rgba(0,0,0,.28);
+  --fi-header-bg:#222A32; --fi-header-text:#EDF1F4;
 }
 </style>
 <script>
@@ -913,6 +974,7 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
     <div class="funil-abas">
       <button type="button" class="aba ativa" id="funilAbaBtnBoard" onclick="funilAba('board')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="7" rx="1.5"/></svg></span>Funil</button>
       <button type="button" class="aba" id="funilAbaBtnCal" onclick="funilAba('calendario')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg></span>Calendário</button>
+      <button type="button" class="aba" id="funilAbaBtnProg" onclick="funilAba('programacao')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3.5V9h-5.5"/><path d="M12 7.5V12l3 1.8"/></svg></span>Programação</button>
       <button type="button" class="aba" id="funilAbaBtnForm" onclick="novaReuniaoAba()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9z"/><path d="M14 3v6h5M12 12v5M9.5 14.5h5"/></svg></span>Nova reunião</button>
     </div>
 
@@ -929,6 +991,25 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
 
     <div id="funilAbaBoard" style="display:none">
       <div class="funil-board" id="funilBoard"></div>
+    </div>
+
+    <div id="funilAbaProgramacao" style="display:none">
+      <div class="prog-topo">
+        <div>
+          <h3>Programação de reuniões</h3>
+          <p>Cada recorrência gera os eventos do calendário. A data que cair em sábado ou domingo é empurrada para o dia útil escolhido.</p>
+        </div>
+        <div class="prog-acoes">
+          <div class="campo">
+            <label>Gerar eventos até</label>
+            <input type="date" id="progAte" onclick="this.showPicker && this.showPicker()">
+          </div>
+          <button type="button" class="btn btn-verde" id="btnGerarTodas" onclick="gerarTodasSeries()">Gerar eventos de todas</button>
+          <button type="button" class="btn btn-vermelho" id="btnNovaSerie" onclick="abrirModalSerie()">+ Nova recorrência</button>
+        </div>
+      </div>
+      <div class="prog-lista" id="progLista"></div>
+      <div class="prog-rodape" id="progRodape"></div>
     </div>
 
     <div id="funilAbaForm" style="display:none">
@@ -1411,6 +1492,164 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL RECORRÊNCIA -->
+<div class="modal" id="modalSerie">
+  <div class="modal-caixa" style="max-width:720px">
+    <div class="modal-topo">
+      <h3 id="modalSerieTitulo">Recorrência de reunião
+        <small>Define de quanto em quanto tempo a reunião se repete e quanto tempo dura.</small></h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharModalSerie()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <input type="hidden" id="serieId">
+      <div class="linha">
+        <div class="col">
+          <label>Nome da recorrência</label>
+          <input type="text" id="serieNome" placeholder="Ex.: Reunião Alice">
+        </div>
+        <div class="col">
+          <label>Vendedor</label>
+          <input type="text" id="serieVendedor" placeholder="Nome do vendedor">
+        </div>
+        <div class="col-fixa">
+          <label>Código</label>
+          <input type="text" id="serieCodigo" placeholder="Ex.: 2000">
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Primeira reunião</label>
+          <input type="date" id="serieInicio" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Horário</label>
+          <input type="time" id="serieHora" value="09:00" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Duração</label>
+          <select id="serieDuracao">
+            <option value="30">30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60" selected>1 hora</option>
+            <option value="90">1h30</option>
+            <option value="120">2 horas</option>
+            <option value="180">3 horas</option>
+            <option value="240">4 horas</option>
+          </select>
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Repete a cada</label>
+          <select id="serieFreq" onchange="serieFreqMudou()">
+            <option value="dias:7">7 dias (semanal)</option>
+            <option value="dias:14">14 dias (quinzenal)</option>
+            <option value="dias:15">15 dias</option>
+            <option value="dias:21">21 dias</option>
+            <option value="dias:28">28 dias</option>
+            <option value="meses:1">1 mês (mensal)</option>
+            <option value="meses:2">2 meses (bimestral)</option>
+            <option value="meses:3">3 meses (trimestral)</option>
+            <option value="custom">Personalizado...</option>
+          </select>
+        </div>
+        <div class="col-fixa" id="serieCustomBox" style="display:none">
+          <label>A cada</label>
+          <input type="number" id="serieCustomValor" min="1" max="365" value="10">
+        </div>
+        <div class="col-fixa" id="serieCustomTipoBox" style="display:none">
+          <label>Unidade</label>
+          <select id="serieCustomTipo">
+            <option value="dias">dias</option>
+            <option value="meses">meses</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Se cair em fim de semana</label>
+          <select id="serieAjuste">
+            <option value="proximo">Empurrar para o próximo dia útil</option>
+            <option value="anterior">Puxar para o dia útil anterior</option>
+            <option value="nenhum">Manter a data, mesmo no fim de semana</option>
+          </select>
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col">
+          <label>Observação (opcional)</label>
+          <input type="text" id="serieObs" placeholder="Pauta padrão, sala, link...">
+        </div>
+        <div class="col-fixa" style="align-self:flex-end;padding-bottom:6px">
+          <label class="sem-reg ok" style="margin:0"><input type="checkbox" id="serieAtivo" checked> Recorrência ativa</label>
+        </div>
+      </div>
+      <div class="vis-aviso">Feriados não são considerados — só sábados e domingos. Eventos que já viraram ata nunca são alterados.</div>
+      <div id="serieErro" class="erro" style="display:none"></div>
+      <div class="vis-acoes">
+        <button type="button" class="btn btn-vermelho btn-grande" onclick="salvarSerie()">Salvar recorrência</button>
+        <button type="button" class="btn btn-claro" id="btnSerieExcluir" style="display:none" onclick="excluirSerie()">Excluir recorrência</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO DO CALENDÁRIO -->
+<div class="modal" id="modalEvento">
+  <div class="modal-caixa" style="max-width:620px">
+    <div class="modal-topo">
+      <h3 id="modalEventoTitulo">Editar evento
+        <small>Altera apenas este evento — a recorrência continua como está.</small></h3>
+      <button type="button" class="btn btn-claro btn-mini" onclick="fecharModalEvento()">Fechar</button>
+    </div>
+    <div class="modal-corpo">
+      <input type="hidden" id="eventoId">
+      <div class="linha">
+        <div class="col-fixa">
+          <label>Data</label>
+          <input type="date" id="eventoData" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Horário</label>
+          <input type="time" id="eventoHora" onclick="this.showPicker && this.showPicker()">
+        </div>
+        <div class="col-fixa">
+          <label>Duração</label>
+          <select id="eventoDuracao">
+            <option value="30">30 minutos</option>
+            <option value="45">45 minutos</option>
+            <option value="60">1 hora</option>
+            <option value="90">1h30</option>
+            <option value="120">2 horas</option>
+            <option value="180">3 horas</option>
+            <option value="240">4 horas</option>
+          </select>
+        </div>
+      </div>
+      <div class="linha">
+        <div class="col">
+          <label>Vendedor</label>
+          <input type="text" id="eventoVendedor" placeholder="Nome do vendedor">
+        </div>
+        <div class="col-fixa">
+          <label>Código</label>
+          <input type="text" id="eventoCodigo" placeholder="Ex.: 2000">
+        </div>
+      </div>
+      <div class="linha" style="margin-bottom:0">
+        <div class="col">
+          <label>Observação</label>
+          <input type="text" id="eventoObs" placeholder="Pauta, contexto...">
+        </div>
+      </div>
+      <div id="eventoSerie" class="vis-aviso" style="display:none"></div>
+      <div id="eventoErro" class="erro" style="display:none"></div>
+      <div class="vis-acoes">
+        <button type="button" class="btn btn-vermelho btn-grande" onclick="salvarEvento()">Salvar evento</button>
+        <button type="button" class="btn btn-claro" onclick="excluirEvento()">Excluir evento</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4199,14 +4438,17 @@ async function abrirFunil(){
 function funilAba(qual){
   document.getElementById('funilAbaBoard').style.display = qual === 'board' ? '' : 'none';
   document.getElementById('funilAbaCalendario').style.display = qual === 'calendario' ? '' : 'none';
+  document.getElementById('funilAbaProgramacao').style.display = qual === 'programacao' ? '' : 'none';
   document.getElementById('funilAbaForm').style.display = qual === 'form' ? '' : 'none';
   document.getElementById('funilAbaBtnBoard').classList.toggle('ativa', qual === 'board');
   document.getElementById('funilAbaBtnCal').classList.toggle('ativa', qual === 'calendario');
+  document.getElementById('funilAbaBtnProg').classList.toggle('ativa', qual === 'programacao');
   document.getElementById('funilAbaBtnForm').classList.toggle('ativa', qual === 'form');
   const fl = document.getElementById('flutuaNav');
   if(fl) fl.classList.toggle('mostrar', qual === 'form');
   if(qual === 'form'){ atualizarPendencia(); }
   if(qual === 'calendario') calRender();
+  if(qual === 'programacao') carregarSeries();
 }
 
 async function funilCarregar(){
@@ -4256,7 +4498,8 @@ function funilMontarCard(c, idxEtapa){
   div.className = 'funil-card' + (clicavel ? ' clicavel' : '');
   const hr = horaBR(c.hora);
   div.innerHTML =
-    '<div class="data">' + dataBR(c.data) + (hr ? ' · ' + esc(hr) : '') + '</div>' +
+    '<div class="data">' + dataBR(c.data) + (hr ? ' · ' + esc(hr) : '') +
+      (c.tipo === 'agenda' && c.duracao_min ? ' · ' + esc(rotuloDuracao(c.duracao_min)) : '') + '</div>' +
     '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
     (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '');
 
@@ -4499,6 +4742,331 @@ async function salvarConfigFunil(){
   }catch(e){ err.textContent = e.message; err.style.display = ''; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   PROGRAMAÇÃO — recorrências de reunião
+   Uma recorrência guarda o padrão (de quanto em quanto tempo, a que
+   horas, por quanto tempo). "Gerar eventos" explode o padrão em
+   agendamentos reais até a data escolhida; cada agendamento continua
+   solto no calendário e pode ser editado ou excluído um a um.
+═══════════════════════════════════════════════════════════ */
+let series = [];
+
+const FREQ_ROTULOS = {
+  'dias:7':'semanal (7 dias)', 'dias:14':'quinzenal (14 dias)', 'dias:15':'a cada 15 dias',
+  'dias:21':'a cada 21 dias', 'dias:28':'a cada 28 dias',
+  'meses:1':'mensal', 'meses:2':'bimestral', 'meses:3':'trimestral'
+};
+function rotuloFreq(tipo, valor){
+  const k = tipo + ':' + valor;
+  if(FREQ_ROTULOS[k]) return FREQ_ROTULOS[k];
+  return 'a cada ' + valor + ' ' + (tipo === 'meses' ? (valor > 1 ? 'meses' : 'mês') : 'dias');
+}
+function rotuloDuracao(min){
+  min = Number(min) || 60;
+  if(min < 60) return min + ' min';
+  const h = Math.floor(min / 60), m = min % 60;
+  return h + 'h' + (m ? String(m).padStart(2,'0') : '');
+}
+const AJUSTE_ROTULOS = {
+  proximo:'fim de semana → próximo dia útil',
+  anterior:'fim de semana → dia útil anterior',
+  nenhum:'sem ajuste de dia útil'
+};
+
+async function carregarSeries(){
+  const box = document.getElementById('progLista');
+  const bNova = document.getElementById('btnNovaSerie');
+  const bGerar = document.getElementById('btnGerarTodas');
+  if(bNova)  bNova.style.display  = admLiberado ? '' : 'none';
+  if(bGerar) bGerar.style.display = admLiberado ? '' : 'none';
+
+  const ate = document.getElementById('progAte');
+  if(ate && !ate.value){
+    const d = new Date(); d.setMonth(d.getMonth() + 3);
+    ate.value = d.toISOString().slice(0,10);
+  }
+  try{
+    const { data, error } = await sb.rpc('ata_series_listar');
+    if(error) throw new Error(error.message);
+    series = data || [];
+    renderSeries();
+  }catch(err){
+    box.innerHTML = '<div class="prog-vazio">Não foi possível carregar a programação: ' + esc(err.message) + '</div>';
+  }
+}
+
+function renderSeries(){
+  const box = document.getElementById('progLista');
+  box.innerHTML = '';
+  if(!series.length){
+    box.innerHTML = '<div class="prog-vazio">Nenhuma recorrência cadastrada. Use <b>+ Nova recorrência</b> para criar a primeira.</div>';
+  }
+  series.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'prog-card' + (s.ativo ? '' : ' off');
+    const futuros = Number(s.eventos_futuros) || 0;
+    div.innerHTML =
+      '<div class="nome">' + esc(s.nome) + (s.ativo ? '' : ' <span class="tag">pausada</span>') + '</div>' +
+      '<div class="vend">' + esc(s.vendedor_nome || '—') +
+        (s.vendedor_codigo ? ' (cód. ' + esc(s.vendedor_codigo) + ')' : '') + '</div>' +
+      '<div class="tags">' +
+        '<span class="tag">Repete <b>' + esc(rotuloFreq(s.freq_tipo, s.freq_valor)) + '</b></span>' +
+        '<span class="tag">Às <b>' + esc(horaBR(s.hora) || '—') + '</b></span>' +
+        '<span class="tag">Dura <b>' + esc(rotuloDuracao(s.duracao_min)) + '</b></span>' +
+      '</div>' +
+      '<div class="tags">' +
+        '<span class="tag">Início <b>' + esc(dataBR(s.data_inicial)) + '</b></span>' +
+        '<span class="tag">' + esc(AJUSTE_ROTULOS[s.ajuste_dia_util] || '') + '</span>' +
+      '</div>' +
+      '<div class="tags">' +
+        '<span class="tag ' + (futuros ? 'forte' : 'zero') + '"><b>' + futuros + '</b> evento(s) à frente</span>' +
+        (s.proximo ? '<span class="tag forte">Próximo <b>' + esc(dataBR(s.proximo)) + '</b></span>' : '') +
+      '</div>' +
+      (s.observacao ? '<div class="vend">' + esc(s.observacao) + '</div>' : '');
+
+    if(admLiberado){
+      const acoes = document.createElement('div');
+      acoes.className = 'acoes';
+      acoes.innerHTML =
+        '<button type="button" class="btn btn-verde btn-mini" data-gerar="' + esc(s.id) + '">Gerar eventos</button>' +
+        '<button type="button" class="btn btn-claro btn-mini" data-editar="' + esc(s.id) + '">Editar</button>' +
+        '<button type="button" class="btn btn-claro btn-mini" data-ver="' + esc(s.id) + '">Ver no calendário</button>';
+      div.appendChild(acoes);
+    }
+    box.appendChild(div);
+  });
+
+  box.querySelectorAll('[data-gerar]').forEach(b=> b.onclick = ()=>gerarSerie(b.dataset.gerar));
+  box.querySelectorAll('[data-editar]').forEach(b=> b.onclick = ()=>abrirModalSerie(b.dataset.editar));
+  box.querySelectorAll('[data-ver]').forEach(b=> b.onclick = ()=>verSerieNoCalendario(b.dataset.ver));
+
+  const rod = document.getElementById('progRodape');
+  const total = series.reduce((n,s)=> n + (Number(s.eventos_futuros)||0), 0);
+  rod.innerHTML = series.length
+    ? '<b>' + total + '</b> evento(s) futuro(s) programado(s) em ' + series.length + ' recorrência(s). ' +
+      'Gerar de novo não duplica: datas que já existem são puladas.'
+    : '';
+}
+
+function verSerieNoCalendario(id){
+  const s = series.find(x => x.id === id);
+  if(s && s.proximo){
+    const d = String(s.proximo).slice(0,10).split('-');
+    calAno = Number(d[0]); calMes = Number(d[1]) - 1;
+  }
+  funilAba('calendario');
+}
+
+/* ── Modal da recorrência ── */
+function serieFreqMudou(){
+  const custom = document.getElementById('serieFreq').value === 'custom';
+  document.getElementById('serieCustomBox').style.display = custom ? '' : 'none';
+  document.getElementById('serieCustomTipoBox').style.display = custom ? '' : 'none';
+}
+
+function abrirModalSerie(id){
+  if(!admLiberado){ alert('Só a Área ADM altera a programação.'); return; }
+  const s = id ? series.find(x => x.id === id) : null;
+  document.getElementById('serieId').value = s ? s.id : '';
+  document.getElementById('modalSerieTitulo').firstChild.textContent =
+    s ? 'Editar recorrência' : 'Nova recorrência';
+  document.getElementById('serieNome').value = s ? (s.nome || '') : '';
+  document.getElementById('serieVendedor').value = s ? (s.vendedor_nome || '') : '';
+  document.getElementById('serieCodigo').value = s ? (s.vendedor_codigo || '') : '';
+  document.getElementById('serieInicio').value = s ? String(s.data_inicial || '').slice(0,10)
+                                                   : new Date().toISOString().slice(0,10);
+  document.getElementById('serieHora').value = s ? (horaBR(s.hora) || '09:00') : '09:00';
+  document.getElementById('serieDuracao').value = String(s ? (s.duracao_min || 60) : 60);
+  document.getElementById('serieAjuste').value = s ? (s.ajuste_dia_util || 'proximo') : 'proximo';
+  document.getElementById('serieObs').value = s ? (s.observacao || '') : '';
+  document.getElementById('serieAtivo').checked = s ? s.ativo !== false : true;
+
+  const chave = s ? (s.freq_tipo + ':' + s.freq_valor) : 'dias:7';
+  const sel = document.getElementById('serieFreq');
+  const existe = Array.from(sel.options).some(o => o.value === chave);
+  sel.value = existe ? chave : 'custom';
+  document.getElementById('serieCustomValor').value = s ? s.freq_valor : 10;
+  document.getElementById('serieCustomTipo').value = s ? s.freq_tipo : 'dias';
+  serieFreqMudou();
+
+  document.getElementById('btnSerieExcluir').style.display = s ? '' : 'none';
+  document.getElementById('serieErro').style.display = 'none';
+  document.getElementById('modalSerie').classList.add('aberto');
+}
+function fecharModalSerie(){ document.getElementById('modalSerie').classList.remove('aberto'); }
+
+async function salvarSerie(){
+  const err = document.getElementById('serieErro');
+  err.style.display = 'none';
+  const nome = document.getElementById('serieNome').value.trim();
+  if(!nome){ err.textContent = 'Informe o nome da recorrência.'; err.style.display = ''; return; }
+
+  let tipo, valor;
+  const f = document.getElementById('serieFreq').value;
+  if(f === 'custom'){
+    tipo = document.getElementById('serieCustomTipo').value;
+    valor = parseInt(document.getElementById('serieCustomValor').value, 10);
+    if(!valor || valor < 1){ err.textContent = 'Informe de quantos em quantos dias/meses a reunião se repete.'; err.style.display = ''; return; }
+  } else {
+    const partes = f.split(':'); tipo = partes[0]; valor = parseInt(partes[1], 10);
+  }
+
+  const dados = {
+    nome: nome,
+    vendedor_nome: document.getElementById('serieVendedor').value.trim(),
+    vendedor_codigo: document.getElementById('serieCodigo').value.trim(),
+    hora: document.getElementById('serieHora').value || '09:00',
+    duracao_min: parseInt(document.getElementById('serieDuracao').value, 10) || 60,
+    freq_tipo: tipo, freq_valor: valor,
+    data_inicial: document.getElementById('serieInicio').value,
+    ajuste_dia_util: document.getElementById('serieAjuste').value,
+    observacao: document.getElementById('serieObs').value.trim(),
+    ativo: document.getElementById('serieAtivo').checked
+  };
+  const id = document.getElementById('serieId').value || null;
+  try{
+    const { error } = await sb.rpc('ata_serie_salvar', { p_senha: admSenhaAtual, p_id: id, p_dados: dados });
+    if(error) throw new Error(error.message);
+    fecharModalSerie();
+    await carregarSeries();
+    toast(id ? 'Recorrência atualizada.' : 'Recorrência criada — agora gere os eventos.');
+  }catch(e){ err.textContent = e.message; err.style.display = ''; }
+}
+
+async function excluirSerie(){
+  const id = document.getElementById('serieId').value;
+  if(!id) return;
+  const s = series.find(x => x.id === id) || {};
+  const futuros = Number(s.eventos_futuros) || 0;
+  if(!confirm('Excluir a recorrência "' + (s.nome || '') + '"?\n\n' +
+              (futuros ? 'Os ' + futuros + ' evento(s) futuro(s) ainda não iniciados também serão apagados. '
+                       : '') +
+              'Eventos que já viraram ata não são tocados.')) return;
+  try{
+    const { error } = await sb.rpc('ata_serie_remover',
+      { p_senha: admSenhaAtual, p_id: id, p_apagar_eventos: true });
+    if(error) throw new Error(error.message);
+    fecharModalSerie();
+    await carregarSeries();
+    await funilCarregar();
+    toast('Recorrência excluída.');
+  }catch(e){
+    const err = document.getElementById('serieErro');
+    err.textContent = e.message; err.style.display = '';
+  }
+}
+
+/* ── Explosão de eventos ── */
+async function gerarSerie(id, silencioso){
+  const ate = document.getElementById('progAte').value;
+  if(!ate){ alert('Escolha até quando os eventos devem ser gerados.'); return null; }
+  const s = series.find(x => x.id === id) || {};
+  if(!silencioso && !confirm('Gerar os eventos de "' + (s.nome||'') + '" até ' + dataBR(ate) + '?\n\n' +
+      'Datas que já existem são puladas — nada é duplicado.')) return null;
+  try{
+    const { data, error } = await sb.rpc('ata_serie_gerar',
+      { p_senha: admSenhaAtual, p_id: id, p_ate: ate, p_de: null });
+    if(error) throw new Error(error.message);
+    if(!silencioso){
+      await carregarSeries();
+      await funilCarregar();
+      toast((data && data.criados || 0) + ' evento(s) criado(s)' +
+            (data && data.existentes ? ', ' + data.existentes + ' já existiam.' : '.'));
+    }
+    return data;
+  }catch(err){
+    if(!silencioso) alert('Não foi possível gerar os eventos: ' + err.message);
+    throw err;
+  }
+}
+
+async function gerarTodasSeries(){
+  const ate = document.getElementById('progAte').value;
+  if(!ate){ alert('Escolha até quando os eventos devem ser gerados.'); return; }
+  const ativas = series.filter(s => s.ativo !== false);
+  if(!ativas.length){ alert('Nenhuma recorrência ativa.'); return; }
+  if(!confirm('Gerar os eventos das ' + ativas.length + ' recorrências ativas até ' + dataBR(ate) + '?')) return;
+  const btn = document.getElementById('btnGerarTodas');
+  btn.disabled = true;
+  let criados = 0, existentes = 0, falhas = 0;
+  for(const s of ativas){
+    try{
+      const r = await gerarSerie(s.id, true);
+      criados += (r && r.criados) || 0;
+      existentes += (r && r.existentes) || 0;
+    }catch(e){ falhas++; }
+  }
+  btn.disabled = false;
+  await carregarSeries();
+  await funilCarregar();
+  if(falhas) alert('Algumas recorrências falharam (' + falhas + '). As demais foram geradas.');
+  toast(criados + ' evento(s) criado(s)' + (existentes ? ', ' + existentes + ' já existiam.' : '.'));
+}
+
+/* ── Edição de um evento solto, a partir do calendário ── */
+function abrirModalEvento(id){
+  if(!admLiberado){ alert('Só a Área ADM altera os eventos.'); return; }
+  const c = funilCards.find(x => x.tipo === 'agenda' && x.id === id);
+  if(!c){ alert('Evento não encontrado.'); return; }
+  document.getElementById('eventoId').value = c.id;
+  document.getElementById('eventoData').value = String(c.data || '').slice(0,10);
+  document.getElementById('eventoHora').value = horaBR(c.hora) || '09:00';
+  document.getElementById('eventoDuracao').value = String(c.duracao_min || 60);
+  document.getElementById('eventoVendedor').value = c.vendedor_nome || '';
+  document.getElementById('eventoCodigo').value = c.vendedor_codigo || '';
+  document.getElementById('eventoObs').value = c.observacao || '';
+  const aviso = document.getElementById('eventoSerie');
+  if(c.serie_nome){
+    aviso.innerHTML = 'Este evento veio da recorrência <b>' + esc(c.serie_nome) +
+      '</b>. Alterar aqui muda só este evento — os demais seguem o padrão da recorrência.';
+    aviso.style.display = '';
+  } else { aviso.style.display = 'none'; }
+  document.getElementById('eventoErro').style.display = 'none';
+  document.getElementById('modalEvento').classList.add('aberto');
+}
+function fecharModalEvento(){ document.getElementById('modalEvento').classList.remove('aberto'); }
+
+async function salvarEvento(){
+  const err = document.getElementById('eventoErro');
+  err.style.display = 'none';
+  const id = document.getElementById('eventoId').value;
+  const data = document.getElementById('eventoData').value;
+  const vend = document.getElementById('eventoVendedor').value.trim();
+  if(!data || !vend){ err.textContent = 'Informe a data e o vendedor.'; err.style.display = ''; return; }
+  try{
+    const { error } = await sb.rpc('ata_agenda_atualizar', { p_senha: admSenhaAtual, p_id: id, p_dados: {
+      data: data,
+      hora: document.getElementById('eventoHora').value,
+      duracao_min: parseInt(document.getElementById('eventoDuracao').value, 10) || 60,
+      vendedor_nome: vend,
+      vendedor_codigo: document.getElementById('eventoCodigo').value.trim(),
+      observacao: document.getElementById('eventoObs').value.trim()
+    }});
+    if(error) throw new Error(error.message);
+    fecharModalEvento();
+    await funilCarregar();
+    if(document.getElementById('funilAbaProgramacao').style.display !== 'none') await carregarSeries();
+    toast('Evento atualizado.');
+  }catch(e){ err.textContent = e.message; err.style.display = ''; }
+}
+
+async function excluirEvento(){
+  const id = document.getElementById('eventoId').value;
+  if(!id) return;
+  if(!confirm('Excluir este evento do calendário?\n\nA recorrência continua — gerar de novo recria esta data.')) return;
+  try{
+    const { error } = await sb.rpc('ata_agenda_excluir', { p_senha: admSenhaAtual, p_id: id });
+    if(error) throw new Error(error.message);
+    fecharModalEvento();
+    await funilCarregar();
+    if(document.getElementById('funilAbaProgramacao').style.display !== 'none') await carregarSeries();
+    toast('Evento excluído.');
+  }catch(e){
+    const err = document.getElementById('eventoErro');
+    err.textContent = e.message; err.style.display = '';
+  }
+}
+
 /* ── Reunião agendada → vira a própria ata ao ser iniciada ── */
 function iniciarAtaDeAgenda(c){
   if(editandoId){
@@ -4562,7 +5130,8 @@ function calRender(){
       // identificada na conversa ("a 0008 do Murilo").
       // uma etiqueta por reunião: número da ata + horário. Nada mais.
       html += '<div class="cal-eventos">' + itens.map(c=>{
-        const num  = c.numero ? 'nº ' + String(c.numero).padStart(4,'0') : 'Reunião';
+        const num  = c.numero ? 'nº ' + String(c.numero).padStart(4,'0')
+                              : (c.vendedor_nome ? String(c.vendedor_nome).split(' ')[0] : 'Reunião');
         const hora = horaBR(c.hora);
         const etiq = num + (hora ? ' · ' + hora : '');
         return '<span class="cal-evento '+c.tipo+'" data-short="'+esc(etiq)+'" title="'+esc(etiq+' — '+(c.vendedor_nome||''))+
@@ -4589,7 +5158,9 @@ function calMostrarDia(key, itens){
     html += '<div class="funil-card' + (podeAbrir ? ' clicavel' : '') + '"' +
         (podeAbrir ? ' data-ver="' + esc(c.id) + '"' : '') + ' style="margin-bottom:7px">' +
       '<div class="data">' + (c.numero ? 'Ata nº ' + String(c.numero).padStart(4,'0') : 'Reunião a agendar') +
-        (hora ? ' · ' + esc(hora) : '') + '</div>' +
+        (hora ? ' · ' + esc(hora) : '') +
+        (!ehAta && c.duracao_min ? ' · ' + esc(rotuloDuracao(c.duracao_min)) : '') + '</div>' +
+      (!ehAta && c.serie_nome ? '<div class="num">Recorrência: ' + esc(c.serie_nome) + '</div>' : '') +
       '<div class="vend">' + esc(c.vendedor_nome || '—') +
         (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
       (c.condutor ? '<div class="num">Condutor: ' + esc(c.condutor) + '</div>' : '') +
@@ -4600,7 +5171,8 @@ function calMostrarDia(key, itens){
         ? '<div class="adm-ctl">' + (ehAta
             ? '<button type="button" data-abrir="' + esc(c.id) + '">Abrir ata</button>' +
               '<button type="button" data-ver2="' + esc(c.id) + '">Ver resumo</button>'
-            : '<button type="button" data-iniciar="' + esc(c.id) + '">Iniciar ata</button>') + '</div>'
+            : '<button type="button" data-iniciar="' + esc(c.id) + '">Iniciar ata</button>' +
+              '<button type="button" data-evento="' + esc(c.id) + '">Editar evento</button>') + '</div>'
         : '') +
     '</div>';
   });
@@ -4616,6 +5188,9 @@ function calMostrarDia(key, itens){
   });
   box.querySelectorAll('[data-ver2]').forEach(b=>{
     b.addEventListener('click', (ev)=>{ ev.stopPropagation(); admVer(b.dataset.ver2); });
+  });
+  box.querySelectorAll('[data-evento]').forEach(b=>{
+    b.addEventListener('click', (ev)=>{ ev.stopPropagation(); abrirModalEvento(b.dataset.evento); });
   });
   box.querySelectorAll('[data-iniciar]').forEach(b=>{
     b.addEventListener('click', (ev)=>{
@@ -4668,7 +5243,9 @@ async function iniciar(){
 window.addEventListener('load', iniciar);
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
-    if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
+    if(document.getElementById('modalSerie').classList.contains('aberto')) fecharModalSerie();
+    else if(document.getElementById('modalEvento').classList.contains('aberto')) fecharModalEvento();
+    else if(document.getElementById('modalAgenda').classList.contains('aberto')) fecharModalAgenda();
     else if(document.getElementById('modalConfigFunil').classList.contains('aberto')) fecharConfigFunil();
     else if(document.getElementById('modalAta').classList.contains('aberto')) fecharModal();
     else if(document.getElementById('admPainel').classList.contains('aberto')) fecharADM();
@@ -4679,6 +5256,12 @@ document.getElementById('modalAta').addEventListener('click', function(e){
 });
 document.getElementById('modalAgenda').addEventListener('click', function(e){
   if(e.target === this) fecharModalAgenda();
+});
+document.getElementById('modalSerie').addEventListener('click', function(e){
+  if(e.target === this) fecharModalSerie();
+});
+document.getElementById('modalEvento').addEventListener('click', function(e){
+  if(e.target === this) fecharModalEvento();
 });
 document.getElementById('modalConfigFunil').addEventListener('click', function(e){
   if(e.target === this) fecharConfigFunil();
