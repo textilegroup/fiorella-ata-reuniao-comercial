@@ -834,12 +834,35 @@ html[data-theme=dark] .plano-retorno.pendente > label,html[data-theme=dark] .pla
 html[data-theme=dark] .plano-retorno.pendente > label:before{background:#C98A4A;}
 html[data-theme=dark] .plano-retorno.pendente textarea,html[data-theme=dark] .plano-retorno.pendente input[type=date]{border-color:#9A6B3A;}
 
+/* ───── ORDENAÇÃO DO FUNIL ───── */
+.funil-ordem{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;}
+.funil-ordem label{font-size:12px;margin:0;color:var(--cinza-texto);}
+.funil-ordem select{min-width:290px;max-width:100%;}
+
+/* ───── ARRASTAR NO CALENDÁRIO ───── */
+.cal-evento.arrastavel{cursor:grab;}
+.cal-evento.arrastavel:active{cursor:grabbing;}
+.cal-evento.arrastando{opacity:.45;}
+.cal-dia.alvo{
+  outline:2px dashed var(--verde,#1E7A3C);outline-offset:-2px;
+  background:var(--verde-suave,#E9F5EE)!important;
+}
+html[data-theme=dark] .cal-dia.alvo{background:#15301F!important;outline-color:#4FA574;}
+.cal-dica{font-size:11.5px;color:var(--cinza-texto);margin:0 0 12px;}
+
 /* ───── ORIENTAÇÕES (guia própria) ───── */
 .orient-topo{margin-bottom:20px;}
 .orient-topo h3{font-size:15px;font-weight:700;margin:0 0 4px;color:var(--preto);}
 .orient-topo p{font-size:12.5px;color:var(--cinza-texto);margin:0;max-width:640px;line-height:1.55;}
 .orient-corpo{max-width:900px;margin:0;padding:0;}
 .orient-corpo .card:last-child{margin-bottom:0;}
+
+.serie-resumo{
+  min-height:42px;display:flex;align-items:center;padding:10px 12px;border-radius:8px;
+  border:1px solid var(--cinza-borda);background:#F5F6F6;color:var(--preto);
+  font-size:13px;line-height:1.45;
+}
+html[data-theme=dark] .serie-resumo{background:var(--soft,#2a343e);border-color:var(--cinza-borda);}
 
 /* ───── PROGRAMAÇÃO ───── */
 .prog-topo{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
@@ -939,6 +962,99 @@ html[data-theme=dark] .reg-nav{
   --fi-shadow:0 4px 18px rgba(0,0,0,.28);
   --fi-header-bg:#222A32; --fi-header-text:#EDF1F4;
 }
+/* ═══════════ DENSIDADE DO FORMULÁRIO DA ATA ═══════════
+   Nenhum campo sai da tela: o que encolhe é o espaço entre eles.
+   Tudo escopado em #funilAbaForm para não apertar o funil, a
+   programação, as orientações nem os modais. */
+#funilAbaForm .container{padding-bottom:70px;}
+
+/* blocos */
+#funilAbaForm .card,#funilAbaForm .card.completo{margin-bottom:10px;border-radius:10px;}
+#funilAbaForm .card-titulo,#funilAbaForm .card.completo .card-titulo{padding:9px 14px;gap:9px;}
+#funilAbaForm .card-corpo{padding:11px 14px;}
+#funilAbaForm .progresso{padding:9px 14px;margin-bottom:10px;}
+#funilAbaForm .separador{margin:16px 0 9px;}
+#funilAbaForm .edicao{padding:11px 15px;margin-bottom:12px;}
+
+/* guias e zona de importação */
+#funilAbaForm .guia,#funilAbaForm .card.completo .guia{padding:8px 11px;margin-bottom:9px;line-height:1.4;font-size:12.5px;}
+#funilAbaForm .guia ul{margin:4px 0 0 17px;}
+#funilAbaForm .guia li{margin:1px 0;}
+#funilAbaForm .zona-import{padding:9px 12px;margin-bottom:9px;}
+#funilAbaForm .zona-import p{margin:0 0 8px;line-height:1.45;}
+#funilAbaForm .import-acoes{gap:7px;}
+
+/* campos */
+#funilAbaForm label{margin-bottom:2px;font-size:11px;line-height:1.3;}
+#funilAbaForm input[type=text],#funilAbaForm input[type=date],#funilAbaForm input[type=time],
+#funilAbaForm input[type=number],#funilAbaForm select{padding:6px 9px;min-height:31px;font-size:13.5px;border-radius:7px;}
+#funilAbaForm textarea{padding:7px 10px;min-height:46px;line-height:1.4;font-size:13.5px;border-radius:7px;}
+#funilAbaForm .linha{gap:9px;margin-bottom:7px;}
+#funilAbaForm .linha:last-child{margin-bottom:0;}
+
+/* cartão do cliente */
+#funilAbaForm .registro,
+#funilAbaForm .registro.tem-plano,
+#funilAbaForm .registro.plano-executado{padding:9px 12px;margin-bottom:8px;border-radius:8px;}
+#funilAbaForm .registro-topo{margin-bottom:6px;gap:10px;}
+#funilAbaForm .ref{margin-bottom:7px;gap:5px;}
+#funilAbaForm .ref span{padding:2px 7px;}
+#funilAbaForm .alerta{margin:0 0 8px;padding:7px 10px;}
+#funilAbaForm .registro .sup{margin-top:6px;}
+#funilAbaForm .registro .sup textarea{min-height:38px;}
+#funilAbaForm .docs-area{margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#funilAbaForm .docs-area > label{margin:0;flex:none;}
+#funilAbaForm .docs-area > input[type=file]{flex:1;min-width:180px;font-size:12.5px;}
+#funilAbaForm .docs-area .lista-arquivos{flex:1 1 100%;}
+#funilAbaForm .lista-arquivos{margin:5px 0 0;}
+#funilAbaForm .lista-acoes{gap:7px;margin-top:2px;}
+
+/* chaves e plano de ação */
+#funilAbaForm .plano-toggle,
+#funilAbaForm .elim-toggle,
+#funilAbaForm .grupo-toggle{margin-top:7px;padding-top:7px;}
+#funilAbaForm .plano-bloco{margin-top:7px;padding:10px 11px;border-radius:8px;}
+#funilAbaForm .plano-retorno{margin:11px 0 3px;padding:11px 13px;}
+#funilAbaForm .plano-retorno > label{margin-bottom:6px;}
+#funilAbaForm .plano-retorno textarea{min-height:62px;}
+#funilAbaForm .plano-executado-linha{margin-top:9px;}
+
+/* rodapé "cliente abaixo" acompanha o padding novo do cartão */
+#funilAbaForm .reg-nav{margin:9px -12px -9px;padding:6px 12px;}
+
+/* botões e ações finais */
+#funilAbaForm .btn{padding:6px 12px;min-height:31px;}
+#funilAbaForm .btn-grande{padding:10px;min-height:40px;}
+#funilAbaForm .acoes-finais{gap:7px;margin-top:10px;}
+#funilAbaForm .nota-banco{margin-top:12px;line-height:1.5;}
+#funilAbaForm .foco-plano{margin-bottom:12px;padding:11px 13px;}
+
+/* Em tela larga, os campos curtos do plano de ação e dos dados da reunião
+   ocupam uma linha só. display:contents sobe as colunas para o flex do pai,
+   mantendo a ordem do HTML. */
+@media(min-width:1000px){
+  #funilAbaForm .plano-bloco,
+  #funilAbaForm #sec0 .card-corpo{display:flex;flex-wrap:wrap;gap:9px;align-items:flex-start;}
+  #funilAbaForm .plano-bloco > label,
+  #funilAbaForm .plano-bloco > textarea,
+  #funilAbaForm .plano-bloco > .plano-retorno,
+  #funilAbaForm .plano-bloco > .plano-executado-linha{flex:1 1 100%;margin-top:0;}
+  #funilAbaForm .plano-bloco > .linha,
+  #funilAbaForm #sec0 .card-corpo > .linha{display:contents;}
+  #funilAbaForm .plano-bloco > .linha > .col-fixa,
+  #funilAbaForm #sec0 .card-corpo > .linha > .col-fixa{flex:1 1 150px;min-width:0;}
+  #funilAbaForm .plano-bloco > .linha > .col,
+  #funilAbaForm #sec0 .card-corpo > .linha > .col{flex:2 1 220px;min-width:0;}
+}
+
+@media(max-width:640px){
+  #funilAbaForm .card-titulo,#funilAbaForm .card-corpo{padding:11px 12px;}
+  #funilAbaForm .registro,
+  #funilAbaForm .registro.tem-plano,
+  #funilAbaForm .registro.plano-executado{padding:10px 11px;}
+  #funilAbaForm .reg-nav{margin:9px -11px -9px;padding:6px 11px;}
+  #funilAbaForm .linha{gap:8px;}
+}
 </style>
 <script>
 function aplicarTema(escuro){document.documentElement.dataset.theme=escuro?'dark':'light'; const b=document.getElementById('btnTema'); if(b){b.textContent=escuro?'Modo claro':'Modo escuro';b.setAttribute('aria-pressed',String(escuro));}}
@@ -992,12 +1108,25 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
         <div class="mes" id="calMesRotulo">—</div>
         <button type="button" class="btn btn-claro btn-mini" onclick="calMudarMes(1)">Próximo ▸</button>
       </div>
+      <p class="cal-dica" id="calDica" style="display:none">Arraste um compromisso para outro dia para remarcá-lo. No celular, use <b>Editar evento</b> no detalhe do dia.</p>
       <div class="cal-grid" id="calGrid"></div>
       <div class="cal-legenda" aria-label="Legenda do calendário"><span><i aria-hidden="true"></i>Agendamento de reunião</span><span><i class="leg-ata" aria-hidden="true"></i>Ata de reunião</span></div>
       <div id="calDiaDetalhe" style="margin-top:16px"></div>
     </div>
 
     <div id="funilAbaBoard" style="display:none">
+      <div class="funil-ordem">
+        <label for="funilOrdem">Ordenar os cards por</label>
+        <select id="funilOrdem" onchange="mudarOrdemFunil()">
+          <option value="data_desc">Data da reunião — mais recente primeiro</option>
+          <option value="data_asc">Data da reunião — mais antiga primeiro</option>
+          <option value="etapa_desc">Chegada na etapa — mais recente primeiro</option>
+          <option value="etapa_asc">Chegada na etapa — há mais tempo parado</option>
+          <option value="vendedor">Vendedor (A–Z)</option>
+          <option value="numero_desc">Número da ata — maior primeiro</option>
+          <option value="numero_asc">Número da ata — menor primeiro</option>
+        </select>
+      </div>
       <div class="funil-board" id="funilBoard"></div>
     </div>
 
@@ -1537,30 +1666,76 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
       </div>
       <div class="linha">
         <div class="col-fixa">
-          <label>Repete a cada</label>
-          <select id="serieFreq" onchange="serieFreqMudou()">
-            <option value="dias:7">7 dias (semanal)</option>
-            <option value="dias:14">14 dias (quinzenal)</option>
-            <option value="dias:15">15 dias</option>
-            <option value="dias:21">21 dias</option>
-            <option value="dias:28">28 dias</option>
-            <option value="meses:1">1 mês (mensal)</option>
-            <option value="meses:2">2 meses (bimestral)</option>
-            <option value="meses:3">3 meses (trimestral)</option>
-            <option value="custom">Personalizado...</option>
+          <label>Como se repete</label>
+          <select id="serieModo" onchange="serieFreqMudou()">
+            <option value="semanal">Dia fixo da semana</option>
+            <option value="mensal_dow">Dia da semana no mês</option>
+            <option value="mensal_dia">Data fixa do mês</option>
+            <option value="dias">A cada N dias</option>
+            <option value="meses">A cada N meses</option>
           </select>
         </div>
-        <div class="col-fixa" id="serieCustomBox" style="display:none">
+
+        <!-- dia fixo da semana -->
+        <div class="col-fixa" id="boxSemanaIntervalo">
           <label>A cada</label>
-          <input type="number" id="serieCustomValor" min="1" max="365" value="10">
-        </div>
-        <div class="col-fixa" id="serieCustomTipoBox" style="display:none">
-          <label>Unidade</label>
-          <select id="serieCustomTipo">
-            <option value="dias">dias</option>
-            <option value="meses">meses</option>
+          <select id="serieSemanas">
+            <option value="1">1 semana</option>
+            <option value="2">2 semanas</option>
+            <option value="3">3 semanas</option>
+            <option value="4">4 semanas</option>
           </select>
         </div>
+        <div class="col-fixa" id="boxDow">
+          <label>Dia da semana</label>
+          <select id="serieDow">
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
+          </select>
+        </div>
+
+        <!-- posição dentro do mês -->
+        <div class="col-fixa" id="boxPosicao" style="display:none">
+          <label>Qual semana</label>
+          <select id="seriePosicao">
+            <option value="1">1ª do mês</option>
+            <option value="2">2ª do mês</option>
+            <option value="3">3ª do mês</option>
+            <option value="4">4ª do mês</option>
+            <option value="-1">Última do mês</option>
+          </select>
+        </div>
+
+        <!-- data fixa do mês -->
+        <div class="col-fixa" id="boxDiaMes" style="display:none">
+          <label>Dia do mês</label>
+          <input type="number" id="serieDiaMes" min="1" max="31" value="1">
+        </div>
+
+        <!-- intervalo em meses -->
+        <div class="col-fixa" id="boxMeses" style="display:none">
+          <label>A cada</label>
+          <select id="serieMeses">
+            <option value="1">1 mês</option>
+            <option value="2">2 meses</option>
+            <option value="3">3 meses</option>
+            <option value="6">6 meses</option>
+            <option value="12">12 meses</option>
+          </select>
+        </div>
+
+        <!-- a cada N dias -->
+        <div class="col-fixa" id="boxDias" style="display:none">
+          <label>A cada</label>
+          <input type="number" id="serieDias" min="1" max="365" value="7">
+        </div>
+      </div>
+      <div class="linha">
         <div class="col">
           <label>Se cair em fim de semana</label>
           <select id="serieAjuste">
@@ -1568,6 +1743,10 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
             <option value="anterior">Puxar para o dia útil anterior</option>
             <option value="nenhum">Manter a data, mesmo no fim de semana</option>
           </select>
+        </div>
+        <div class="col">
+          <label>Resumo da repetição</label>
+          <div class="serie-resumo" id="serieResumo">—</div>
         </div>
       </div>
       <div class="linha">
@@ -4105,6 +4284,18 @@ function admRenderCards(r){
     <div class="adm-card"><div class="rot">Empresas registradas</div><div class="val">${(ps.risco||0)+(ps.perdido||0)+(ps.semcontato||0)+(ps.oportunidade||0)+(ps.chamado||0)}</div></div>`;
 }
 
+/* "há 3 dias", "hoje", "há 2 meses" — para a ordenação por chegada na etapa. */
+function haQuantoTempo(iso){
+  if(!iso) return 'há algum tempo';
+  const d = new Date(iso);
+  if(isNaN(d)) return 'há algum tempo';
+  const dias = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if(dias <= 0) return 'desde hoje';
+  if(dias === 1) return 'há 1 dia';
+  if(dias < 30) return 'há ' + dias + ' dias';
+  const meses = Math.floor(dias / 30);
+  return 'há ' + meses + (meses === 1 ? ' mês' : ' meses');
+}
 function horaBR(h){
   if(!h) return '';
   const m = String(h).match(/^(\d{1,2}):(\d{2})/);
@@ -4460,11 +4651,39 @@ async function funilCarregar(){
   }
 }
 
+/* Ordenação dos cards dentro de cada coluna. A escolha fica no navegador. */
+let funilOrdemAtual = 'data_desc';
+try{ funilOrdemAtual = localStorage.getItem('fiorella-funil-ordem') || 'data_desc'; }catch(e){}
+
+function mudarOrdemFunil(){
+  funilOrdemAtual = document.getElementById('funilOrdem').value;
+  try{ localStorage.setItem('fiorella-funil-ordem', funilOrdemAtual); }catch(e){}
+  funilRenderBoard();
+}
+
+function ordenarCards(lista){
+  const txt = v => String(v == null ? '' : v);
+  const num = v => Number(v) || 0;
+  const cmp = {
+    data_desc:  (a,b)=> txt(b.data).localeCompare(txt(a.data)),
+    data_asc:   (a,b)=> txt(a.data).localeCompare(txt(b.data)),
+    etapa_desc: (a,b)=> txt(b.etapa_em || b.criado_em).localeCompare(txt(a.etapa_em || a.criado_em)),
+    etapa_asc:  (a,b)=> txt(a.etapa_em || a.criado_em).localeCompare(txt(b.etapa_em || b.criado_em)),
+    vendedor:   (a,b)=> txt(a.vendedor_nome).localeCompare(txt(b.vendedor_nome), 'pt-BR',
+                          {sensitivity:'base'}) || txt(b.data).localeCompare(txt(a.data)),
+    numero_desc:(a,b)=> num(b.numero) - num(a.numero) || txt(b.data).localeCompare(txt(a.data)),
+    numero_asc: (a,b)=> (num(a.numero) || 1e9) - (num(b.numero) || 1e9) || txt(a.data).localeCompare(txt(b.data))
+  };
+  return lista.slice().sort(cmp[funilOrdemAtual] || cmp.data_desc);
+}
+
 function funilRenderBoard(){
   const board = document.getElementById('funilBoard');
   board.innerHTML = '';
+  const sel = document.getElementById('funilOrdem');
+  if(sel && sel.value !== funilOrdemAtual) sel.value = funilOrdemAtual;
   ETAPAS_FUNIL.forEach((et, idx)=>{
-    const cards = funilCards.filter(c => c.etapa === et.slug);
+    const cards = ordenarCards(funilCards.filter(c => c.etapa === et.slug));
     const col = document.createElement('div');
     col.className = 'funil-col col-' + et.slug;
     col.innerHTML =
@@ -4490,7 +4709,9 @@ function funilMontarCard(c, idxEtapa){
     '<div class="data">' + dataBR(c.data) + (hr ? ' · ' + esc(hr) : '') +
       (c.tipo === 'agenda' && c.duracao_min ? ' · ' + esc(rotuloDuracao(c.duracao_min)) : '') + '</div>' +
     '<div class="vend">' + esc(c.vendedor_nome) + (c.vendedor_codigo ? ' (cód. ' + esc(c.vendedor_codigo) + ')' : '') + '</div>' +
-    (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '');
+    (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '') +
+    ((funilOrdemAtual === 'etapa_asc' || funilOrdemAtual === 'etapa_desc')
+      ? '<div class="num">Nesta etapa ' + esc(haQuantoTempo(c.etapa_em || c.criado_em)) + '</div>' : '');
 
   if(c.tipo === 'agenda'){
     const btn = document.createElement('button');
@@ -4512,7 +4733,7 @@ function funilMontarCard(c, idxEtapa){
     else if(c.etapa === 'realizada')
       bt = ['Finalizar avaliação', 'btn-verde', null, 'plano'];           // destino decidido pelos planos abertos
     else if(c.etapa === 'em_andamento')
-      bt = ['Finalizar plano de ação', 'btn-verde', null, 'conferencia'];   // destino depende do retorno
+      bt = ['Finalizar plano de ação', 'btn-verde', null, 'conferencia'];   // sempre vai para a conferência
     else if(c.etapa === 'conferencia')
       bt = ['Concluir conferência', 'btn-cinza', 'arquivo', 'arquivo'];
     if(bt){
@@ -4597,8 +4818,8 @@ function contarPlanos(d){
   return n;
 }
 
-/* Fim da execução: só vai para a conferência quando existe plano de ação E
-   retorno registrado. Sem retorno, segue direto para o arquivo. */
+/* Fim da execução: a ata vai SEMPRE para a conferência — nunca pula direto
+   para o arquivo. O diálogo avisa quantos planos já têm retorno antes de mover. */
 async function finalizarPlanoAcao(c){
   const nAta = c.numero ? ' nº ' + String(c.numero).padStart(4,'0') : '';
   let planos = 0, retornos = 0;
@@ -4610,13 +4831,16 @@ async function finalizarPlanoAcao(c){
     alert('Não foi possível ler a ata' + nAta + ' para conferir os retornos:\n\n' + err.message);
     return;
   }
-  const destino = (planos > 0 && retornos > 0) ? 'conferencia' : 'arquivo';
+  // o caminho é sempre o mesmo: execução → conferência → arquivo
+  const destino = 'conferencia';
   const et = ETAPAS_FUNIL.find(e => e.slug === destino);
-  const detalhe = destino === 'conferencia'
-    ? retornos + ' de ' + planos + ' plano(s) de ação com retorno registrado.'
-    : (planos > 0 ? 'Nenhum retorno registrado nos planos de ação.' : 'Nenhum plano de ação nesta ata.');
-  if(!confirm('Encerrar a execução do plano de ação da ata' + nAta + '?\n\n' + detalhe +
-              '\nEla vai para "' + (et ? et.titulo : destino) + '".')) return;
+  const detalhe = planos === 0
+    ? 'Esta ata não tem plano de ação registrado.'
+    : (retornos > 0
+        ? retornos + ' de ' + planos + ' plano(s) de ação com retorno registrado.'
+        : 'Nenhum retorno registrado ainda nos ' + planos + ' plano(s) de ação.');
+  if(!confirm('Finalizar o plano de ação da ata' + nAta + '?\n\n' + detalhe +
+              '\nEla vai para "' + (et ? et.titulo : destino) + '" para ser conferida.')) return;
   try{
     await definirEtapaAta(c.id, destino);
     await funilCarregar();
@@ -4740,15 +4964,28 @@ async function salvarConfigFunil(){
 ═══════════════════════════════════════════════════════════ */
 let series = [];
 
-const FREQ_ROTULOS = {
-  'dias:7':'semanal (7 dias)', 'dias:14':'quinzenal (14 dias)', 'dias:15':'a cada 15 dias',
-  'dias:21':'a cada 21 dias', 'dias:28':'a cada 28 dias',
-  'meses:1':'mensal', 'meses:2':'bimestral', 'meses:3':'trimestral'
-};
-function rotuloFreq(tipo, valor){
-  const k = tipo + ':' + valor;
-  if(FREQ_ROTULOS[k]) return FREQ_ROTULOS[k];
-  return 'a cada ' + valor + ' ' + (tipo === 'meses' ? (valor > 1 ? 'meses' : 'mês') : 'dias');
+const DOW_NOMES = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const POS_NOMES = {'1':'1ª','2':'2ª','3':'3ª','4':'4ª','-1':'última'};
+
+/* Frase única que descreve a repetição — usada no card e no resumo do modal. */
+function rotuloFreq(s){
+  const tipo = s.freq_tipo || 'dias';
+  const v = Number(s.freq_valor) || 1;
+  if(tipo === 'semanal_dow'){
+    const dia = DOW_NOMES[Number(s.freq_dow) || 1];
+    return v === 1 ? 'toda ' + dia : 'a cada ' + v + ' semanas, ' + dia;
+  }
+  if(tipo === 'mensal_dow'){
+    const dia = DOW_NOMES[Number(s.freq_dow) || 5];
+    const pos = POS_NOMES[String(s.freq_semana_mes == null ? -1 : s.freq_semana_mes)] || 'última';
+    return pos + ' ' + dia + ' do mês' + (v > 1 ? ', a cada ' + v + ' meses' : '');
+  }
+  if(tipo === 'mensal_dia'){
+    const dia = Number(s.freq_dia_mes) || 1;
+    return 'todo dia ' + dia + (v > 1 ? ', a cada ' + v + ' meses' : ' do mês');
+  }
+  if(tipo === 'meses') return v === 1 ? 'mensal, na mesma data' : 'a cada ' + v + ' meses, na mesma data';
+  return 'a cada ' + v + ' dia(s)';
 }
 function rotuloDuracao(min){
   min = Number(min) || 60;
@@ -4799,7 +5036,7 @@ function renderSeries(){
       '<div class="vend">' + esc(s.vendedor_nome || '—') +
         (s.vendedor_codigo ? ' (cód. ' + esc(s.vendedor_codigo) + ')' : '') + '</div>' +
       '<div class="tags">' +
-        '<span class="tag">Repete <b>' + esc(rotuloFreq(s.freq_tipo, s.freq_valor)) + '</b></span>' +
+        '<span class="tag">Repete <b>' + esc(rotuloFreq(s)) + '</b></span>' +
         '<span class="tag">Às <b>' + esc(horaBR(s.hora) || '—') + '</b></span>' +
         '<span class="tag">Dura <b>' + esc(rotuloDuracao(s.duracao_min)) + '</b></span>' +
       '</div>' +
@@ -4850,9 +5087,57 @@ function verSerieNoCalendario(id){
 
 /* ── Modal da recorrência ── */
 function serieFreqMudou(){
-  const custom = document.getElementById('serieFreq').value === 'custom';
-  document.getElementById('serieCustomBox').style.display = custom ? '' : 'none';
-  document.getElementById('serieCustomTipoBox').style.display = custom ? '' : 'none';
+  const m = document.getElementById('serieModo').value;
+  const mostrar = (id, ok)=>{ const e = document.getElementById(id); if(e) e.style.display = ok ? '' : 'none'; };
+  mostrar('boxSemanaIntervalo', m === 'semanal');
+  mostrar('boxDow',             m === 'semanal' || m === 'mensal_dow');
+  mostrar('boxPosicao',         m === 'mensal_dow');
+  mostrar('boxDiaMes',          m === 'mensal_dia');
+  mostrar('boxMeses',           m === 'mensal_dow' || m === 'mensal_dia' || m === 'meses');
+  mostrar('boxDias',            m === 'dias');
+  const r = document.getElementById('serieResumo');
+  if(r) r.textContent = rotuloFreq(lerRepeticaoDoModal());
+}
+
+/* Lê os campos de repetição e devolve no formato que o banco entende. */
+function lerRepeticaoDoModal(){
+  const m = document.getElementById('serieModo').value;
+  const num = id => parseInt(document.getElementById(id).value, 10);
+  if(m === 'semanal')
+    return { freq_tipo:'semanal_dow', freq_valor:num('serieSemanas') || 1,
+             freq_dow:num('serieDow'), freq_semana_mes:null, freq_dia_mes:null };
+  if(m === 'mensal_dow')
+    return { freq_tipo:'mensal_dow', freq_valor:num('serieMeses') || 1,
+             freq_dow:num('serieDow'), freq_semana_mes:num('seriePosicao'), freq_dia_mes:null };
+  if(m === 'mensal_dia')
+    return { freq_tipo:'mensal_dia', freq_valor:num('serieMeses') || 1,
+             freq_dow:null, freq_semana_mes:null, freq_dia_mes:num('serieDiaMes') || 1 };
+  if(m === 'meses')
+    return { freq_tipo:'meses', freq_valor:num('serieMeses') || 1,
+             freq_dow:null, freq_semana_mes:null, freq_dia_mes:null };
+  return { freq_tipo:'dias', freq_valor:num('serieDias') || 7,
+           freq_dow:null, freq_semana_mes:null, freq_dia_mes:null };
+}
+
+/* Preenche os campos de repetição a partir de uma recorrência salva. */
+function aplicarRepeticaoNoModal(s){
+  const set = (id, v)=>{ const e = document.getElementById(id); if(e && v != null) e.value = String(v); };
+  const tipo = s ? (s.freq_tipo || 'dias') : 'semanal_dow';
+  const modo = tipo === 'semanal_dow' ? 'semanal'
+             : tipo === 'mensal_dow'  ? 'mensal_dow'
+             : tipo === 'mensal_dia'  ? 'mensal_dia'
+             : tipo === 'meses'       ? 'meses' : 'dias';
+  document.getElementById('serieModo').value = modo;
+
+  // padrões: o dia da semana da data inicial, para a escolha já nascer coerente
+  const base = s && s.data_inicial ? new Date(String(s.data_inicial).slice(0,10) + 'T12:00:00') : new Date();
+  set('serieDow', s && s.freq_dow != null ? s.freq_dow : base.getDay());
+  set('seriePosicao', s && s.freq_semana_mes != null ? s.freq_semana_mes : -1);
+  set('serieDiaMes', s && s.freq_dia_mes != null ? s.freq_dia_mes : base.getDate());
+  set('serieSemanas', modo === 'semanal' && s ? (s.freq_valor || 1) : 1);
+  set('serieMeses', (modo === 'meses' || modo === 'mensal_dia' || modo === 'mensal_dow') && s ? (s.freq_valor || 1) : 1);
+  set('serieDias', modo === 'dias' && s ? (s.freq_valor || 7) : 7);
+  serieFreqMudou();
 }
 function serieLimiteMudou(){
   const v = document.getElementById('serieLimite').value;
@@ -4885,13 +5170,7 @@ function abrirModalSerie(id){
   document.getElementById('serieLimiteQt').value = (s && s.limite_ocorrencias) ? s.limite_ocorrencias : 12;
   serieLimiteMudou();
 
-  const chave = s ? (s.freq_tipo + ':' + s.freq_valor) : 'dias:7';
-  const sel = document.getElementById('serieFreq');
-  const existe = Array.from(sel.options).some(o => o.value === chave);
-  sel.value = existe ? chave : 'custom';
-  document.getElementById('serieCustomValor').value = s ? s.freq_valor : 10;
-  document.getElementById('serieCustomTipo').value = s ? s.freq_tipo : 'dias';
-  serieFreqMudou();
+  aplicarRepeticaoNoModal(s);
 
   document.getElementById('btnSerieExcluir').style.display = s ? '' : 'none';
   document.getElementById('serieErro').style.display = 'none';
@@ -4899,20 +5178,28 @@ function abrirModalSerie(id){
 }
 function fecharModalSerie(){ document.getElementById('modalSerie').classList.remove('aberto'); }
 
+/* qualquer mexida nos campos de repetição reescreve a frase-resumo */
+['serieDow','seriePosicao','serieDiaMes','serieSemanas','serieMeses','serieDias','serieInicio'].forEach(id=>{
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.id === id){
+      const r = document.getElementById('serieResumo');
+      if(r) r.textContent = rotuloFreq(lerRepeticaoDoModal());
+    }
+  });
+});
+
 async function salvarSerie(){
   const err = document.getElementById('serieErro');
   err.style.display = 'none';
   const nome = document.getElementById('serieNome').value.trim();
   if(!nome){ err.textContent = 'Informe o nome da recorrência.'; err.style.display = ''; return; }
 
-  let tipo, valor;
-  const f = document.getElementById('serieFreq').value;
-  if(f === 'custom'){
-    tipo = document.getElementById('serieCustomTipo').value;
-    valor = parseInt(document.getElementById('serieCustomValor').value, 10);
-    if(!valor || valor < 1){ err.textContent = 'Informe de quantos em quantos dias/meses a reunião se repete.'; err.style.display = ''; return; }
-  } else {
-    const partes = f.split(':'); tipo = partes[0]; valor = parseInt(partes[1], 10);
+  const rep = lerRepeticaoDoModal();
+  if(!rep.freq_valor || rep.freq_valor < 1){
+    err.textContent = 'Informe o intervalo da repetição.'; err.style.display = ''; return;
+  }
+  if(rep.freq_tipo === 'mensal_dia' && (!rep.freq_dia_mes || rep.freq_dia_mes < 1 || rep.freq_dia_mes > 31)){
+    err.textContent = 'Informe um dia do mês entre 1 e 31.'; err.style.display = ''; return;
   }
 
   const dados = {
@@ -4921,7 +5208,8 @@ async function salvarSerie(){
     vendedor_codigo: document.getElementById('serieCodigo').value.trim(),
     hora: document.getElementById('serieHora').value || '09:00',
     duracao_min: parseInt(document.getElementById('serieDuracao').value, 10) || 60,
-    freq_tipo: tipo, freq_valor: valor,
+    freq_tipo: rep.freq_tipo, freq_valor: rep.freq_valor,
+    freq_dow: rep.freq_dow, freq_semana_mes: rep.freq_semana_mes, freq_dia_mes: rep.freq_dia_mes,
     data_inicial: document.getElementById('serieInicio').value,
     ajuste_dia_util: document.getElementById('serieAjuste').value,
     observacao: document.getElementById('serieObs').value.trim(),
@@ -5114,6 +5402,8 @@ function calMudarMes(delta){
 
 function calRender(){
   document.getElementById('calMesRotulo').textContent = CAL_MESES[calMes] + ' de ' + calAno;
+  const dica = document.getElementById('calDica');
+  if(dica) dica.style.display = admLiberado ? '' : 'none';
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
   CAL_DOW.forEach(d=>{
@@ -5152,16 +5442,82 @@ function calRender(){
                               : (c.vendedor_nome ? String(c.vendedor_nome).split(' ')[0] : 'Reunião');
         const hora = horaBR(c.hora);
         const etiq = num + (hora ? ' · ' + hora : '');
-        return '<span class="cal-evento '+c.tipo+'" data-short="'+esc(etiq)+'" title="'+esc(etiq+' — '+(c.vendedor_nome||''))+
+        const arrastavel = admLiberado;
+        return '<span class="cal-evento '+c.tipo+(arrastavel?' arrastavel':'')+'"' +
+               (arrastavel ? ' draggable="true" data-mover="'+esc(c.id)+'" data-tipo="'+esc(c.tipo)+'"' : '') +
+               ' data-short="'+esc(etiq)+'" title="'+esc(etiq+' — '+(c.vendedor_nome||'') +
+               (arrastavel ? ' · arraste para outro dia' : ''))+
                '"><span class="evento-label">'+esc(etiq)+'</span></span>';
       }).join('') + '</div>';
     }
     cel.innerHTML = html;
+    cel.dataset.dia = key;
+    if(admLiberado) ligarSoltarNoDia(cel, key);
     if(itens.length){ cel.onclick = ()=>calMostrarDia(key, itens); cel.tabIndex=0; cel.setAttribute('role','button'); cel.setAttribute('aria-label',dia+' de '+CAL_MESES[calMes]+': '+itens.length+' reunião(ões)'); cel.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();calMostrarDia(key,itens);}}; }
     grid.appendChild(cel);
   }
 
   document.getElementById('calDiaDetalhe').innerHTML = '';
+  if(admLiberado) ligarArrastarEventos();
+}
+
+/* ═══════════ ARRASTAR UM COMPROMISSO PARA OUTRO DIA ═══════════
+   Só com perfil ADM. O calendário é a origem e o destino; quem não
+   arrasta (celular, por exemplo) muda a data pelo botão "Editar evento". */
+let calArrastando = null;
+
+function ligarArrastarEventos(){
+  document.querySelectorAll('#calGrid .cal-evento[data-mover]').forEach(el=>{
+    el.addEventListener('dragstart', ev=>{
+      calArrastando = { id: el.dataset.mover, tipo: el.dataset.tipo,
+                        de: el.closest('.cal-dia') ? el.closest('.cal-dia').dataset.dia : null };
+      el.classList.add('arrastando');
+      try{ ev.dataTransfer.setData('text/plain', el.dataset.mover); }catch(e){}
+      if(ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', ()=>{
+      el.classList.remove('arrastando');
+      document.querySelectorAll('.cal-dia.alvo').forEach(d=>d.classList.remove('alvo'));
+      calArrastando = null;
+    });
+  });
+}
+
+function ligarSoltarNoDia(cel, key){
+  cel.addEventListener('dragover', ev=>{
+    if(!calArrastando || key === calArrastando.de) return;
+    ev.preventDefault();
+    if(ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+    cel.classList.add('alvo');
+  });
+  cel.addEventListener('dragleave', ()=> cel.classList.remove('alvo'));
+  cel.addEventListener('drop', ev=>{
+    ev.preventDefault();
+    cel.classList.remove('alvo');
+    const info = calArrastando;
+    calArrastando = null;
+    if(!info || key === info.de) return;
+    moverCompromisso(info, key);
+  });
+}
+
+async function moverCompromisso(info, novaData){
+  const c = funilCards.find(x => x.id === info.id) || {};
+  const rotulo = c.numero ? 'a ata nº ' + String(c.numero).padStart(4,'0')
+                          : 'o compromisso de ' + (c.vendedor_nome || '—');
+  if(!confirm('Mover ' + rotulo + ' de ' + dataBR(info.de) + ' para ' + dataBR(novaData) + '?')) {
+    await funilCarregar(); return;
+  }
+  try{
+    const { error } = await sb.rpc('ata_mover_data',
+      { p_senha: admSenhaAtual, p_tipo: info.tipo, p_id: info.id, p_data: novaData });
+    if(error) throw new Error(error.message);
+    await funilCarregar();
+    toast('Movido para ' + dataBR(novaData) + '.');
+  }catch(err){
+    alert('Não foi possível mover: ' + err.message);
+    await funilCarregar();
+  }
 }
 
 function calMostrarDia(key, itens){
