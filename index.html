@@ -834,6 +834,28 @@ html[data-theme=dark] .plano-retorno.pendente > label,html[data-theme=dark] .pla
 html[data-theme=dark] .plano-retorno.pendente > label:before{background:#C98A4A;}
 html[data-theme=dark] .plano-retorno.pendente textarea,html[data-theme=dark] .plano-retorno.pendente input[type=date]{border-color:#9A6B3A;}
 
+/* ───── SELEÇÃO DE CARDS NO FUNIL ───── */
+.funil-card{position:relative;}
+.card-sel{
+  position:absolute;top:8px;right:8px;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;
+}
+.card-sel input{width:17px;height:17px;margin:0;cursor:pointer;accent-color:var(--vermelho);}
+.funil-card.selecionado{
+  outline:2px solid var(--vermelho);outline-offset:-2px;
+  background:var(--vermelho-suave)!important;
+}
+html[data-theme=dark] .funil-card.selecionado{background:#3A2026!important;outline-color:#E0808F;}
+.funil-selbarra{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:0 0 14px;padding:11px 15px;border-radius:10px;
+  border:1px solid var(--vermelho);background:var(--vermelho-suave);
+}
+.funil-selbarra .qt{font-size:13px;font-weight:700;color:var(--vermelho);}
+.funil-selbarra .det{font-size:12px;color:var(--cinza-texto);margin-right:auto;}
+html[data-theme=dark] .funil-selbarra{background:#3A2026;border-color:#E0808F;}
+html[data-theme=dark] .funil-selbarra .qt{color:#F0B8C0;}
+
 /* ───── ORDENAÇÃO DO FUNIL ───── */
 .funil-ordem{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;}
 .funil-ordem label{font-size:12px;margin:0;color:var(--cinza-texto);}
@@ -1126,6 +1148,12 @@ function alternarTema(){const escuro=document.documentElement.dataset.theme!=='d
           <option value="numero_desc">Número da ata — maior primeiro</option>
           <option value="numero_asc">Número da ata — menor primeiro</option>
         </select>
+      </div>
+      <div class="funil-selbarra" id="funilSelBarra" style="display:none">
+        <span class="qt" id="funilSelQt">0 selecionado(s)</span>
+        <span class="det" id="funilSelDet"></span>
+        <button type="button" class="btn btn-claro btn-mini" onclick="limparSelecaoFunil()">Limpar seleção</button>
+        <button type="button" class="btn btn-remover btn-mini" onclick="excluirSelecionados()">Excluir selecionados</button>
       </div>
       <div class="funil-board" id="funilBoard"></div>
     </div>
@@ -4651,6 +4679,113 @@ async function funilCarregar(){
   }
 }
 
+/* ═══════════ SELEÇÃO E EXCLUSÃO DE CARDS NO FUNIL ═══════════
+   Marcar um card não muda nada sozinho: só a barra do topo age, e a
+   exclusão apaga a ata inteira (itens, anexos e o card). */
+const funilSelecao = new Set();
+
+/* concordância: plural(1,'card','cards') → "1 card" */
+function plural(n, sing, plur){ return n + ' ' + (n === 1 ? sing : plur); }
+
+function alternarSelecao(id, ligado){
+  if(ligado) funilSelecao.add(id); else funilSelecao.delete(id);
+  const card = document.querySelector('.funil-card[data-card="' + id + '"]');
+  if(card) card.classList.toggle('selecionado', ligado);
+  atualizarBarraSelecao();
+}
+
+function limparSelecaoFunil(){
+  funilSelecao.clear();
+  document.querySelectorAll('.funil-card.selecionado').forEach(c=>c.classList.remove('selecionado'));
+  document.querySelectorAll('.card-sel input:checked').forEach(i=>{ i.checked = false; });
+  atualizarBarraSelecao();
+}
+
+function selecionados(){
+  return funilCards.filter(c => funilSelecao.has(c.id));
+}
+
+function atualizarBarraSelecao(){
+  const barra = document.getElementById('funilSelBarra');
+  if(!barra) return;
+  // ids que sumiram do funil (recarregado) saem da seleção
+  const vivos = new Set(funilCards.map(c => c.id));
+  Array.from(funilSelecao).forEach(id=>{ if(!vivos.has(id)) funilSelecao.delete(id); });
+
+  const lista = selecionados();
+  barra.style.display = (admLiberado && lista.length) ? '' : 'none';
+  if(!lista.length) return;
+  const atas = lista.filter(c => c.tipo === 'ata').length;
+  const ags  = lista.length - atas;
+  document.getElementById('funilSelQt').textContent =
+    plural(lista.length, 'card selecionado', 'cards selecionados');
+  document.getElementById('funilSelDet').textContent =
+    [atas ? plural(atas, 'ata', 'atas') : '',
+     ags  ? plural(ags, 'agendamento', 'agendamentos') : ''].filter(Boolean).join(' · ');
+}
+
+async function excluirSelecionados(){
+  const lista = selecionados();
+  if(!lista.length) return;
+
+  const atas = lista.filter(c => c.tipo === 'ata');
+  const ags  = lista.filter(c => c.tipo === 'agenda');
+  const nomes = lista.slice(0, 12).map(c =>
+    '• ' + (c.numero ? 'Ata nº ' + String(c.numero).padStart(4,'0') : 'Agendamento') +
+    ' — ' + dataBR(c.data) + ' — ' + (c.vendedor_nome || '—')).join('\n');
+
+  if(!confirm('Excluir definitivamente ' + plural(lista.length, 'card', 'cards') + '?\n\n' + nomes +
+              (lista.length > 12 ? '\n• ... e mais ' + (lista.length - 12) : '') +
+              (atas.length ? '\n\n' + (atas.length === 1
+                 ? 'A ata sai com os itens e os anexos.'
+                 : 'As ' + atas.length + ' atas saem com os itens e os anexos.') : '') +
+              '\n\nEsta ação não pode ser desfeita.')) return;
+
+  // segunda confirmação quando há ata: é conteúdo de reunião, não um agendamento vazio
+  if(atas.length && !confirm(atas.length === 1
+      ? 'Confirma? A ata de reunião será apagada do banco, com todo o conteúdo lançado.'
+      : 'Confirma? ' + atas.length + ' atas de reunião serão apagadas do banco, com todo o conteúdo lançado.')) return;
+
+  const btn = document.querySelector('#funilSelBarra .btn-remover');
+  if(btn) btn.disabled = true;
+  let ok = 0; const falhas = [];
+  const caminhos = [];
+
+  for(const c of lista){
+    try{
+      if(c.tipo === 'ata'){
+        const { data, error } = await sb.rpc('ata_admin_excluir', { p_senha: admSenhaAtual, p_id: c.id });
+        if(error) throw new Error(error.message);
+        ((data && data.arquivos) || []).forEach(x => caminhos.push(x));
+      } else {
+        const { error } = await sb.rpc('ata_agenda_excluir', { p_senha: admSenhaAtual, p_id: c.id });
+        if(error) throw new Error(error.message);
+      }
+      funilSelecao.delete(c.id);
+      ok++;
+    }catch(err){
+      falhas.push((c.numero ? 'nº ' + String(c.numero).padStart(4,'0') : dataBR(c.data)) + ': ' + err.message);
+    }
+  }
+
+  if(caminhos.length){
+    try{ await sb.storage.from(BUCKET_ANEXOS).remove(caminhos); }catch(e){}
+  }
+  if(btn) btn.disabled = false;
+
+  await funilCarregar();
+  if(typeof admDados !== 'undefined' && document.getElementById('admPainel') &&
+     document.getElementById('admPainel').classList.contains('aberto')){
+    try{ await admCarregar(); }catch(e){}
+  }
+  if(falhas.length){
+    alert((ok ? plural(ok, 'card excluído', 'cards excluídos') + '. ' : '') +
+          'Não foi possível excluir ' + plural(falhas.length, 'card', 'cards') + ':\n\n' + falhas.join('\n'));
+  } else {
+    toast(plural(ok, 'card excluído', 'cards excluídos') + '.');
+  }
+}
+
 /* Ordenação dos cards dentro de cada coluna. A escolha fica no navegador. */
 let funilOrdemAtual = 'data_desc';
 try{ funilOrdemAtual = localStorage.getItem('fiorella-funil-ordem') || 'data_desc'; }catch(e){}
@@ -4698,12 +4833,15 @@ function funilRenderBoard(){
     }
     cards.forEach(c => corpo.appendChild(funilMontarCard(c, idx)));
   });
+  atualizarBarraSelecao();
 }
 
 function funilMontarCard(c, idxEtapa){
   const div = document.createElement('div');
   const clicavel = c.tipo === 'ata' && admLiberado;
-  div.className = 'funil-card' + (clicavel ? ' clicavel' : '');
+  div.className = 'funil-card' + (clicavel ? ' clicavel' : '') +
+                  (funilSelecao.has(c.id) ? ' selecionado' : '');
+  div.dataset.card = c.id;
   const hr = horaBR(c.hora);
   div.innerHTML =
     '<div class="data">' + dataBR(c.data) + (hr ? ' · ' + esc(hr) : '') +
@@ -4712,6 +4850,18 @@ function funilMontarCard(c, idxEtapa){
     (c.numero ? '<div class="num">nº ' + String(c.numero).padStart(4,'0') + '</div>' : '') +
     ((funilOrdemAtual === 'etapa_asc' || funilOrdemAtual === 'etapa_desc')
       ? '<div class="num">Nesta etapa ' + esc(haQuantoTempo(c.etapa_em || c.criado_em)) + '</div>' : '');
+
+  if(admLiberado){
+    const sel = document.createElement('label');
+    sel.className = 'card-sel';
+    sel.title = 'Selecionar este card';
+    sel.innerHTML = '<input type="checkbox"' + (funilSelecao.has(c.id) ? ' checked' : '') + '>';
+    sel.addEventListener('click', ev => ev.stopPropagation());
+    sel.querySelector('input').addEventListener('change', ev=>{
+      alternarSelecao(c.id, ev.target.checked);
+    });
+    div.appendChild(sel);
+  }
 
   if(c.tipo === 'agenda'){
     const btn = document.createElement('button');
